@@ -39,12 +39,11 @@ public class BaseObject : MonoBehaviour
         rb=GetComponent<Rigidbody>();
         if (rb == null) Debug.Log(gameObject.name + "未挂载Rigidbody");
 
-        GameObject canvasGo = GameObject.Find("Canvas");
-        if (canvasGo != null)
-        {
-            canvasRt = canvasGo.GetComponent<RectTransform>();
-            canvas = canvasGo.GetComponent<Canvas>();
-        }
+        // 场景中不再常驻 Canvas：改为运行时通过 UIManager 单例获取
+        //（首次访问 UIManager 时若场景没有 Canvas 会自动创建并 DontDestroyOnLoad）
+        Transform uiCanvasTrans = UIManager.Instance.canvasTrans;
+        canvasRt = uiCanvasTrans.GetComponent<RectTransform>();
+        canvas = uiCanvasTrans.GetComponent<Canvas>();
         floatingDamagePre = Resources.Load<GameObject>("Prefabs/UI/FloatingDamage");
         if (floatingDamagePre == null)
             Debug.LogWarning("FloatingDamage 预制体未找到：Resources/Prefabs/UI/FloatingDamage 路径是否正确？");
@@ -55,14 +54,15 @@ public class BaseObject : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
-        
+
     }
+
     public virtual void Injured(BaseObject attacker,float extraHarm)
     {
         hp -= attacker.atk * extraHarm;
-        Debug.Log(attacker.gameObject.name + "攻击了" + gameObject.name);
+        Debug.Log(gameObject.name + "受到了" + attacker.gameObject.name);
         if (hp <= 0)
         {
             hp = 0;

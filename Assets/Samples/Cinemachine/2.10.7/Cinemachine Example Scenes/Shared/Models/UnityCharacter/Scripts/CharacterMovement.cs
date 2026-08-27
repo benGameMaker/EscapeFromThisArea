@@ -67,7 +67,7 @@ namespace Cinemachine.Examples
             anim.SetFloat("Direction", direction);
             anim.SetBool("isSprinting", isSprinting);
 
-            // Update target direction relative to the camera view or player forward
+            // Update target direction relative to the camera view or driver forward
             var tr = useCharacterForward ? transform : mainCamera.transform;
             var right = tr.right;
             var forward = tr.forward;

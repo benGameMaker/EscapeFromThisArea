@@ -44,8 +44,8 @@ public class WeaponSwitching : MonoBehaviour
             }
         }
 
-        Debug.Log("当前手中武器有：");
-        foreach (Transform t in weaponLists) Debug.Log(t.gameObject.name);
+        //Debug.Log("当前手中武器有：");
+        //foreach (Transform t in weaponLists) Debug.Log(t.gameObject.name);
     }
 
     void Update()

@@ -26,7 +26,6 @@ public class WeaponControl : MonoBehaviour
     void Start()
     {
         FirePoint = transform.Find("FirePoint");
-        owner = GetComponentInParent<BaseObject>();
 
         curCapacity = capacity;
 
@@ -40,6 +39,14 @@ public class WeaponControl : MonoBehaviour
             bulletPoolMaxSize
         );
 
+    }
+
+    //通过函数设置武器归属者（上车时由VehicleController调用传入玩家，用于子弹伤害归属）
+    public void SetOwner(BaseObject newOwner)
+    {
+        if(newOwner!=null)Debug.Log(name + "获取到了" + newOwner + "的信息");
+        else Debug.Log(name + "获取到了" + newOwner + "的信息-------失败！！！！！！！！");
+        owner = newOwner;
     }
 
     // Update is called once per frame

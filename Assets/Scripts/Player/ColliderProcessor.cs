@@ -77,12 +77,10 @@ public class ColliderProcessor : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log(gameObject.name+"接触了"+ collision.gameObject.name);
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        Debug.Log(gameObject.name + "离开了" + collision.gameObject.name);
     }
 
 }

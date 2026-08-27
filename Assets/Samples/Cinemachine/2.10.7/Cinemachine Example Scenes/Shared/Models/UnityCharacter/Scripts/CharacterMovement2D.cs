@@ -73,7 +73,7 @@ namespace Cinemachine.Examples
                 if (input.x > 0f) targetrot = Quaternion.Euler(0, 90, 0);
                 headingleft = !headingleft;
             }
-            // Rotate player if direction changes
+            // Rotate driver if direction changes
             var rot = Quaternion.Lerp(rb.rotation, targetrot, Time.deltaTime * 20f);
 
             // Rigidbody.MoveRotation breaks interpolation for non-kinematic rigidbodies, so don't use it

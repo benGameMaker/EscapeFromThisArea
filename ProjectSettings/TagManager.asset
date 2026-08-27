@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Zombie
+  - Vehicle
+  - Item
+  - Bullet
   layers:
   - Default
   - TransparentFX
@@ -13,10 +16,10 @@ TagManager:
   - Water
   - UI
   - Zombie
-  - 
-  - 
-  - 
-  - 
+  - Vehicle
+  - Item
+  - Invisible
+  - Bullet
   - 
   - 
   - 

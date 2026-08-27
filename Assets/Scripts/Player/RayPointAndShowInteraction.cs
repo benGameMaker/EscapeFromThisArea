@@ -103,7 +103,7 @@ public class RayPointAndShowInteraction : MonoBehaviour
         else
         {
             UIManager.Instance.GetPanel<InteractionPanel>().HideMe(() => { });
-            Debug.Log("检测到的物体(" + item.name + ") 没有面板");
+            //Debug.Log("检测到的物体(" + item.name + ") 没有面板");
         }
     }
 }

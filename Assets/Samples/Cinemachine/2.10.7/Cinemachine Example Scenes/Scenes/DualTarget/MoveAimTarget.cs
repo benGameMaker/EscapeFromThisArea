@@ -15,7 +15,7 @@ namespace Cinemachine.Examples
 
         [TagField]
         [Tooltip("Obstacles with this tag will be ignored.  "
-            + "It's a good idea to set this field to the player's tag")]
+            + "It's a good idea to set this field to the driver's tag")]
         public string IgnoreTag = string.Empty;
 
         /// <summary>The Vertical axis.  Value is -90..90. Controls the vertical orientation</summary>

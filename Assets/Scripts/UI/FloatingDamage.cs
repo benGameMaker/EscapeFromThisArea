@@ -22,14 +22,8 @@ public class FloatingDamage : MonoBehaviour
 
     bool isInitialized;
 
-    void Awake()
-    {
-        if (!isInitialized) Debug.Log("飘动伤害初始化失败");
-    }
-
     /// <summary>
-    /// 由调用方（如 BaseObject）在实例化后、生成文本前显式注入依赖，
-    /// 避免内部重复查找 GameObject.Find("Canvas")，也保证 Awake 中未就绪时可被补齐。
+    /// 由调用方（如 BaseObject）在实例化后、生成文本前显式注入依赖。
     /// </summary>
     public void InjectDependencies(Canvas targetCanvas, RectTransform targetCanvasRt, Camera camera = null)
     {

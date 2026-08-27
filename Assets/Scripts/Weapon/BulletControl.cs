@@ -25,7 +25,7 @@ public class BulletControl : MonoBehaviour
         weaponControl = wc;
         owner = wc.owner;
         isInPool = false;
-
+        if (wc.owner == null) Debug.Log(wc.name + "这把武器没有主人");
         // 重置刚体速度，避免复用时残留上次的力
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -76,6 +76,7 @@ public class BulletControl : MonoBehaviour
     {
         var go = Instantiate(effectPrefab, transform.position, Quaternion.LookRotation(collision.contacts[0].normal));
         Destroy(go, 1f);
+        if (owner == null) Debug.Log("owner为空");
         if (collision.gameObject.CompareTag("Zombie"))
         {
             collision.gameObject.GetComponent<BaseObject>().Injured(owner, weaponControl.harmMultiplier);

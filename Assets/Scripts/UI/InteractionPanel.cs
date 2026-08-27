@@ -21,7 +21,7 @@ public class InteractionPanel : BasePanel
     {
         loaclRt = GetComponent<RectTransform>();
         HideMe(() => { });
-        Debug.Log("InteractionPanel初始化完成");
+        //Debug.Log("InteractionPanel初始化完成");
     }
 
     protected override void Update()
@@ -52,7 +52,7 @@ public class InteractionPanel : BasePanel
 
         txtGuidance.text = textG;
         txtItem.text = textI;
-        Debug.Log("正在显示" + itemPos.gameObject.name + "交互信息");
+        //Debug.Log("正在显示" + itemPos.gameObject.name + "交互信息");
     }
 
     Vector3 screenPostion;
@@ -70,7 +70,7 @@ public class InteractionPanel : BasePanel
         Vector2 finalUiOffset = overrideUiOffset ?? uiOffset;
         loaclRt.anchoredPosition = loaclPoint + finalUiOffset;
 
-        Debug.Log("正在跟踪" + itemPos.gameObject.name + "的位置");
+        //Debug.Log("正在跟踪" + itemPos.gameObject.name + "的位置");
     }
     public override void ShowMe()
     {

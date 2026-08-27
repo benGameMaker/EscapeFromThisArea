@@ -52,7 +52,7 @@ public class PlayerController : BaseObject
         cco = transform.Find("FreeLook Camera").GetComponentInChildren<CinemachineCameraOffset>();
     }
 
-    void Update()
+    protected override void Update()
     {
         animator.SetBool("Static_b", isStatic);
 
