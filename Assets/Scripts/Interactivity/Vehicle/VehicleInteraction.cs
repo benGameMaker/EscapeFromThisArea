@@ -44,8 +44,8 @@ public class VehicleInteraction : BaseInteractivity
         if (vehicle != null)
         {
             vehicle.SetWeaponsOwner(obj.GetComponent<BaseObject>());
-            if (obj.GetComponent<BaseObject>().name != null) Debug.Log("VehicleInteraction传入玩家信息" + obj.GetComponent<BaseObject>().name);
-            else Debug.Log("VehicleInteraction传入玩家信息" + obj.GetComponent<BaseObject>().name+"------失败！！！！！！！！！！");
+            //if (obj.GetComponent<BaseObject>().name != null) Debug.Log("VehicleInteraction传入玩家信息" + obj.GetComponent<BaseObject>().name);
+            //else Debug.Log("VehicleInteraction传入玩家信息" + obj.GetComponent<BaseObject>().name+"------失败！！！！！！！！！！");
         }
         else Debug.Log("vehicle不存在");
 

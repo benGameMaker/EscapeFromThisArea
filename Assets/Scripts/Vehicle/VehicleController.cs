@@ -22,8 +22,8 @@ public class VehicleController : MonoBehaviour
 
     [Tooltip("摄像机瞄准射线的最大距离，超过该距离武器指向射线末端")]
     public float aimRayDistance = 100f;
-    [Tooltip("设置武器射速")]
-    public float fireRate = 10f;
+
+    float fireRate = 10f;
 
     Vector2 inputAxis;
     Transform mainCameraPos;
@@ -66,8 +66,8 @@ public class VehicleController : MonoBehaviour
             WeaponControl wc = weapon.GetComponent<WeaponControl>();
             if (wc != null)
             {
+                wc.enableExclusionLayer = true;
                 weaponLists.Add(wc);
-                weapon.gameObject.SetActive(false);
             }
         }
         if (weaponLists.Count > 0) SwitchToWeapon(0);
@@ -161,26 +161,25 @@ public class VehicleController : MonoBehaviour
     {
         if (weaponLists.Count == 0) return;
 
-        //隐藏当前武器
-        if (curWeapon != null) curWeapon.gameObject.SetActive(false);
 
         curWeaponIndex = ((index % weaponLists.Count) + weaponLists.Count) % weaponLists.Count;
         curWeapon = weaponLists[curWeaponIndex];
-        curWeapon.gameObject.SetActive(true);
+        fireRate = curWeapon.fireRate;
+        
     }
     //为所有武器设置归属者（上车时由VehicleInteraction传入玩家，使子弹伤害归属玩家）
     public void SetWeaponsOwner(BaseObject owner)
     {
         CollectWeapons(); //兜底：确保武器列表已收集（组件被禁用时Start未执行）
-        Debug.Log(name + "拥有" + weaponLists.Count + "把武器");
+        //Debug.Log(name + "拥有" + weaponLists.Count + "把武器");
         for (int i = 0; i < weaponLists.Count; i++)
         {
             Debug.Log("正在给" + weaponLists[i].name + "传入拥有者");
             if (weaponLists[i] != null)
             {
                 weaponLists[i].SetOwner(owner);
-                if (owner != null) Debug.Log("向" + weaponLists[i].name + "传入" + owner.name + "的信息");
-                else Debug.Log("向" + weaponLists[i].name + "传入" + owner.name + "的信息---失败!!!!!!!!!!!");
+                //if (owner != null) Debug.Log("向" + weaponLists[i].name + "传入" + owner.name + "的信息");
+                //else Debug.Log("向" + weaponLists[i].name + "传入" + owner.name + "的信息---失败!!!!!!!!!!!");
             }
         }
     }

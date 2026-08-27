@@ -61,6 +61,11 @@ public class BaseObject : MonoBehaviour
 
     public virtual void Injured(BaseObject attacker,float extraHarm)
     {
+        if(attacker == null)
+        {
+            Debug.Log("攻击对象为空"); 
+            return;
+        }
         hp -= attacker.atk * extraHarm;
         Debug.Log(gameObject.name + "受到了" + attacker.gameObject.name);
         if (hp <= 0)

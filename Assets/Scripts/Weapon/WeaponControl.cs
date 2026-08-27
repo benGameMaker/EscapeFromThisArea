@@ -8,11 +8,17 @@ public class WeaponControl : MonoBehaviour
     public Transform FirePoint;
     public GameObject BulletPre;
     public GameObject FirePre;
+    [Tooltip("用于车上使用武器时的武器射速")]
+    public float fireRate = 100f;
 
     public float harmMultiplier = 1;
     public int capacity;
     public int bulletPoolDefaultCapacity = 10;
     public int bulletPoolMaxSize = 100;
+    [Tooltip("在启用子弹忽略层级，这把武器打出的子弹不会命中的层级")]
+    public LayerMask ignorelLayer;
+    public bool enableExclusionLayer;
+    LayerMask originalExcludeLayer;
 
     [HideInInspector]
     public int curCapacity;
@@ -26,7 +32,7 @@ public class WeaponControl : MonoBehaviour
     void Start()
     {
         FirePoint = transform.Find("FirePoint");
-
+        owner = GetComponentInParent<BaseObject>();
         curCapacity = capacity;
 
         bulletPool = new ObjectPool<GameObject>(
@@ -44,8 +50,8 @@ public class WeaponControl : MonoBehaviour
     //通过函数设置武器归属者（上车时由VehicleController调用传入玩家，用于子弹伤害归属）
     public void SetOwner(BaseObject newOwner)
     {
-        if(newOwner!=null)Debug.Log(name + "获取到了" + newOwner + "的信息");
-        else Debug.Log(name + "获取到了" + newOwner + "的信息-------失败！！！！！！！！");
+        //if(newOwner!=null)Debug.Log(name + "获取到了" + newOwner + "的信息");
+        //else Debug.Log(name + "获取到了" + newOwner + "的信息-------失败！！！！！！！！");
         owner = newOwner;
     }
 
@@ -72,11 +78,23 @@ public class WeaponControl : MonoBehaviour
 
     GameObject CreateBullet()
     {
-        return Instantiate(BulletPre);
+        if (bulletPool.CountAll <= 0)
+        {
+            GameObject bullet = Instantiate(BulletPre);
+            originalExcludeLayer = bullet.GetComponent<Rigidbody>().excludeLayers;
+            return bullet;
+        }
+        else
+        {
+            return Instantiate(BulletPre);
+        }
     }
 
     void OnBulletGet(GameObject bullet)
     {
+        Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+        if (enableExclusionLayer) bulletRb.excludeLayers = ignorelLayer;
+        else bulletRb.excludeLayers = originalExcludeLayer;
         bullet.transform.SetPositionAndRotation(FirePoint.position, FirePoint.rotation);
         bullet.SetActive(true);
         var bc = bullet.GetComponent<BulletControl>();
