@@ -564,7 +564,6 @@ MonoBehaviour:
   maxSteeringAngle: 30
   aimRayDistance: 100
   fireRate: 10
-  rb: {fileID: 0}
 --- !u!114 &7071518494022169807
 MonoBehaviour:
   m_ObjectHideFlags: 0
