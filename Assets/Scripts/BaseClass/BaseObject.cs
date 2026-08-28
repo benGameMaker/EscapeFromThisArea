@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class BaseObject : MonoBehaviour
 {
-    public float hp = 100;
-    public float atk = 10;
+    [HideInInspector]
+    public float HP;
+    public float maxHP = 100f;
+    public float atk = 10f;
     [Tooltip("基于动画自带的速度改变物体移速的倍率")]
     public float moveSpeedMultiplier = 1;
     [Tooltip("物体转身速度")]
@@ -29,11 +31,9 @@ public class BaseObject : MonoBehaviour
 
     protected virtual void Awake()
     {
-        if (animator == null)
-            animator = GetComponent<Animator>();
-        if (animator == null)
-            Debug.LogError(gameObject.name + " animator未获取，请检查Animator组件是否挂载");
-
+        HP = maxHP;
+        animator = GetComponent<Animator>();
+        if (animator == null) Debug.LogError(gameObject.name + " animator未获取，请检查Animator组件是否挂载");
         myBox = GetComponent<BoxCollider>();
         if (myBox == null) Debug.Log(gameObject.name + "未挂载BoxCollider");
         rb=GetComponent<Rigidbody>();
@@ -66,11 +66,11 @@ public class BaseObject : MonoBehaviour
             Debug.Log("攻击对象为空"); 
             return;
         }
-        hp -= attacker.atk * extraHarm;
+        HP -= attacker.atk * extraHarm;
         Debug.Log(gameObject.name + "受到了" + attacker.gameObject.name);
-        if (hp <= 0)
+        if (HP <= 0)
         {
-            hp = 0;
+            HP = 0;
             Death();
         }
         if (floatingDamage)

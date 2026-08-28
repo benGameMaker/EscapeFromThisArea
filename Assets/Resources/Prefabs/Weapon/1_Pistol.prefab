@@ -620,5 +620,11 @@ MonoBehaviour:
   capacity: 10
   bulletPoolDefaultCapacity: 10
   bulletPoolMaxSize: 100
+  ignorelLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  enableExclusionLayer: 0
+  WeaponIcon: {fileID: 21300000, guid: 880ee01b0daaec9418d65516c1f36fc6, type: 3}
+  BulletIcon: {fileID: 21300000, guid: 54078cb9c407e6c4fb687599315c869f, type: 3}
   curCapacity: 0
   owner: {fileID: 0}

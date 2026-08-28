@@ -18,13 +18,16 @@ public class WeaponControl : MonoBehaviour
     [Tooltip("在启用子弹忽略层级，这把武器打出的子弹不会命中的层级")]
     public LayerMask ignorelLayer;
     public bool enableExclusionLayer;
-    LayerMask originalExcludeLayer;
+    public Sprite WeaponIcon;
+    public Sprite BulletIcon;
 
+    LayerMask originalExcludeLayer;
     [HideInInspector]
     public int curCapacity;
     [HideInInspector]
     public BaseObject owner;
 
+    PlayerPanel pp;
 
     // 子弹对象池
     ObjectPool <GameObject> bulletPool;
@@ -66,6 +69,8 @@ public class WeaponControl : MonoBehaviour
         if (curCapacity > 0)
         {
             curCapacity--;
+            if (pp == null) pp = UIManager.Instance.GetPanel<PlayerPanel>();
+            pp.UpdataCurCapacity(curCapacity);
             if(curCapacity < 0) { curCapacity = 0; }
             // 从对象池获取子弹
             bulletPool.Get();

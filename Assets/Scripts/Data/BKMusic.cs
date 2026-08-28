@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BKMusic: MonoBehaviour
 {
-    static BKMusic instance = new BKMusic();
+    static BKMusic instance;
     public static BKMusic Instance => instance;
 
     AudioSource bkSource;

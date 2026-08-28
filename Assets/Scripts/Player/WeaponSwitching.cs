@@ -9,7 +9,6 @@ using UnityEngine.InputSystem;
 public class WeaponSwitching : MonoBehaviour
 {
     public List<Transform> weaponLists;
-    public TextCapacityUI capacityUI;
 
     public GameObject Knife;
 
@@ -24,6 +23,7 @@ public class WeaponSwitching : MonoBehaviour
     PlayerController pc;
     ColliderProcessor cp;
     Rig rigHands;
+    PlayerPanel pp;
 
     void Start()
     {
@@ -33,7 +33,8 @@ public class WeaponSwitching : MonoBehaviour
         LeftHand = transform.Find("WeaponHolder/LeftHand");
         RightHand = transform.Find("WeaponHolder/RightHand");
         rigHands = transform.Find("Rig_HandsIK").GetComponentInChildren<Rig>();
-        if (capacityUI == null) capacityUI = FindObjectOfType<TextCapacityUI>();
+        if (pp == null) pp = UIManager.Instance.GetPanel<PlayerPanel>();
+        else pp.HideCapacityDataUI();
 
         weaponLists.Clear();
         if (weaponHolder != null)
@@ -112,7 +113,7 @@ public class WeaponSwitching : MonoBehaviour
     {
         Debug.Log("下一把武器是：" + weapon.gameObject.name);
 
-        if (capacityUI != null) capacityUI.GetCapacityDataToUI(weapon.GetComponent<WeaponControl>());
+        pp.SetCapacityDataToUI(weapon.GetComponent<WeaponControl>());
 
         rigHands.weight = 1f;
         weapon.gameObject.SetActive(true);
@@ -130,7 +131,7 @@ public class WeaponSwitching : MonoBehaviour
 
         pc.isHoldingWeapon = false;
 
-        if (capacityUI != null) capacityUI.HideUI();
+        pp.HideCapacityDataUI();
 
         StartCoroutine(DelayExecute(0.3f, Weapon, (Weapon) =>
         {
@@ -143,5 +144,4 @@ public class WeaponSwitching : MonoBehaviour
         yield return new WaitForSeconds(time);
         callback?.Invoke(transform);
     }
-
 }

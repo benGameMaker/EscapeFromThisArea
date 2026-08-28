@@ -33,6 +33,7 @@ public class PlayerController : BaseObject
     Coroutine delayedHolsterCoroutine = null;
     ColliderProcessor cp;
     MeleeRange mr;
+    PlayerPanel pp;
     [HideInInspector]
     public WeaponControl weaponControl;
     CinemachineCameraOffset cco;
@@ -50,6 +51,9 @@ public class PlayerController : BaseObject
         rigAim = transform.Find("Rig_WeaponAim").GetComponentInChildren<Rig>();
         rigGen = transform.Find("Rig_WeaponPose").GetComponentInChildren<Rig>();
         cco = transform.Find("FreeLook Camera").GetComponentInChildren<CinemachineCameraOffset>();
+        pp = UIManager.Instance.GetPanel<PlayerPanel>();
+        if (pp != null) pp.UpdataHP(HP, maxHP);
+        else Debug.LogWarning("PlayerPanel获取失败");
     }
 
     protected override void Update()
@@ -350,5 +354,10 @@ public class PlayerController : BaseObject
         base.Death();
         PlayerInput playerInput = GetComponent<PlayerInput>();
         playerInput.enabled = false;
+    }
+    public override void Injured(BaseObject attacker, float extraHarm)
+    {
+        base.Injured(attacker, extraHarm);
+        pp.UpdataHP(HP, maxHP);
     }
 }
