@@ -33,8 +33,15 @@ public class VehicleDamage : MonoBehaviour
     public void RepairVehicle(int num)
     {
         curIntegrity += num * Random.Range(0.2f, 2f);
-        if(curIntegrity > 80f)
+        Debug.Log("车辆恢复了" + curIntegrity + "完整度");
+        if (curIntegrity > maxIntegrity) curIntegrity = maxIntegrity;
+        vp.UpdataCurIntegrity(curIntegrity, maxIntegrity);
+        if (curIntegrity >= 80f && isBroke)
         {
+            isBroke = false;
+            vc.SetVehicleState(!isBroke);
+            vp.ShowOrHideNotice(isBroke);
+            Debug.Log("车辆车辆已基本修复");
 
         }
     }
@@ -42,7 +49,7 @@ public class VehicleDamage : MonoBehaviour
     {
         curIntegrity -= value;
         Debug.Log("这次撞击损失了" + value + "车辆完整度");
-        vp.UpdataCurIntegrity(curIntegrity, maxIntegrity);
+        vp.UpdataCurIntegrity((curIntegrity <= 0 ? 0 : curIntegrity), maxIntegrity);
         if (curIntegrity <= 0)
         {
             curIntegrity = 0;

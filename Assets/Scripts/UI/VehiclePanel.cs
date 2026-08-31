@@ -39,9 +39,9 @@ public class VehiclePanel : BasePanel
     public void UpdataCurIntegrity(float curIntegrity, float maxIntegrity)
     {
         if (!isInitialized) maxIntegritywidth = IntegrityBack.rectTransform.rect.width;
-        Debug.Log("更新车辆curIntegrity值");
+        //Debug.Log("更新车辆curIntegrity值");
         IntegrityText.text = curIntegrity.ToString("F1");
-        Debug.Log("curIntegrity: " + curIntegrity + " / maxIntegrity: " + maxIntegrity + "|| maxIntegritywidth: " + maxIntegritywidth);
+        //Debug.Log("curIntegrity: " + curIntegrity + " / maxIntegrity: " + maxIntegrity + "|| maxIntegritywidth: " + maxIntegritywidth);
         (IntegrityLine.transform as RectTransform).sizeDelta = new Vector2((float)curIntegrity / maxIntegrity * maxIntegritywidth, 50f);
     }
     public void UpdataCurCapacity(int cur)

@@ -37,9 +37,9 @@ public class PlayerPanel : BasePanel
     }
     public void UpdataHP(float HP,float maxHP)
     {
-        Debug.Log("跟新玩家HP值");
+        //Debug.Log("跟新玩家HP值");
         HPText.text = HP.ToString("F1");
-        Debug.Log("HP: " + HP + " / maxHP: " + maxHP + "|| maxHPwidth: " + maxHPwidth);
+        //Debug.Log("HP: " + HP + " / maxHP: " + maxHP + "|| maxHPwidth: " + maxHPwidth);
         (HPLine.transform as RectTransform).sizeDelta = new Vector2((float)HP / maxHP * maxHPwidth, 50f);
     }
     public void UpdataCurCapacity(int cur)
