@@ -27,7 +27,7 @@ public class VehicleDamage : MonoBehaviour
     {
         curVelocity = transform.InverseTransformDirection(rb.velocity).z;
         if (vp != null && vp.isShow) vp.UpdataCurVelocity(curVelocity);
-        else Debug.Log("未获取到VehiclePanel面板或者该面板已经隐藏");
+        //else Debug.Log("未获取到VehiclePanel面板或者该面板已经隐藏");
     }
 
     public void RepairVehicle(int num)

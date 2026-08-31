@@ -12,6 +12,8 @@ TagManager:
   - Zombie_Body
   - Player_Head
   - Player_Body
+  - Cell
+  - ItemUnit
   layers:
   - Default
   - TransparentFX
