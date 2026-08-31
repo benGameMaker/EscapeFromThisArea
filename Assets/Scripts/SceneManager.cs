@@ -6,7 +6,7 @@ public class SceneManager : MonoBehaviour
 {
     static SceneManager instance;
     public static SceneManager Instance => instance;
-    public BaseObject testObject;
+    public GameObject testObject;
     public BaseObject atker;
     private void Awake()
     {
@@ -24,7 +24,12 @@ public class SceneManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.G))
         {
-            testObject.Injured(testObject, 1f);
+            //testObject.Injured(testObject, 1f);
+            testObject.GetComponent<VehicleDamage>().DamageVehicle(100f);
+        }
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            testObject.GetComponent<VehicleDamage>().RepairVehicle(10);
         }
     }
 }

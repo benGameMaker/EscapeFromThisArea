@@ -12,6 +12,7 @@ public class VehiclePanel : BasePanel
     public Image IntegrityLine;
     public TextMeshProUGUI IntegrityText;
     public TextMeshProUGUI VelocityText;
+    public GameObject VehicleDamagedNotice;
 
     public Image WeaponIcon;
     public Image Separator;
@@ -39,7 +40,7 @@ public class VehiclePanel : BasePanel
     {
         if (!isInitialized) maxIntegritywidth = IntegrityBack.rectTransform.rect.width;
         Debug.Log("更新车辆curIntegrity值");
-        IntegrityText.text = curIntegrity.ToString();
+        IntegrityText.text = curIntegrity.ToString("F1");
         Debug.Log("curIntegrity: " + curIntegrity + " / maxIntegrity: " + maxIntegrity + "|| maxIntegritywidth: " + maxIntegritywidth);
         (IntegrityLine.transform as RectTransform).sizeDelta = new Vector2((float)curIntegrity / maxIntegrity * maxIntegritywidth, 50f);
     }
@@ -80,6 +81,14 @@ public class VehiclePanel : BasePanel
         }
         EndReloadProgress();
         if (CapacityData != null) CapacityData.SetActive(false);
+    }
+    //通知面板通知玩家已经车辆损毁，需要维修
+    public void ShowOrHideNotice(bool IsOrNo)
+    {
+
+        if (IsOrNo) VehicleDamagedNotice.SetActive(true);
+        else VehicleDamagedNotice.SetActive(false);
+        Debug.Log("通知面板：" + VehicleDamagedNotice.activeSelf);
     }
 
     // 换弹开始事件回调：按武器ReloadTime匀速将准星填充从0补到1

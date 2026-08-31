@@ -23,6 +23,9 @@ public class VehicleController : MonoBehaviour
     [Tooltip("摄像机瞄准射线的最大距离，超过该距离武器指向射线末端")]
     public float aimRayDistance = 100f;
 
+    [Tooltip("反向行驶刹车时，车速（本地Z轴速度）降到该值以下才恢复驱动力")]
+    public float brakeStopSpeed = 1f;
+
     float fireRate = 10f;
 
     Vector2 inputAxis;
@@ -38,6 +41,8 @@ public class VehicleController : MonoBehaviour
     bool isFiring = false;
     float nextFireTime = 0f;
     Coroutine reloadCoroutine;
+    bool isBrakeHeld = false;
+    bool isCanDrive = true;
 
     void Awake()
     {
@@ -89,8 +94,7 @@ public class VehicleController : MonoBehaviour
 
     public void Drive(InputAction.CallbackContext context)
     {
-
-        inputAxis = context.ReadValue<Vector2>();
+        if (isCanDrive) inputAxis = context.ReadValue<Vector2>();
     }
     public void Fire(InputAction.CallbackContext context)
     {
@@ -113,17 +117,13 @@ public class VehicleController : MonoBehaviour
     {
         if (context.performed)
         {
-            flWheel.brakeTorque = brakeTorque;
-            frWheel.brakeTorque = brakeTorque;
-            rlWheel.brakeTorque = brakeTorque;
-            rrWheel.brakeTorque = brakeTorque;
+            isBrakeHeld = true;
+            ApplyBrake(brakeTorque);
         }
         else if (context.canceled)
         {
-            flWheel.brakeTorque = 0;
-            frWheel.brakeTorque = 0;
-            rlWheel.brakeTorque = 0;
-            rrWheel.brakeTorque = 0;
+            isBrakeHeld = false;
+            ApplyBrake(0);
         }
     }
     public void DropOff(InputAction.CallbackContext context)
@@ -186,6 +186,9 @@ public class VehicleController : MonoBehaviour
 
         VehiclePanel vp = UIManager.Instance.ShowPanel<VehiclePanel>();
         if (curWeapon != null) vp.ShowCapacityDataToUI(curWeapon);
+
+        if (vd.isBroke) vp.ShowOrHideNotice(true);
+        else vp.ShowOrHideNotice(false);
         vp.UpdataCurIntegrity(vd.curIntegrity, vd.maxIntegrity);
         vd.vp = UIManager.Instance.GetPanel<VehiclePanel>();
     }
@@ -214,6 +217,17 @@ public class VehicleController : MonoBehaviour
             }
         }
     }
+    public void SetVehicleState(bool state)
+    {
+        isCanDrive = state;
+        Debug.Log("车辆驾驶状态设置为：" + isCanDrive);
+    }
+    IEnumerator ReloadAfterDelay(WeaponControl weapon)
+    {
+        yield return new WaitForSeconds(Mathf.Max(0.01f, weapon.ReloadTime * 2f));
+        weapon.Reload();
+        reloadCoroutine = null;
+    }
     void UpdateWeaponAim()
     {
         if (WeaponPos == null || mainCameraPos == null) return;
@@ -235,17 +249,39 @@ public class VehicleController : MonoBehaviour
             WeaponPos.rotation = Quaternion.LookRotation(dir);
         }
     }
-    IEnumerator ReloadAfterDelay(WeaponControl weapon)
-    {
-        yield return new WaitForSeconds(Mathf.Max(0.01f, weapon.ReloadTime * 2f));
-        weapon.Reload();
-        reloadCoroutine = null;
-    }
 
+    //移动：当输入方向与当前车速方向相反时先刹车制动，减速到brakeStopSpeed以内再恢复驱动力
     void Move()
     {
-        rlWheel.motorTorque = motorTorque * inputAxis.y;
-        rrWheel.motorTorque = motorTorque * inputAxis.y;
+        float inputY = inputAxis.y;
+        float speed = vd != null ? vd.curVelocity : 0f;
+
+        //反向意图：想前进但车在较快倒车，或想倒车但车在较快前进
+        bool reverseIntent = (inputY > 0.01f && speed < -brakeStopSpeed)
+                          || (inputY < -0.01f && speed > brakeStopSpeed);
+
+        if (reverseIntent)
+        {
+            //先刹车制动，暂不施加驱动力
+            ApplyBrake(brakeTorque);
+            rlWheel.motorTorque = 0;
+            rrWheel.motorTorque = 0;
+            return;
+        }
+
+        //车速已降到阈值范围内（或方向一致），恢复驱动力
+        //若反向刹车结束且未按Space，需清掉之前施加的刹车
+        if (!isBrakeHeld) ApplyBrake(0);
+
+        rlWheel.motorTorque = motorTorque * inputY;
+        rrWheel.motorTorque = motorTorque * inputY;
+    }
+    void ApplyBrake(float torque)
+    {
+        flWheel.brakeTorque = torque;
+        frWheel.brakeTorque = torque;
+        rlWheel.brakeTorque = torque;
+        rrWheel.brakeTorque = torque;
     }
     void Turn()
     {
