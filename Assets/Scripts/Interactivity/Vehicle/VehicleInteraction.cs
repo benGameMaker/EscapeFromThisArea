@@ -38,6 +38,15 @@ public class VehicleInteraction : BaseInteractivity
         obj.transform.localPosition = Vector3.zero;
         obj.transform.localRotation = Quaternion.identity;
 
+        //上车前退出玩家的瞄准状态（isAim=false），下车后回到普通持枪动作（rigAim=0/rigGen=1）
+        PlayerController playerCtrl = obj.GetComponent<PlayerController>();
+        if (playerCtrl != null)
+        {
+            playerCtrl.isAim = false;
+            playerCtrl.rigAim.weight = 0f;
+            playerCtrl.rigGen.weight = 1f;
+        }
+
         obj.SetActive(false);
 
         //将玩家信息传给车辆上的武器（子弹伤害归属玩家）
@@ -51,6 +60,9 @@ public class VehicleInteraction : BaseInteractivity
 
         SetVehicleBehaviour(true);
 
+        //上车后显示车辆UI面板并展示当前武器数据
+        if (vehicle != null) vehicle.ShowVehicleUI();
+
         HideInteractionPanel();
     }
 
@@ -63,6 +75,9 @@ public class VehicleInteraction : BaseInteractivity
         }
 
         SetVehicleBehaviour(false);
+
+        //下车后隐藏车辆UI面板
+        if (vehicle != null) vehicle.HideVehicleUI();
 
         driver.SetActive(true);
         rb.excludeLayers = originalExcludeLayer;

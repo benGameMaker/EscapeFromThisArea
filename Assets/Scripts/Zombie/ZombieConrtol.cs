@@ -14,6 +14,8 @@ public class ZombieConrtol : BaseObject
     protected override void Awake()
     {
         base.Awake();
+        BodyParts.Add(transform.Find("Head").GetComponent<BoxCollider>());
+        BodyParts.Add(transform.Find("Hips_jnt").GetComponent<BoxCollider>());
         ZombieConfig = GetComponent<ZombieConeVisionConfig>();
         mrAtk = transform.Find("MeleeRange_Atk").GetComponent<MeleeRange>();
         mrBashAtk = transform.Find("MeleeRange_BashAtk").GetComponent<MeleeRange>();
@@ -63,7 +65,7 @@ public class ZombieConrtol : BaseObject
     void TriggerMelee()
     {
         if (isDead || ZombieConfig.distance == -1) return;
-        Debug.Log(ZombieConfig.distance);
+        //Debug.Log(ZombieConfig.distance);
         if (ZombieConfig.distance <= bashAtkDistance) animator.SetTrigger("isBashAtk_t");
         else if (ZombieConfig.distance <= atkDistance) animator.SetTrigger("isAtk_t");
     }

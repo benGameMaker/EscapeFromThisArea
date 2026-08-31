@@ -18,10 +18,10 @@ public class ZombieConeVisionConfig : MonoBehaviour
     [Tooltip("追踪时的锥形半角角度（度），总角度=半角*2）")]
     [Range(0, 180)]
     public float traceHalfAngle = 90f;
-
-
     [Tooltip("视野是否可以被障碍物遮挡")]
     public bool checkObstacle = true;
+    [Tooltip("要追踪的目标")]
+    public LayerMask TrackTargets;
 
     public bool detectionVisualFieldVisualization = false;
     public bool traceVisualFieldVisualization = false;
@@ -45,14 +45,19 @@ public class ZombieConeVisionConfig : MonoBehaviour
 
     public void VisibilityDetection(Transform target)
     {
+        // 避免重复计入同一个目标
         if (TracekedTarget != null) return;
-        //Debug.Log("开始追踪" + target.name);
+        Debug.Log("开始追踪" + target.name);
         if (checkObstacle)
         {
             // 发射射线检测是否有障碍物遮挡
-            if (RaycastTag(target, detectionRadius, "Player"))
+            if (RaycastTag(target, detectionRadius))
             {
                 TracekedTarget = target;
+            }
+            else
+            {
+                Debug.Log("有遮挡，" + name + "没能看见" + target.name + "||" + target.tag);
             }
         }
         else
@@ -66,7 +71,7 @@ public class ZombieConeVisionConfig : MonoBehaviour
         agent.isStopped = false;
         agent.SetDestination(targetPoint);
     }
-
+    //持续追踪目标，直至目标超出追踪范围或有障碍物遮挡视野
     public void ExecutionTraceTarget(Transform target)
     {
         Vector3 ZombieToTarget = target.position - DetectionPoint.position;
@@ -75,29 +80,26 @@ public class ZombieConeVisionConfig : MonoBehaviour
         float dot = Vector3.Dot(DetectionPoint.forward, ZombieToTarget.normalized);
         float angle = Mathf.Acos(Mathf.Clamp(dot, -1f, 1f)) * Mathf.Rad2Deg;
 
-        if (ZombieToTarget.magnitude > traceRadius || angle > traceHalfAngle || !RaycastTag(target, traceRadius, "Player"))
+        if (ZombieToTarget.magnitude > traceRadius || angle > traceHalfAngle || !RaycastTag(target, traceRadius))
         {
             TracekedTarget = null;
             distance = -1f;
-            //Debug.Log(gameObject.name + "跟丢玩家");
+            Debug.Log(gameObject.name + "跟丢玩家");
         }
-        //Debug.Log(gameObject.name + "正在追踪玩家");
+        Debug.Log(gameObject.name + "正在追踪玩家");
         NavigationToTargetPoint(target.parent.position);
     }
 
-    bool RaycastTag(Transform target, float length, string tag)
+    bool RaycastTag(Transform target, float length)
     {
         RaycastHit hit;
-        if (Physics.Raycast(
+        return Physics.Raycast(
             DetectionPoint.position,
             target.position - DetectionPoint.position,
             out hit,
-            length
-        ))
-        {
-             return hit.collider.CompareTag(tag);
-        }
-        return false;
+            length,
+            TrackTargets
+        );
     }
 
     #region 调试可视化（在Scene视图中绘制锥形）

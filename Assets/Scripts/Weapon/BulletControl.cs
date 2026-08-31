@@ -79,12 +79,13 @@ public class BulletControl : MonoBehaviour
         if (owner == null) Debug.Log("owner为空");
         if (collision.gameObject.CompareTag("Zombie"))
         {
-            Debug.Log("子弹击中了" + collision.gameObject.name);
-            collision.gameObject.GetComponent<BaseObject>().Injured(owner, weaponControl.harmMultiplier);
+            string part = collision.collider.gameObject.tag;
+            Debug.Log("子弹击中了" + collision.gameObject.name + "的" + part);
+            collision.gameObject.GetComponentInParent<BaseObject>().Injured(owner, (part == "Zombie_Body" ? weaponControl.harmMultiplier : weaponControl.harmMultiplier * 1.5f));
         }
         else
         {
-            Debug.Log("子弹击中的" + collision.gameObject.name+"不是对象基类");
+            Debug.Log("子弹击中的" + collision.gameObject.name+"不是对象基类，他的类型是"+collision.gameObject.tag);
 
         }
         // 碰撞后回收子弹到对象池

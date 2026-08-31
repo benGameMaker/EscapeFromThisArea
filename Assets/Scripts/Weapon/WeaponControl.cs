@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,7 @@ public class WeaponControl : MonoBehaviour
     public GameObject FirePre;
     [Tooltip("用于车上使用武器时的武器射速")]
     public float fireRate = 100f;
-
+    public float ReloadTime;
     public float harmMultiplier = 1;
     public int capacity;
     public int bulletPoolDefaultCapacity = 10;
@@ -27,16 +28,25 @@ public class WeaponControl : MonoBehaviour
     [HideInInspector]
     public BaseObject owner;
 
-    PlayerPanel pp;
+    public event Action<int> OnCapacityChanged;
+    public event Action<float> OnReloadStart;
 
     // 子弹对象池
     ObjectPool <GameObject> bulletPool;
+    private void Awake()
+    {
+        InitCapacity();
+    }
 
+    // 初始化弹匣。物体初始 inactive 时 Awake 不会执行，需由外部（如WeaponSwitching）主动调用
+    public void InitCapacity()
+    {
+        curCapacity = capacity;
+    }
     void Start()
     {
         FirePoint = transform.Find("FirePoint");
         owner = GetComponentInParent<BaseObject>();
-        curCapacity = capacity;
 
         bulletPool = new ObjectPool<GameObject>(
             CreateBullet,
@@ -69,9 +79,9 @@ public class WeaponControl : MonoBehaviour
         if (curCapacity > 0)
         {
             curCapacity--;
-            if (pp == null) pp = UIManager.Instance.GetPanel<PlayerPanel>();
-            pp.UpdataCurCapacity(curCapacity);
             if(curCapacity < 0) { curCapacity = 0; }
+            // 广播弹药数量变化，由订阅的面板（PlayerPanel/VehiclePanel等）刷新显示
+            OnCapacityChanged?.Invoke(curCapacity);
             // 从对象池获取子弹
             bulletPool.Get();
             // 生成火焰特效
@@ -79,7 +89,17 @@ public class WeaponControl : MonoBehaviour
         }
 
     }
+    public void Reload()
+    {
+        curCapacity = capacity;
+        OnCapacityChanged?.Invoke(curCapacity);
+    }
 
+    // 开始换弹：广播换弹开始事件（携带ReloadTime），由外部（玩家/车辆）在换弹行为发生时调用
+    public void StartReload()
+    {
+        OnReloadStart?.Invoke(ReloadTime);
+    }
 
     GameObject CreateBullet()
     {

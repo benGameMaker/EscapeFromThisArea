@@ -585,6 +585,7 @@ MonoBehaviour:
   BulletPre: {fileID: 7829902662320680386, guid: 72dcc63a7f150cd46916577bf8c711f0, type: 3}
   FirePre: {fileID: 4785327272306611209, guid: c3b808182c1d8614fbf842ee0b701698, type: 3}
   fireRate: 5
+  ReloadTime: 1.3
   harmMultiplier: 2
   capacity: 30
   bulletPoolDefaultCapacity: 10

@@ -22,7 +22,7 @@ public class BaseObject : MonoBehaviour
     public Animator animator;
 
     public bool isDead = false;
-    protected BoxCollider myBox;
+    protected List<Collider> BodyParts = new List<Collider>();
     protected Rigidbody rb;
 
     Canvas canvas;
@@ -34,8 +34,6 @@ public class BaseObject : MonoBehaviour
         HP = maxHP;
         animator = GetComponent<Animator>();
         if (animator == null) Debug.LogError(gameObject.name + " animator未获取，请检查Animator组件是否挂载");
-        myBox = GetComponent<BoxCollider>();
-        if (myBox == null) Debug.Log(gameObject.name + "未挂载BoxCollider");
         rb=GetComponent<Rigidbody>();
         if (rb == null) Debug.Log(gameObject.name + "未挂载Rigidbody");
 
@@ -96,7 +94,7 @@ public class BaseObject : MonoBehaviour
     {
         if (animator != null)
             animator.SetBool("isDead_b", true);
-        myBox.enabled = false;
+        foreach (Collider part in BodyParts) part.enabled = false;
         rb.isKinematic = true;
         Debug.Log(gameObject.name + "已死亡");
     }

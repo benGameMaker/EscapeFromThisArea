@@ -43,4 +43,9 @@ public class SettingPanel : BasePanel
             GameDataMgr.Instance.musicData.soundValue = v;
         });
     }
+
+    protected override void Update()
+    {
+        
+    }
 }

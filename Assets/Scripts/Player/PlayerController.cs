@@ -51,6 +51,7 @@ public class PlayerController : BaseObject
         rigAim = transform.Find("Rig_WeaponAim").GetComponentInChildren<Rig>();
         rigGen = transform.Find("Rig_WeaponPose").GetComponentInChildren<Rig>();
         cco = transform.Find("FreeLook Camera").GetComponentInChildren<CinemachineCameraOffset>();
+        BodyParts.Add(transform.Find("Hips_jnt").GetComponent<BoxCollider>());
         pp = UIManager.Instance.GetPanel<PlayerPanel>();
         if (pp != null) pp.UpdataHP(HP, maxHP);
         else Debug.LogWarning("PlayerPanel获取失败");
@@ -178,6 +179,8 @@ public class PlayerController : BaseObject
         if (weaponControl.curCapacity <= 0)
         {
             animator.SetBool("Reload_b", true);
+            // 空仓自动换弹：通知面板播放换弹进度
+            weaponControl.StartReload();
         }
         if (!isAim)
         {
@@ -227,6 +230,8 @@ public class PlayerController : BaseObject
     public void Reload(InputAction.CallbackContext context)
     {
         animator.SetBool("Reload_b", true);
+        // 通知面板播放换弹进度（时长由当前武器ReloadTime决定）
+        if (weaponControl != null) weaponControl.StartReload();
     }
 
     void Movement(Vector3 camForwardFlat)
@@ -269,7 +274,7 @@ public class PlayerController : BaseObject
     public void ReloadCompleted()
     {
         animator.SetBool("Reload_b", false);
-        weaponControl.curCapacity = weaponControl.capacity;
+        weaponControl.Reload();
     }
     public void AimingAction()
     {

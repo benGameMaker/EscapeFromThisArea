@@ -673,6 +673,59 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.35042334, y: 0.0000017285347, z: 0.03416568}
     m_Extent: {x: 1.3956409, y: 1.6845057, z: 0.5929845}
   m_DirtyAABB: 0
+--- !u!1 &1770878857661939984
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7927750022595094939}
+  - component: {fileID: 9157856656068446440}
+  m_Layer: 0
+  m_Name: Head
+  m_TagString: Zombie_Head
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7927750022595094939
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770878857661939984}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: -0.05000305, y: 2.5649877, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8923885451884169949}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &9157856656068446440
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770878857661939984}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.9290094, y: 0.7426602, z: 0.71881104}
+  m_Center: {x: 0.03549531, y: 0.048797905, z: 0.0050964355}
 --- !u!1 &1912128893325418107
 GameObject:
   m_ObjectHideFlags: 0
@@ -1755,7 +1808,6 @@ GameObject:
   - component: {fileID: 1304559306728378742}
   - component: {fileID: 3030383282345898484}
   - component: {fileID: 7102493281363062535}
-  - component: {fileID: 7333706476654780338}
   - component: {fileID: 4037464971117716143}
   - component: {fileID: 2694195902517243703}
   m_Layer: 6
@@ -1781,6 +1833,7 @@ Transform:
   - {fileID: 4035948096091251336}
   - {fileID: 8769157061729709416}
   - {fileID: 8470921979092147042}
+  - {fileID: 7927750022595094939}
   - {fileID: 4049829863039038370}
   - {fileID: 8092259880348611517}
   - {fileID: 5084029082085335509}
@@ -1867,7 +1920,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4e68baf89623e147bab39a387ea4355, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 999999
+  HP: 0
+  maxHP: 100
   atk: 10
   moveSpeedMultiplier: 1
   rotationSpeed: 5
@@ -1885,7 +1939,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3229983896207690296}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 837fd2ba7f42b2747b671eae77c4d07b, type: 3}
   m_Name: 
@@ -1895,34 +1949,16 @@ MonoBehaviour:
   detectionHalfAngle: 45
   traceHalfAngle: 85
   checkObstacle: 1
-  detectionVisualFieldVisualization: 0
-  traceVisualFieldVisualization: 0
+  TrackTargets:
+    serializedVersion: 2
+    m_Bits: 8
+  detectionVisualFieldVisualization: 1
+  traceVisualFieldVisualization: 1
   DetectionPoint: {fileID: 8470921979092147042}
   distance: -1
   agent: {fileID: 0}
   detectionGizmoColor: {r: 0, g: 1, b: 0, a: 1}
   traceGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
---- !u!65 &7333706476654780338
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3229983896207690296}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 3.1077156, z: 1}
-  m_Center: {x: 0, y: 1.5690773, z: 0}
 --- !u!54 &4037464971117716143
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1946,7 +1982,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 1
@@ -3788,9 +3824,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4049829863039038370}
-  m_Layer: 0
+  - component: {fileID: 9087711504849918942}
+  m_Layer: 6
   m_Name: Hips_jnt
-  m_TagString: Untagged
+  m_TagString: Zombie_Body
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3813,6 +3850,27 @@ Transform:
   - {fileID: 931778210165527508}
   m_Father: {fileID: 8923885451884169949}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &9087711504849918942
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5794443592385428610}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.0120955, y: 0.8300779, z: 0.5617676}
+  m_Center: {x: -0.011081338, y: -0.0036997497, z: 0.009887695}
 --- !u!1 &5810137678887601282
 GameObject:
   m_ObjectHideFlags: 0
@@ -4103,9 +4161,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8873939029843610888}
   - component: {fileID: 5175543366601289936}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SA_Zombie_Pilot
-  m_TagString: Untagged
+  m_TagString: Zombie
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

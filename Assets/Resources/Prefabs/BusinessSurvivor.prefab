@@ -445,7 +445,7 @@ Transform:
   m_GameObject: {fileID: 487782938900130294}
   serializedVersion: 2
   m_LocalRotation: {x: 0.11905045, y: 0.018267658, z: -0.0021907263, w: 0.99271774}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.00000023841858, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1270,7 +1270,6 @@ GameObject:
   - component: {fileID: 1267684129594623033}
   - component: {fileID: 8198960227738202158}
   - component: {fileID: 1222814188538428670}
-  - component: {fileID: 2533775408016451140}
   m_Layer: 3
   m_Name: BusinessSurvivor
   m_TagString: Player
@@ -1448,7 +1447,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5732487b27728a140808664c82324319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 100
+  HP: 0
+  maxHP: 100
   atk: 12
   moveSpeedMultiplier: 1
   rotationSpeed: 300
@@ -1500,8 +1500,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponLists: []
-  capacityUI: {fileID: 0}
   Knife: {fileID: 2170802098427923434}
+  KnifeIcon: {fileID: 21300000, guid: 61f0dab2fe1e42c46b3a3af8f3ef0943, type: 3}
 --- !u!114 &1267684129594623033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1519,7 +1519,7 @@ MonoBehaviour:
   interactionDistance: 4
   ignoreLayers:
     serializedVersion: 2
-    m_Bits: 1096
+    m_Bits: 1032
   drawDebugRay: 0
   lookAtPosFixedInEndOfRay: 1
   lookAtPos: {fileID: 0}
@@ -1720,27 +1720,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!65 &2533775408016451140
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1562557432242902593}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 2.794404, z: 0.6993408}
-  m_Center: {x: 0, y: 1.4209743, z: 0}
 --- !u!1 &1657002597154584203
 GameObject:
   m_ObjectHideFlags: 0
@@ -7044,9 +7023,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4651888679855241370}
   - component: {fileID: 6379724565207601486}
+  - component: {fileID: 6001212385217538859}
   m_Layer: 3
   m_Name: Hips_jnt
-  m_TagString: Player
+  m_TagString: Player_Body
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7083,6 +7063,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Weight: 1
   m_Effectors: []
+--- !u!65 &6001212385217538859
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8116650142580343923}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.7821481, y: 0.8765255, z: 0.68634033}
+  m_Center: {x: -0.37248135, y: 0.0041125417, z: -0.0036315918}
 --- !u!1 &8384622371708905099
 GameObject:
   m_ObjectHideFlags: 3
@@ -7109,7 +7110,7 @@ Transform:
   m_GameObject: {fileID: 8384622371708905099}
   serializedVersion: 2
   m_LocalRotation: {x: 0.09056914, y: 0.018322907, z: -0.0016666227, w: 0.9957202}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.00000023841858, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8345,6 +8346,10 @@ PrefabInstance:
     - target: {fileID: 4589942682132852160, guid: ced072d87d8156a42be2d8c4cdd3b1cf, type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4685669036069642702, guid: ced072d87d8156a42be2d8c4cdd3b1cf, type: 3}
+      propertyPath: ReloadTime
+      value: 1.3
       objectReference: {fileID: 0}
     - target: {fileID: 8308687416516443048, guid: ced072d87d8156a42be2d8c4cdd3b1cf, type: 3}
       propertyPath: m_Name

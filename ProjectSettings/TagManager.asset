@@ -8,6 +8,10 @@ TagManager:
   - Vehicle
   - Item
   - Bullet
+  - Zombie_Head
+  - Zombie_Body
+  - Player_Head
+  - Player_Body
   layers:
   - Default
   - TransparentFX

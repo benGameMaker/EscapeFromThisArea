@@ -31,7 +31,6 @@ public class MeleeRange : MonoBehaviour
 
     public void TriggerMeleeAtk(float time)
     {
-        Debug.Log(gameObject.name + "开始近战攻击");
         if (MeleeRangeBox == null) return;
 
         // 重新激活前先取消旧的失活协程，避免连续调用导致提前失活
@@ -51,8 +50,13 @@ public class MeleeRange : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        BaseObject obj = other.GetComponent<BaseObject>();
-        if (other.CompareTag(gameObject.tag) || obj == null) return;
+        BaseObject obj = other.GetComponentInParent<BaseObject>();
+        Debug.Log("攻击到" + other.name);
+        if (other.CompareTag(gameObject.tag) || obj == null)
+        {
+            Debug.Log("刀到了" + gameObject.tag + "||" + gameObject.name);
+            return;
+        }
 
         Debug.Log(other.gameObject.name + "被" + gameObject.name + "攻击了");
         obj.Injured(executor, harmMulitpler);

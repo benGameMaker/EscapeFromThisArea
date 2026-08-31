@@ -35,7 +35,7 @@ public class DetectionZombies : MonoBehaviour
             zombieConeVision = zombie.gameObject.GetComponent<ZombieConeVisionConfig>();
             if (zombieConeVision != null)
             {
-                Debug.Log("开始检测" + zombie.name + "是否可见玩家");
+                //Debug.Log("开始检测" + zombie.name + "是否可见玩家");
                 Transform zombiePos = zombieConeVision.DetectionPoint;
                 //僵尸到玩家的方向
                 Vector3 ZombieToPlayer = transform.position - zombiePos.position;
@@ -43,7 +43,7 @@ public class DetectionZombies : MonoBehaviour
                 float distance = ZombieToPlayer.magnitude;
                 if (distance > zombieConeVision.detectionRadius)
                 {
-                    Debug.Log("距离不够");
+                    //Debug.Log("距离不够");
                     continue;
                 }
                 //判断是否进入僵尸视野角度（方向需归一化，与forward点积得到cos值）
@@ -51,12 +51,12 @@ public class DetectionZombies : MonoBehaviour
                 float angle = Mathf.Acos(Mathf.Clamp(dot, -1f, 1f)) * Mathf.Rad2Deg;
                 if (angle > zombieConeVision.detectionHalfAngle)
                 {
-                    Debug.Log("角度不对");
+                    //Debug.Log("角度不对");
                     continue;
                 }
                 //让僵尸发出射线判断是否有遮挡，没有则将僵尸导航至玩家附近
                 zombieConeVision.VisibilityDetection(transform);
-                Debug.Log("玩家被" + zombie.name + "发现了");
+                //Debug.Log("玩家被" + zombie.name + "发现了");
             }
         }
         while(deadZombies.Count > 0)
@@ -71,13 +71,14 @@ public class DetectionZombies : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        string zombiesName = other.name;
-        BaseObject zombie = other.gameObject.GetComponent<BaseObject>();
-        if (zombie != null && !zombie.isDead)
+        string zombiesName = other.transform.parent.name;
+        BaseObject zombie = other.gameObject.GetComponentInParent<BaseObject>();
+        if (zombie != null && !zombie.isDead && !Zombies.ContainsKey(zombiesName))
         {
             Zombies.Add(zombiesName, zombie);
-            Debug.Log(zombiesName + "进入了玩家的球形粗筛范围内");
+            //Debug.Log(zombiesName + "进入了玩家的球形粗筛范围内");
         }
+        //Debug.Log("进入范围的有" + other.name + "||tag：" + other.tag);
     }
 
     private void OnTriggerExit(Collider other)
@@ -86,7 +87,7 @@ public class DetectionZombies : MonoBehaviour
         if (Zombies.ContainsKey(zombiesName))
         {
             Zombies.Remove(zombiesName);
-            Debug.Log(zombiesName + "离开了玩家的球形粗筛范围内");
+            //Debug.Log(zombiesName + "离开了玩家的球形粗筛范围内");
         }
     }
 }

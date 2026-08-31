@@ -33,16 +33,17 @@ public class VehicleController : MonoBehaviour
     List<WeaponControl> weaponLists = new List<WeaponControl>();
     int curWeaponIndex = -1;
     WeaponControl curWeapon;
+    VehicleDamage vd;
     [HideInInspector]
-
     bool isFiring = false;
     float nextFireTime = 0f;
+    Coroutine reloadCoroutine;
 
     void Awake()
     {
         WeaponPos = transform.Find("WeaponPos");
         if (WeaponPos == null) Debug.LogWarning("WeaponPos获取失败");
-
+        vd = GetComponent<VehicleDamage>();
         //组件可能默认禁用（上车才激活），Start不会执行，Awake不受禁用影响，确保武器列表提前就绪
         CollectWeapons();
     }
@@ -88,6 +89,7 @@ public class VehicleController : MonoBehaviour
 
     public void Drive(InputAction.CallbackContext context)
     {
+
         inputAxis = context.ReadValue<Vector2>();
     }
     public void Fire(InputAction.CallbackContext context)
@@ -154,9 +156,13 @@ public class VehicleController : MonoBehaviour
     }
     void DoReload()
     {
-        if (curWeapon == null) return;
-        curWeapon.curCapacity = curWeapon.capacity;
+        if (curWeapon == null || reloadCoroutine != null) return; //换弹中不重复触发
+
+        //通知面板播放换弹进度，ReloadTime秒后完成补弹
+        curWeapon.StartReload();
+        reloadCoroutine = StartCoroutine(ReloadAfterDelay(curWeapon));
     }
+
     void SwitchToWeapon(int index)
     {
         if (weaponLists.Count == 0) return;
@@ -165,7 +171,32 @@ public class VehicleController : MonoBehaviour
         curWeaponIndex = ((index % weaponLists.Count) + weaponLists.Count) % weaponLists.Count;
         curWeapon = weaponLists[curWeaponIndex];
         fireRate = curWeapon.fireRate;
-        
+
+        //切枪后刷新车辆UI面板的武器数据（面板未显示时GetPanel返回null，不处理）
+        VehiclePanel vp = UIManager.Instance.GetPanel<VehiclePanel>();
+        if (vp != null) vp.ShowCapacityDataToUI(curWeapon);
+    }
+
+    //上车时显示车辆UI面板并展示当前武器数据（由VehicleInteraction调用）
+    public void ShowVehicleUI()
+    {
+        //玩家HUD面板常驻不销毁（WeaponSwitching/PlayerController缓存其引用，销毁会导致切枪等失效），仅隐藏显示
+        PlayerPanel pp = UIManager.Instance.GetPanel<PlayerPanel>();
+        if (pp != null) pp.gameObject.SetActive(false);
+
+        VehiclePanel vp = UIManager.Instance.ShowPanel<VehiclePanel>();
+        if (curWeapon != null) vp.ShowCapacityDataToUI(curWeapon);
+        vp.UpdataCurIntegrity(vd.curIntegrity, vd.maxIntegrity);
+        vd.vp = UIManager.Instance.GetPanel<VehiclePanel>();
+    }
+
+    //下车时隐藏车辆UI面板、重新显示玩家面板（由VehicleInteraction调用）
+    public void HideVehicleUI()
+    {
+        UIManager.Instance.HidePanel<VehiclePanel>();
+
+        PlayerPanel pp = UIManager.Instance.GetPanel<PlayerPanel>();
+        if (pp != null) pp.gameObject.SetActive(true);
     }
     //为所有武器设置归属者（上车时由VehicleInteraction传入玩家，使子弹伤害归属玩家）
     public void SetWeaponsOwner(BaseObject owner)
@@ -203,6 +234,12 @@ public class VehicleController : MonoBehaviour
         {
             WeaponPos.rotation = Quaternion.LookRotation(dir);
         }
+    }
+    IEnumerator ReloadAfterDelay(WeaponControl weapon)
+    {
+        yield return new WaitForSeconds(Mathf.Max(0.01f, weapon.ReloadTime * 2f));
+        weapon.Reload();
+        reloadCoroutine = null;
     }
 
     void Move()
