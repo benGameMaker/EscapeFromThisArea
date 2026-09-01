@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ItemUnit : MonoBehaviour
 {
-    public Sprite itemIcon;
-    public int curNum;
-    public string itemName;
+    public Image itemIcon;
+    public TextMeshProUGUI curNum;
+    public TextMeshProUGUI itemName;
+    public int cellIndex;
     void Start()
     {
         

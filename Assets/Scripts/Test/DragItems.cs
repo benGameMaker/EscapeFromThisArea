@@ -10,11 +10,13 @@ public class DragItems : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
     CanvasGroup cg;
     RectTransform selfRect;
+    ItemUnit selfItem;
     private void Start()
     {
         fatherObj = GameObject.Find("Canvas/BagPanel/Cells");
         cg = GetComponent<CanvasGroup>();
         selfRect = GetComponent<RectTransform>();
+        selfItem = GetComponent<ItemUnit>();
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -55,5 +57,11 @@ public class DragItems : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         transform.SetParent(parent);
         cg.blocksRaycasts = block;
         selfRect.sizeDelta = new Vector2(size, size);
+        string cellIndexStr = parent.name.Substring(parent.name.LastIndexOf('_') + 1);
+        if (int.TryParse(cellIndexStr, out int cellIndex))
+        {
+            selfItem.cellIndex = cellIndex;
+            Debug.Log("Item " + selfItem.itemName.text + " moved to cell index: " + cellIndex);
+        }
     }
 }

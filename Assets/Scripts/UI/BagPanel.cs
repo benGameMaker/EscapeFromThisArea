@@ -21,6 +21,7 @@ public class BagPanel : BasePanel
             //Cursor.visible = false;
         });
         CollectCells();
+        ItemDataLoadCell();
     }
 
     // Update is called once per frame
@@ -28,7 +29,27 @@ public class BagPanel : BasePanel
     {
         base.Update();
     }
+    void ItemDataLoadCell()
+    {
+        GameObject itemUnitObj;
+        ItemUnit itemUnit;
+        foreach (CellData cell in GameDataMgr.Instance.cellDatas)
+        {
+            itemUnitObj = Instantiate(Resources.Load<GameObject>("Prefabs/UI/ItemUnit"));
+            if (cell.cellIndex < itemCells.Count)
+            {
+                itemUnitObj.transform.SetParent(itemCells[cell.cellIndex], false);
+            }
+            else Debug.LogError(cell.itemName + "的单元格索引超出范围: " + cell.cellIndex);
 
+            itemUnit = itemUnitObj.GetComponent<ItemUnit>();
+
+            itemUnit.itemIcon.sprite = Resources.Load<Sprite>("Sprites/" + cell.itemIconName);
+            itemUnit.itemName.text = cell.itemName;
+            itemUnit.curNum.text = cell.curNum.ToString();
+            itemUnit.cellIndex = cell.cellIndex;
+        }
+    }
     void CollectCells()
     {
         for(int i = 0; i < Cells.childCount; i++)
