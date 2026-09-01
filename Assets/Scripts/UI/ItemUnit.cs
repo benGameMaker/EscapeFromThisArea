@@ -9,6 +9,8 @@ public class ItemUnit : MonoBehaviour
     public Image itemIcon;
     public TextMeshProUGUI curNum;
     public TextMeshProUGUI itemName;
+    public int maxStackNum;
+    public int useBehaviorNumber;
     public int cellIndex;
     void Start()
     {

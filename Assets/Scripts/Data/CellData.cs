@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CellData : MonoBehaviour
+//纯数据类，用于背包格子数据的序列化与反序列化，不需要挂载到任何物体上
+public class CellData
 {
     //背包格子中的物品图标
     public string itemIconName;
