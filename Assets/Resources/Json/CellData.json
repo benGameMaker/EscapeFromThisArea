@@ -1,0 +1,7 @@
+[
+	{"itemIconName":"item_1","itemName":"item_1","curNum":3,"maxStackNum":20,"useBehaviorNumber":1,"cellIndex":0},
+	{"itemIconName":"item_3","itemName":"item_3","curNum":4,"maxStackNum":20,"useBehaviorNumber":1,"cellIndex":1},
+	{"itemIconName":"item_5","itemName":"item_5","curNum":6,"maxStackNum":20,"useBehaviorNumber":1,"cellIndex":2},
+	{"itemIconName":"Bullet_Handgun","itemName":"pistol_bullet","curNum":12,"maxStackNum":40,"useBehaviorNumber":1,"cellIndex":3},
+	{"itemIconName":"Bullet_Rifle","itemName":"rifle_bullet","curNum":7,"maxStackNum":30,"useBehaviorNumber":1,"cellIndex":4}
+]

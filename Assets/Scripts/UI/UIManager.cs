@@ -11,7 +11,8 @@ public class UIManager
     Dictionary<string, BasePanel> panelDic = new Dictionary<string, BasePanel>();
     UIManager()
     {
-        GameObject canvas = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UI/Canvas"));
+        GameObject canvas = GameObject.Find("Canvas");
+        if (canvas == null) canvas = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UI/Canvas"));
         canvasTrans = canvas.transform;
         GameObject.DontDestroyOnLoad(canvas);
     }
