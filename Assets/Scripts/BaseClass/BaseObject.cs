@@ -33,9 +33,9 @@ public class BaseObject : MonoBehaviour
     {
         HP = maxHP;
         animator = GetComponent<Animator>();
-        if (animator == null) Debug.LogError(gameObject.name + " animator未获取，请检查Animator组件是否挂载");
+        if (animator == null) Debug.LogWarning(gameObject.name + " animator未获取，请检查Animator组件是否挂载");
         rb=GetComponent<Rigidbody>();
-        if (rb == null) Debug.Log(gameObject.name + "未挂载Rigidbody");
+        if (rb == null) Debug.LogWarning(gameObject.name + "未挂载Rigidbody");
 
         // 场景中不再常驻 Canvas：改为运行时通过 UIManager 单例获取
         //（首次访问 UIManager 时若场景没有 Canvas 会自动创建并 DontDestroyOnLoad）
@@ -57,15 +57,21 @@ public class BaseObject : MonoBehaviour
 
     }
 
-    public virtual void Injured(BaseObject attacker,float extraHarm)
+    public virtual void Injured(BaseObject attacker, float extraHarm)
     {
-        if(attacker == null)
+        if (attacker == null)
         {
-            Debug.Log("攻击对象为空"); 
+            Debug.Log("攻击对象为空");
             return;
         }
-        HP -= attacker.atk * extraHarm;
         Debug.Log(gameObject.name + "受到了" + attacker.gameObject.name);
+        Injured(attacker.atk * extraHarm);
+    }
+
+    // 只传入伤害数值的受伤方法，直接扣除 harm 点 HP
+    public virtual void Injured(float harm)
+    {
+        HP -= harm;
         if (HP <= 0)
         {
             HP = 0;
@@ -82,7 +88,7 @@ public class BaseObject : MonoBehaviour
                 return;
             }
             fd.InjectDependencies(canvas, canvasRt, Camera.main);
-            fd.CreateFloatingDamageText(attacker.atk * extraHarm, transform.position + floatingDamageOffSet, Vector2.up, 100f, 0.5f);
+            fd.CreateFloatingDamageText(harm, transform.position + floatingDamageOffSet, Vector2.up, 100f, 0.5f);
         }
     }
 

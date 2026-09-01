@@ -6,6 +6,7 @@ public class TestLauchUI : MonoBehaviour
 {
     public ItemObjData item1;
     public ItemObjData item2;
+    public Transform ThrowPoint;
     public int consumeNum;
     BagPanel bp;
     void Start()
@@ -34,6 +35,16 @@ public class TestLauchUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H))
         {
             Debug.Log((bp.ConsumeItem(item2.itemName, consumeNum) ? "能够消耗" : "不够消耗") + item2.itemName);
+        }
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            // Instantiate a new grenade at the throw point and trigger its fuse
+            GameObject grenade = Instantiate(Resources.Load<GameObject>("Prefabs/Items/Wep_Grenade"), ThrowPoint.position, ThrowPoint.rotation);
+            GrenadeControl gc = grenade.GetComponent<GrenadeControl>();
+            if (gc != null)
+            {
+                gc.TriggerFuse();
+            }
         }
     }
 }
