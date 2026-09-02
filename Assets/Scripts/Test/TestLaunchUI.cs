@@ -36,7 +36,8 @@ public class TestLauchUI : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.H))
         {
-            Debug.Log((bp.ConsumeItem(item2.itemName, consumeNum) ? "能够消耗" : "不够消耗") + item2.itemName);
+            if (item2 != null) Debug.Log((bp.ConsumeItem(item2.itemName, consumeNum) ? "能够消耗" : "不够消耗") + item2.itemName);
+            else Debug.Log("H键对应的物品为空");
         }
         if (Input.GetKeyDown(KeyCode.X))
         {

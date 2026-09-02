@@ -19,15 +19,16 @@ public class BagPanel : BasePanel
     public Dictionary<string, int> itemCellMaxIndex = new Dictionary<string, int>();
     public override void Init()
     {
+        pc = SceneManager.Instance.player;
         btnExit.onClick.AddListener(() =>
         {
             HideMe(() => { });
-            //Cursor.lockState = CursorLockMode.Locked;
-            //pc.enableMouseInput(true);
-            //Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            pc.enableMouseInput(true);
+            Cursor.visible = false;
         });
         CollectCells();
-        ItemDataLoadCell();
+        //ItemDataLoadCell();
         //加载完数据后刷新物品占格最大下标记录
         RefreshItemCellMaxIndex();
     }
@@ -63,6 +64,7 @@ public class BagPanel : BasePanel
             cellItem.curNum.text = (cur + add).ToString();
             //同步最大堆叠数量，保证存档数据正确
             cellItem.maxStackNum = item.maxStackNum;
+
             remaining -= add;
         }
 
@@ -76,7 +78,8 @@ public class BagPanel : BasePanel
             if (emptyIndex >= 0)
             {
                 CreateItemUnit(itemCells[emptyIndex], item.itemName, item.itemIcon,
-                    remaining, item.maxStackNum, item.useBehaviorNumber, emptyIndex);
+                    remaining, item.maxStackNum, item.useBehaviorNumber, emptyIndex,
+                    item.UseBahaivor);
                 remaining = 0;
             }
         }
@@ -197,7 +200,7 @@ public class BagPanel : BasePanel
         return null;
     }
     //创建新的物品单元并放入指定格子中，填充数据后返回
-    ItemUnit CreateItemUnit(Transform cell, string itemName, Sprite itemIcon, int curNum, int maxStackNum, int useBehaviorNumber, int cellIndex)
+    ItemUnit CreateItemUnit(Transform cell, string itemName, Sprite itemIcon, int curNum, int maxStackNum, int useBehaviorNumber, int cellIndex, UnityAction action)
     {
         GameObject itemUnitObj = Instantiate(Resources.Load<GameObject>("Prefabs/UI/ItemUnit"));
         itemUnitObj.transform.SetParent(cell, false);
@@ -208,6 +211,7 @@ public class BagPanel : BasePanel
         itemUnit.maxStackNum = maxStackNum;
         itemUnit.useBehaviorNumber = useBehaviorNumber;
         itemUnit.cellIndex = cellIndex;
+        itemUnit.UseBehavior += action;
         itemUnit.iip = iip;
         return itemUnit;
     }
@@ -239,7 +243,7 @@ public class BagPanel : BasePanel
             }
             CreateItemUnit(itemCells[cell.cellIndex], cell.itemName,
                 Resources.Load<Sprite>("Sprites/" + cell.itemIconName), cell.curNum,
-                cell.maxStackNum, cell.useBehaviorNumber, cell.cellIndex);
+                cell.maxStackNum, cell.useBehaviorNumber, cell.cellIndex, () => { Debug.Log("Json导入的物品暂时无行为函数"); });
         }
     }
     void SaveItemDatasToCellDatas()

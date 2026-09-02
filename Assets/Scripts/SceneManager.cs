@@ -8,13 +8,16 @@ public class SceneManager : MonoBehaviour
     public static SceneManager Instance => instance;
     public GameObject testObject;
     public BaseObject atker;
+    public PlayerController player;
     private void Awake()
     {
         instance = this;
         UIManager.Instance.ShowPanel<PlayerPanel>();
+        UIManager.Instance.ShowPanel<BagPanel>(true);
     }
     void Start()
     {
+        if (player == null) Debug.Log("玩家物体未初始化");
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
