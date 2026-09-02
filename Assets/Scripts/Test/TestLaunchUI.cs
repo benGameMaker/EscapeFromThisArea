@@ -4,17 +4,14 @@ using UnityEngine;
 
 public class TestLauchUI : MonoBehaviour
 {
-    public ItemObjData item1;
-    public ItemObjData item2;
+    public BaseItemObjData item1;
+    public BaseItemObjData item2;
     public Transform ThrowPoint;
     public int consumeNum;
     BagPanel bp;
     Thrower thrower;
     void Start()
     {
-        UIManager.Instance.ShowPanel<BagPanel>();
-        bp = UIManager.Instance.GetPanel<BagPanel>();
-        thrower = ThrowPoint.GetComponent<Thrower>();
     }
 
     // Update is called once per frame
@@ -22,13 +19,16 @@ public class TestLauchUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.B))
         {
-            if (UIManager.Instance.GetPanel<BagPanel>() == null)
+            if (bp == null)
             {
                 UIManager.Instance.ShowPanel<BagPanel>();
                 bp = UIManager.Instance.GetPanel<BagPanel>();
             }
-            if (bp.isShow) bp.HideMe(() => { });
-            else bp.ShowMe();
+            else
+            {
+                if (bp.isShow) bp.HideMe(() => { });
+                else bp.ShowMe();
+            }
         }
         if (Input.GetKeyDown(KeyCode.G))
         {

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Pool;
 
 public class WeaponControl : MonoBehaviour
@@ -28,8 +29,8 @@ public class WeaponControl : MonoBehaviour
     [HideInInspector]
     public BaseObject owner;
 
-    public event Action<int> OnCapacityChanged;
-    public event Action<float> OnReloadStart;
+    public event UnityAction<int> OnCapacityChanged;
+    public event UnityAction<float> OnReloadStart;
 
     // 子弹对象池
     ObjectPool <GameObject> bulletPool;

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3608450603181267284}
   - component: {fileID: 3056695865350437933}
   - component: {fileID: 7274450156371677011}
-  - component: {fileID: 547350916222754399}
+  - component: {fileID: 5080989140382880452}
   m_Layer: 0
   m_Name: Bullet_Rifle
   m_TagString: Untagged
@@ -84,7 +84,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &547350916222754399
+--- !u!114 &5080989140382880452
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,11 +93,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 3540524579709830767}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6f087efe5c06fc438ab42597fc15a6f, type: 3}
+  m_Script: {fileID: 11500000, guid: d626a660748d34f488ee449a9dff3fd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemIcon: {fileID: 21300000, guid: 164a7cc9266f6764f82456d4b9d6b5b4, type: 3}
-  itemName: rifle_bullet
-  curNum: 30
-  maxStackNum: 60
+  itemIcon: {fileID: 0}
+  itemName: 
+  curNum: 0
+  maxStackNum: 0
   useBehaviorNumber: 0

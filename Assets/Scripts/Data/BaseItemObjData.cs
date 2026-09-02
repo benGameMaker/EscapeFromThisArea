@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemObjData : MonoBehaviour
+public abstract class BaseItemObjData : MonoBehaviour
 {
     //物品图标
     public Sprite itemIcon;
@@ -15,4 +15,6 @@ public class ItemObjData : MonoBehaviour
     //在背包使用它时，所要执行的行为函数编号
     public int useBehaviorNumber;
 
+    // 在背包中使用时它要执行的行为方法，在子类中实现
+    public abstract void UseBahaivor();
 }

@@ -9,8 +9,11 @@ public class BagPanel : BasePanel
 {
     public Button btnExit;
     public Transform Cells;
+    public Transform iip;   //物品操作面板（BagPanel预制体中的嵌套子物体，右键物品时显示）
 
+    [HideInInspector]
     public PlayerController pc;
+    [HideInInspector]
     public List<Transform> itemCells;
     //记录每种物品（按名称区分）所占据的格子中的最大下标
     public Dictionary<string, int> itemCellMaxIndex = new Dictionary<string, int>();
@@ -34,7 +37,7 @@ public class BagPanel : BasePanel
     {
         base.Update();
     }
-    public void AddItem(ItemObjData item)
+    public void AddItem(BaseItemObjData item)
     {
         if (item == null) return;
 
@@ -66,21 +69,12 @@ public class BagPanel : BasePanel
         //第二步：还有剩余数量，放到下标最小的空格子中
         if (remaining > 0)
         {
-            for (int i = 0; i < itemCells.Count; i++)
+            int emptyIndex = FindFirstEmptyCellIndex();
+            if (emptyIndex >= 0)
             {
-                if (GetItemInCell(i) != null) continue;
-
-                GameObject itemUnitObj = Instantiate(Resources.Load<GameObject>("Prefabs/UI/ItemUnit"));
-                itemUnitObj.transform.SetParent(itemCells[i], false);
-                ItemUnit itemUnit = itemUnitObj.GetComponent<ItemUnit>();
-                itemUnit.itemIcon.sprite = item.itemIcon;
-                itemUnit.itemName.text = item.itemName;
-                itemUnit.curNum.text = remaining.ToString();
-                itemUnit.maxStackNum = item.maxStackNum;
-                itemUnit.useBehaviorNumber = item.useBehaviorNumber;
-                itemUnit.cellIndex = i;
+                CreateItemUnit(itemCells[emptyIndex], item.itemName, item.itemIcon,
+                    remaining, item.maxStackNum, item.useBehaviorNumber, emptyIndex);
                 remaining = 0;
-                break;
             }
         }
         //暂不处理格子不足、物品无法全部放完的情况
@@ -149,6 +143,45 @@ public class BagPanel : BasePanel
             itemCellMaxIndex[name] = i;
         }
     }
+    //将拖拽的物品堆叠到目标格子：能装下则数量全部并入并销毁被拖物品单元；
+    //装不下则目标格子装到上限，剩余数量保留在被拖物品单元中，并把它放入下标最小的空格子（无空格子则回到原格子）
+    public void StackItemToCell(ItemUnit draggedItem, Transform targetCell, Transform fallbackCell)
+    {
+        if (draggedItem == null || targetCell == null) return;
+        int targetIndex = itemCells.IndexOf(targetCell);
+        if (targetIndex < 0) return;
+        ItemUnit targetItem = GetItemInCell(targetIndex);
+        if (targetItem == null) return;
+
+        //最大堆叠数量取两者中较大值，并统一更新
+        int newMax = Mathf.Max(draggedItem.maxStackNum, targetItem.maxStackNum);
+        draggedItem.maxStackNum = newMax;
+        targetItem.maxStackNum = newMax;
+
+        int.TryParse(draggedItem.curNum.text, out int draggedNum);
+        int.TryParse(targetItem.curNum.text, out int targetNum);
+        //目标格子还能容纳的数量
+        int capacity = newMax - targetNum;
+
+        if (draggedNum <= capacity)
+        {
+            //目标格子能装下全部数量，并入后销毁被拖物品单元
+            targetItem.curNum.text = (targetNum + draggedNum).ToString();
+            Destroy(draggedItem.gameObject);
+        }
+        else
+        {
+            //目标格子装到上限，剩余数量保留在被拖物品单元中
+            targetItem.curNum.text = newMax.ToString();
+            draggedItem.curNum.text = (draggedNum - capacity).ToString();
+            //把保留剩余数量的物品单元放入下标最小的空格子，没有则回到原格子
+            int emptyIndex = FindFirstEmptyCellIndex();
+            MoveItemToCell(draggedItem, emptyIndex >= 0 ? itemCells[emptyIndex] : fallbackCell);
+        }
+
+        //布局可能变化，刷新物品占格最大下标记录
+        RefreshItemCellMaxIndex();
+    }
     //获取指定下标格子中的物品，没有则返回null
     ItemUnit GetItemInCell(int cellIndex)
     {
@@ -160,26 +193,50 @@ public class BagPanel : BasePanel
         }
         return null;
     }
+    //创建新的物品单元并放入指定格子中，填充数据后返回
+    ItemUnit CreateItemUnit(Transform cell, string itemName, Sprite itemIcon, int curNum, int maxStackNum, int useBehaviorNumber, int cellIndex)
+    {
+        GameObject itemUnitObj = Instantiate(Resources.Load<GameObject>("Prefabs/UI/ItemUnit"));
+        itemUnitObj.transform.SetParent(cell, false);
+        ItemUnit itemUnit = itemUnitObj.GetComponent<ItemUnit>();
+        itemUnit.itemIcon.sprite = itemIcon;
+        itemUnit.itemName.text = itemName;
+        itemUnit.curNum.text = curNum.ToString();
+        itemUnit.maxStackNum = maxStackNum;
+        itemUnit.useBehaviorNumber = useBehaviorNumber;
+        itemUnit.cellIndex = cellIndex;
+        itemUnit.iip = iip;
+        return itemUnit;
+    }
+    //找到下标最小的空格子的下标，没有则返回-1
+    int FindFirstEmptyCellIndex()
+    {
+        for (int i = 0; i < itemCells.Count; i++)
+        {
+            if (GetItemInCell(i) == null) return i;
+        }
+        return -1;
+    }
+    //把已有的物品单元移动到指定格子，并同步格子下标、刷新布局
+    void MoveItemToCell(ItemUnit itemUnit, Transform cell)
+    {
+        if (itemUnit == null || cell == null) return;
+        itemUnit.transform.SetParent(cell, false);
+        itemUnit.cellIndex = itemCells.IndexOf(cell);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(cell as RectTransform);
+    }
     void ItemDataLoadCell()
     {
-        GameObject itemUnitObj;
-        ItemUnit itemUnit;
         foreach (CellData cell in GameDataMgr.Instance.cellDatas)
         {
-            itemUnitObj = Instantiate(Resources.Load<GameObject>("Prefabs/UI/ItemUnit"));
-            if (cell.cellIndex < itemCells.Count)
+            if (cell.cellIndex >= itemCells.Count)
             {
-                itemUnitObj.transform.SetParent(itemCells[cell.cellIndex], false);
+                Debug.LogError(cell.itemName + "的单元格索引超出范围: " + cell.cellIndex);
+                continue;
             }
-            else Debug.LogError(cell.itemName + "的单元格索引超出范围: " + cell.cellIndex);
-
-            itemUnit = itemUnitObj.GetComponent<ItemUnit>();
-
-            itemUnit.itemIcon.sprite = Resources.Load<Sprite>("Sprites/" + cell.itemIconName);
-            itemUnit.itemName.text = cell.itemName;
-            itemUnit.curNum.text = cell.curNum.ToString();
-            itemUnit.useBehaviorNumber = cell.useBehaviorNumber;
-            itemUnit.cellIndex = cell.cellIndex;
+            CreateItemUnit(itemCells[cell.cellIndex], cell.itemName,
+                Resources.Load<Sprite>("Sprites/" + cell.itemIconName), cell.curNum,
+                cell.maxStackNum, cell.useBehaviorNumber, cell.cellIndex);
         }
     }
     void SaveItemDatasToCellDatas()
@@ -224,6 +281,12 @@ public class BagPanel : BasePanel
     public override void HideMe(UnityAction callback)
     {
         base.HideMe(callback);
+        //关闭背包时同步隐藏物品操作面板
+        if (iip != null)
+        {
+            ItemInteractionPanel panel = iip.GetComponent<ItemInteractionPanel>();
+            if (panel != null) panel.HideMe(() => { });
+        }
         //SaveItemDatasToCellDatas();
     }
 }
