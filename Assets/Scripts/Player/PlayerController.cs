@@ -43,6 +43,8 @@ public class PlayerController : BaseObject
     public Rig rigAim;
     [HideInInspector]
     public Rig rigGen;
+    [HideInInspector]
+    public BagPanel bp;
 
     void Start()
     {
@@ -56,6 +58,7 @@ public class PlayerController : BaseObject
         cfl = transform.Find("FreeLook Camera").GetComponent<CinemachineFreeLook>();
         BodyParts.Add(transform.Find("Hips_jnt").GetComponent<BoxCollider>());
         pp = UIManager.Instance.GetPanel<PlayerPanel>();
+        bp = UIManager.Instance.GetPanel<BagPanel>();
         if (pp != null) pp.UpdataHP(HP, maxHP);
         else Debug.LogWarning("PlayerPanel获取失败");
     }
@@ -240,11 +243,18 @@ public class PlayerController : BaseObject
     {
         if (context.performed)
         {
-            UIManager.Instance.ShowPanel<BagPanel>();
-            UIManager.Instance.GetPanel<BagPanel>().pc = this;
-            Cursor.lockState = CursorLockMode.Confined;
-            Cursor.visible = true;
-            enableMouseInput(false);
+            if (bp.isShow)// 关闭背包
+            {
+                bp.HideMe(() => { });
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            else// 打开背包
+            {
+                bp.ShowMe();
+                Cursor.lockState = CursorLockMode.Confined;
+            }
+            Cursor.visible = bp.isShow;
+            enableMouseInput(!bp.isShow);
         }
     }
 

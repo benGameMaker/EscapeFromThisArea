@@ -17,7 +17,8 @@ public class UIManager
         GameObject.DontDestroyOnLoad(canvas);
     }
 
-    public T ShowPanel<T>() where T : BasePanel
+    // 参数的作用是是否仅初始化面板而不显示面板
+    public T ShowPanel<T>(bool onlyInti = false) where T : BasePanel
     {
         //在容器中面板的下标于面板名保持一致
         string panelName = typeof(T).Name;
@@ -28,12 +29,13 @@ public class UIManager
 
         T panel = panelObj.GetComponent<T>();
         panelDic.Add(panelName, panel);
-        panel.ShowMe();
+        if (onlyInti) panel.HideMe(() => { });
+        else panel.ShowMe();
 
         return panel;
     }
       
-    //参数的作用是是否要面板在显示和隐藏时有淡入淡出的效果
+    // 参数的作用是是否要面板在显示和隐藏时有淡入淡出的效果
     public void HidePanel<T>(bool isFade = true) where T : BasePanel
     {
         string panelName = typeof(T).Name;

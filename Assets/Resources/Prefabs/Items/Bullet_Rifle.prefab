@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 3608450603181267284}
   - component: {fileID: 3056695865350437933}
   - component: {fileID: 7274450156371677011}
-  - component: {fileID: 547350916222754399}
+  - component: {fileID: 5080989140382880452}
+  - component: {fileID: -5780764905737716419}
   m_Layer: 0
   m_Name: Bullet_Rifle
   m_TagString: Untagged
@@ -97,7 +98,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemIcon: {fileID: 21300000, guid: 164a7cc9266f6764f82456d4b9d6b5b4, type: 3}
-  itemName: rifle_bullet
-  curNum: 30
+  itemName: RifteBullet
+  curNum: 15
   maxStackNum: 60
   useBehaviorNumber: 0
+--- !u!114 &-5780764905737716419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3540524579709830767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de2284a4588389d4c8c2a308e83d6ad8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guidingText: Pass E to pick
+  itemName: Rifle bullet
+  panelOffset: {x: 0, y: 0.5}
