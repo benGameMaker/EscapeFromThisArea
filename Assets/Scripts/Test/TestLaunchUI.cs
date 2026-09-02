@@ -12,9 +12,6 @@ public class TestLauchUI : MonoBehaviour
     Thrower thrower;
     void Start()
     {
-        UIManager.Instance.ShowPanel<BagPanel>();
-        bp = UIManager.Instance.GetPanel<BagPanel>();
-        thrower = ThrowPoint.GetComponent<Thrower>();
     }
 
     // Update is called once per frame
