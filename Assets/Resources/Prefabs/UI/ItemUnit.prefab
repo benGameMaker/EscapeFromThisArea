@@ -150,6 +150,10 @@ MonoBehaviour:
   itemIcon: {fileID: 0}
   curNum: {fileID: 0}
   itemName: {fileID: 0}
+  maxStackNum: 0
+  useBehaviorNumber: 0
+  cellIndex: 0
+  iip: {fileID: 0}
 --- !u!1 &2622848697024202919
 GameObject:
   m_ObjectHideFlags: 0
@@ -162,8 +166,8 @@ GameObject:
   - component: {fileID: 8968197354732973085}
   - component: {fileID: 1601560526678133306}
   - component: {fileID: 3441908157748093652}
-  - component: {fileID: 987448122103159499}
   - component: {fileID: 2895988743837090951}
+  - component: {fileID: 987448122103159499}
   m_Layer: 5
   m_Name: ItemUnit
   m_TagString: ItemUnit
@@ -244,18 +248,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fatherObj: {fileID: 0}
   originalFatherObj: {fileID: 0}
---- !u!225 &987448122103159499
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2622848697024202919}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!114 &2895988743837090951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,6 +263,22 @@ MonoBehaviour:
   itemIcon: {fileID: 1601560526678133306}
   curNum: {fileID: 6711766163048344632}
   itemName: {fileID: 8946151890104587451}
+  maxStackNum: 0
+  useBehaviorNumber: 0
+  cellIndex: 0
+  iip: {fileID: 0}
+--- !u!225 &987448122103159499
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2622848697024202919}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &4651557369589310960
 GameObject:
   m_ObjectHideFlags: 0
