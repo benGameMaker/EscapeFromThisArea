@@ -30,7 +30,7 @@ public class WeaponSwitching : MonoBehaviour
     void Start()
     {
         weaponHolder = transform.Find("WeaponHolder");
-        pc = GetComponentInChildren<PlayerController>();
+        pc = SceneManager.Instance.player;
         cp = GetComponentInChildren<ColliderProcessor>();
         LeftHand = transform.Find("WeaponHolder/LeftHand");
         RightHand = transform.Find("WeaponHolder/RightHand");

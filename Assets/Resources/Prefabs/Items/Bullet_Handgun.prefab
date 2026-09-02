@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2186276108546893494}
   - component: {fileID: 3547256371150691272}
   - component: {fileID: 1508928427952322628}
+  - component: {fileID: -4914081285857255183}
   m_Layer: 0
   m_Name: Bullet_Handgun
   m_TagString: Untagged
@@ -96,8 +97,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d626a660748d34f488ee449a9dff3fd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemIcon: {fileID: 0}
-  itemName: 
-  curNum: 0
-  maxStackNum: 0
+  itemIcon: {fileID: 21300000, guid: 5fde0f1b5c595754e945c7d1aa2b5eaf, type: 3}
+  itemName: PistolBullet
+  curNum: 30
+  maxStackNum: 60
   useBehaviorNumber: 0
+--- !u!114 &-4914081285857255183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1650907409513361453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de2284a4588389d4c8c2a308e83d6ad8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guidingText: Pass E to pick
+  itemName: Pistol bullet
+  panelOffset: {x: 0, y: 0.5}
