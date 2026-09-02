@@ -66,6 +66,9 @@ public class BagPanel : BasePanel
             remaining -= add;
         }
 
+
+
+        
         //第二步：还有剩余数量，放到下标最小的空格子中
         if (remaining > 0)
         {
