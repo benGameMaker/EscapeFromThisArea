@@ -101,7 +101,7 @@ public class WeaponSwitching : MonoBehaviour
 
                     Knife.SetActive(false);
                     curWeapon = weaponLists[curWeaponKeyID - 1];
-                    pc.weaponControl = curWeapon;
+                    pc.curWeapon = curWeapon;
                     if (isHoldWeapon) StartCoroutine(DelayExecute(0.3f, curWeapon, TakeUpWeapon));
                     else TakeUpWeapon(curWeapon);
                 }

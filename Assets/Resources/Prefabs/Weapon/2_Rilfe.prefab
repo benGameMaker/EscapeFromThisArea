@@ -588,6 +588,7 @@ MonoBehaviour:
   ReloadTime: 1.3
   harmMultiplier: 2
   capacity: 30
+  bulletTypeName: RifteBullet
   bulletPoolDefaultCapacity: 10
   bulletPoolMaxSize: 100
   ignorelLayer:

@@ -24,7 +24,6 @@ public class PlayerPanel : BasePanel
 
     // 当前绑定的武器，用于事件退订
     WeaponControl curWeapon;
-
     // 换弹进度协程
     Coroutine reloadProgressCoroutine;
     
@@ -49,21 +48,21 @@ public class PlayerPanel : BasePanel
         // 弹药数量恢复（换弹完成），结束换弹进度显示
         EndReloadProgress();
     }
-    public void ShowCapacityDataToUI(WeaponControl weaponControl)
+    public void ShowCapacityDataToUI(WeaponControl wc)
     {
         //退订上一把武器，订阅当前武器的事件，实现实时刷新
         if (curWeapon != null) curWeapon.OnCapacityChanged -= UpdataCurCapacity;
         if (curWeapon != null) curWeapon.OnReloadStart -= StartReloadProgress;
-        curWeapon = weaponControl;
-        weaponControl.OnCapacityChanged += UpdataCurCapacity;
-        weaponControl.OnReloadStart += StartReloadProgress;
+        curWeapon = wc;
+        wc.OnCapacityChanged += UpdataCurCapacity;
+        wc.OnReloadStart += StartReloadProgress;
 
         HideKnifeIcon();
         CapacityData.SetActive(true);
-        MaxCapacity.text = weaponControl.capacity.ToString();
-        CurCapacity.text = weaponControl.curCapacity.ToString();
-        WeaponIcon.sprite = weaponControl.WeaponIcon;
-        Separator.sprite = weaponControl.BulletIcon;
+        MaxCapacity.text = wc.capacity.ToString();
+        CurCapacity.text = UIManager.Instance.GetPanel<BagPanel>().itemsNum.GetValueOrDefault(wc.bulletTypeName).ToString();
+        WeaponIcon.sprite = wc.WeaponIcon;
+        Separator.sprite = wc.BulletIcon;
     }
     public void ShowKnifeIcon(Sprite knifeIcon)
     {

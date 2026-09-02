@@ -36,7 +36,7 @@ public class PlayerController : BaseObject
     MeleeRange mr;
     PlayerPanel pp;
     [HideInInspector]
-    public WeaponControl weaponControl;
+    public WeaponControl curWeapon;
     CinemachineCameraOffset cco;
     CinemachineFreeLook cfl;
     [HideInInspector]
@@ -51,7 +51,7 @@ public class PlayerController : BaseObject
         mainCameraPos = Camera.main.transform;
         mr = GetComponentInChildren<MeleeRange>();
         cp = GetComponentInChildren<ColliderProcessor>();
-        weaponControl = GetComponentInChildren<WeaponControl>();
+        curWeapon = GetComponentInChildren<WeaponControl>();
         rigAim = transform.Find("Rig_WeaponAim").GetComponentInChildren<Rig>();
         rigGen = transform.Find("Rig_WeaponPose").GetComponentInChildren<Rig>();
         cco = transform.Find("FreeLook Camera").GetComponent<CinemachineCameraOffset>();
@@ -67,7 +67,7 @@ public class PlayerController : BaseObject
     {
         animator.SetBool("Static_b", isStatic);
 
-        if (isHoldingWeapon && weaponControl.curCapacity <= 0) animator.SetBool("Shoot_b", false);
+        if (isHoldingWeapon && curWeapon.curCapacity <= 0) animator.SetBool("Shoot_b", false);
         // 计算相机与物体在水平面上的夹角
         Vector3 camForwardFlat = mainCameraPos.forward;
         camForwardFlat.y = 0f;
@@ -182,11 +182,11 @@ public class PlayerController : BaseObject
             }
             return;
         }
-        if (weaponControl.curCapacity <= 0)
+        if (curWeapon.curCapacity <= 0)
         {
             animator.SetBool("Reload_b", true);
             // 空仓自动换弹：通知面板播放换弹进度
-            weaponControl.StartReload();
+            curWeapon.StartReload();
         }
         if (!isAim)
         {
@@ -237,7 +237,7 @@ public class PlayerController : BaseObject
     {
         animator.SetBool("Reload_b", true);
         // 通知面板播放换弹进度（时长由当前武器ReloadTime决定）
-        if (weaponControl != null) weaponControl.StartReload();
+        if (curWeapon != null) curWeapon.StartReload();
     }
     public void OpenBag(InputAction.CallbackContext context)
     {
@@ -289,7 +289,7 @@ public class PlayerController : BaseObject
     }
     public void TriggerFire()
     {
-        weaponControl.Fire();
+        curWeapon.Fire();
     }
     public void TriggerMeleeAtk(float time)
     {
@@ -298,7 +298,7 @@ public class PlayerController : BaseObject
     public void ReloadCompleted()
     {
         animator.SetBool("Reload_b", false);
-        weaponControl.Reload();
+        curWeapon.Reload();
     }
     public void AimingAction()
     {

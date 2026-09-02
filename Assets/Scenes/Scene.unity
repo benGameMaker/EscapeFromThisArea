@@ -3529,11 +3529,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8281496497706186905, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.98529357
       objectReference: {fileID: 0}
     - target: {fileID: 8281496497706186905, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 0.17087014
       objectReference: {fileID: 0}
     - target: {fileID: 8281496497706186905, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
       propertyPath: m_LocalRotation.y
@@ -4152,11 +4152,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7845989839100662730, guid: e1310dd7af9f1fa4483d72a92ed5622e, type: 3}
       propertyPath: m_XAxis.m_InputAxisName
-      value: 
+      value: Mouse X
       objectReference: {fileID: 0}
     - target: {fileID: 7845989839100662730, guid: e1310dd7af9f1fa4483d72a92ed5622e, type: 3}
       propertyPath: m_YAxis.m_InputAxisName
-      value: 
+      value: Mouse Y
       objectReference: {fileID: 0}
     - target: {fileID: 8108036675619890062, guid: e1310dd7af9f1fa4483d72a92ed5622e, type: 3}
       propertyPath: m_Data.m_SourceObjects.m_Item0.transform

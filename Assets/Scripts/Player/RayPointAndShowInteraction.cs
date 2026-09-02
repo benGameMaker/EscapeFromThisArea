@@ -82,6 +82,10 @@ public class RayPointAndShowInteraction : MonoBehaviour
         {
             if (bi == null) Debug.Log("没有可以交互的物体");
             else bi.InteractionBehavior(gameObject);
+            if (gameObject.CompareTag("Bullet"))
+            {
+                UIManager.Instance.GetPanel<PlayerPanel>().ShowCapacityDataToUI(SceneManager.Instance.player.curWeapon);
+            }
         }
     }
     void detectionInteraction(GameObject item)

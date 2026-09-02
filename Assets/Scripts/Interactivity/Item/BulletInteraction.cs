@@ -15,7 +15,7 @@ public class BulletInteraction : BaseInteractivity
         if (UIManager.Instance.GetPanel<BagPanel>() != null && bulletItem != null)
         {
             UIManager.Instance.GetPanel<BagPanel>().AddItem(bulletItem);
-            Debug.Log("拾取了" + this.name);
+            //Debug.Log("拾取了" + this.name);
             Destroy(this.gameObject);
         }
         else

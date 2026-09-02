@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Pool;
 
 public class WeaponControl : MonoBehaviour
@@ -14,6 +15,7 @@ public class WeaponControl : MonoBehaviour
     public float ReloadTime;
     public float harmMultiplier = 1;
     public int capacity;
+    public string bulletTypeName;
     public int bulletPoolDefaultCapacity = 10;
     public int bulletPoolMaxSize = 100;
     [Tooltip("在启用子弹忽略层级，这把武器打出的子弹不会命中的层级")]
@@ -28,9 +30,9 @@ public class WeaponControl : MonoBehaviour
     [HideInInspector]
     public BaseObject owner;
 
-    public event Action<int> OnCapacityChanged;
-    public event Action<float> OnReloadStart;
-
+    public event UnityAction<int> OnCapacityChanged;
+    public event UnityAction<float> OnReloadStart;
+    BagPanel bp;
     // 子弹对象池
     ObjectPool <GameObject> bulletPool;
     private void Awake()
@@ -42,6 +44,7 @@ public class WeaponControl : MonoBehaviour
     public void InitCapacity()
     {
         curCapacity = capacity;
+        bp = UIManager.Instance.GetPanel<BagPanel>();
     }
     void Start()
     {
@@ -91,7 +94,17 @@ public class WeaponControl : MonoBehaviour
     }
     public void Reload()
     {
-        curCapacity = capacity;
+        if (bp == null) bp = UIManager.Instance.GetPanel<BagPanel>();
+        if (bp.itemsNum.GetValueOrDefault(bulletTypeName) >= capacity)
+        {
+            curCapacity = capacity;
+            bp.ConsumeItem(bulletTypeName, capacity);
+        }
+        else
+        {
+            curCapacity = bp.itemsNum.GetValueOrDefault(bulletTypeName);
+            bp.ConsumeItem(bulletTypeName, bp.itemsNum.GetValueOrDefault(bulletTypeName));
+        }
         OnCapacityChanged?.Invoke(curCapacity);
     }
 

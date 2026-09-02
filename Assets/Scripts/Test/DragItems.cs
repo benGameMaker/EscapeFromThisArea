@@ -76,18 +76,38 @@ public class DragItems : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         }
         else if (bottomObj.CompareTag("ItemUnit"))
         {
-            // 拖到有物品的格子，交换位置
             Transform newCell = bottomObj.transform.parent;
-            // 先把对方物品放回我方原格子
-            bottomObj.transform.SetParent(originalFatherObj.transform, false);
-            // 刷新对方物品所在格子的布局，让其居中
-            LayoutRebuilder.ForceRebuildLayoutImmediate(originalFatherObj.transform as RectTransform);
-            // 同步更新对方物品的格子下标
             ItemUnit otherItem = bottomObj.GetComponent<ItemUnit>();
-            if (otherItem != null) otherItem.cellIndex = GetCellIndex(originalFatherObj);
-
-            // 自己移动到目标格子
-            SetSelfParentAndCell(newCell, true);
+            // 名称、图标都相同视为同种物品，进行堆叠
+            if (selfItem != null && otherItem != null &&
+                selfItem.itemName.text == otherItem.itemName.text &&
+                selfItem.itemIcon.sprite == otherItem.itemIcon.sprite)
+            {
+                // 先恢复射线检测（堆叠后本物品会被销毁）
+                cg.blocksRaycasts = true;
+                BagPanel bagPanel = UIManager.Instance.GetPanel<BagPanel>();
+                if (bagPanel != null)
+                {
+                    // 数量全部并入目标格子，装不下的部分随被拖物品单元放入空格子
+                    bagPanel.StackItemToCell(selfItem, newCell, originalFatherObj.transform);
+                }
+                else
+                {
+                    // 找不到背包面板则回到原格子
+                    SetSelfParentAndCell(originalFatherObj.transform, true);
+                }
+            }
+            else
+            {
+                // 不同种物品，交换位置
+                bottomObj.transform.SetParent(originalFatherObj.transform, false);
+                // 刷新对方物品所在格子的布局，让其居中
+                LayoutRebuilder.ForceRebuildLayoutImmediate(originalFatherObj.transform as RectTransform);
+                // 同步更新对方物品的格子下标
+                if (otherItem != null) otherItem.cellIndex = GetCellIndex(originalFatherObj);
+                // 自己移动到目标格子
+                SetSelfParentAndCell(newCell, true);
+            }
         }
         else
         {
@@ -96,7 +116,7 @@ public class DragItems : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         }
 
         //拖拽后背包布局可能变化，刷新每种物品占格的最大下标记录
-        UIManager.Instance.GetPanel<BagPanel>()?.RefreshItemCellMaxIndex();
+        UIManager.Instance.GetPanel<BagPanel>()?.RefreshItemCellMaxIndexAndQuantity();
     }
 
     // 把物品放入指定格子，并强制刷新布局使其居中

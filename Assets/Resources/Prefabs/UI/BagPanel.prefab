@@ -654,6 +654,7 @@ RectTransform:
   - {fileID: 1903871305322709743}
   - {fileID: 3794374935558498592}
   - {fileID: 9081258598068588394}
+  - {fileID: 1923975685840150945}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
@@ -684,6 +685,7 @@ MonoBehaviour:
   isShow: 1
   btnExit: {fileID: 3378669013096193686}
   Cells: {fileID: 9081258598068588394}
+  iip: {fileID: 1923975685840150945}
   pc: {fileID: 0}
   itemCells: []
 --- !u!225 &8964138956877281303

@@ -619,6 +619,7 @@ MonoBehaviour:
   ReloadTime: 1.2
   harmMultiplier: 1.5
   capacity: 10
+  bulletTypeName: PistolBullet
   bulletPoolDefaultCapacity: 10
   bulletPoolMaxSize: 100
   ignorelLayer:
