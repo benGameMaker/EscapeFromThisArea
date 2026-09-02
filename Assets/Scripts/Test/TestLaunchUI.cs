@@ -9,10 +9,12 @@ public class TestLauchUI : MonoBehaviour
     public Transform ThrowPoint;
     public int consumeNum;
     BagPanel bp;
+    Thrower thrower;
     void Start()
     {
         UIManager.Instance.ShowPanel<BagPanel>();
         bp = UIManager.Instance.GetPanel<BagPanel>();
+        thrower = ThrowPoint.GetComponent<Thrower>();
     }
 
     // Update is called once per frame
@@ -38,13 +40,13 @@ public class TestLauchUI : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.X))
         {
-            // Instantiate a new grenade at the throw point and trigger its fuse
-            GameObject grenade = Instantiate(Resources.Load<GameObject>("Prefabs/Items/Wep_Grenade"), ThrowPoint.position, ThrowPoint.rotation);
-            GrenadeControl gc = grenade.GetComponent<GrenadeControl>();
-            if (gc != null)
-            {
-                gc.TriggerFuse();
-            }
+            //// Instantiate a new grenade at the throw point and trigger its fuse
+            //GameObject grenade = Instantiate(Resources.Load<GameObject>("Prefabs/Items/Wep_Grenade"), ThrowPoint.position, ThrowPoint.rotation);
+            //GrenadeControl gc = grenade.GetComponent<GrenadeControl>();
+            //if (gc != null)
+            //{
+            //    gc.TriggerFuse();
+            //}
         }
     }
 }
