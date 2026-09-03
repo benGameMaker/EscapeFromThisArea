@@ -12,6 +12,7 @@ public class WeaponSwitching : MonoBehaviour
     public List<WeaponControl> weaponLists;
 
     public GameObject Knife;
+    public GameObject Grenade;
     public Sprite KnifeIcon;
 
     int lastWeaponKeyID;

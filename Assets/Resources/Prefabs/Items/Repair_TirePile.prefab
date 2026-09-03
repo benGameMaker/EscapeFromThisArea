@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2101448625275614772}
   - component: {fileID: 2205273288305769432}
   - component: {fileID: 3184015044530015462}
+  - component: {fileID: 3404846830097997903}
+  - component: {fileID: 5227830909133145962}
   m_Layer: 0
   m_Name: Repair_TirePile
   m_TagString: Untagged
@@ -114,7 +116,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8253277957372466998}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 10
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -133,3 +135,35 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &3404846830097997903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8253277957372466998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5e3f22ebf974564e949d50ef0172c9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemIcon: {fileID: 21300000, guid: 50a606222ec928c439b67e2e1cbfcc26, type: 3}
+  itemName: RepairItem
+  curNum: 10
+  maxStackNum: 30
+  useBehaviorNumber: 0
+--- !u!114 &5227830909133145962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8253277957372466998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc75d03937ae15841940f8f70b819964, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guidingText: Pass E to pick
+  itemName: Vehicle repair items
+  panelOffset: {x: 0, y: 1}

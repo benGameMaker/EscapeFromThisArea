@@ -44,4 +44,19 @@ public abstract class BaseInteractivity : MonoBehaviour
         if (panel.isShow == true) panel.HideMe(() => { });
     }
 
+    protected virtual void PickToBag<T>(PlayerController obj = null) where T : BaseItemObjData
+    {
+        T itemData;
+        itemData = GetComponent<T>();
+        if (UIManager.Instance.GetPanel<BagPanel>() != null && itemData != null)
+        {
+            UIManager.Instance.GetPanel<BagPanel>().AddItem(itemData);
+            Debug.Log("拾取了" + this.name);
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            Debug.Log("背包未初始化或该物无物品数据，无法拾取");
+        }
+    }
 }
