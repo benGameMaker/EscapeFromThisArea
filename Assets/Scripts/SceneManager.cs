@@ -28,7 +28,7 @@ public class SceneManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.G))
         {
             //testObject.Injured(testObject, 1f);
-            testObject.GetComponent<VehicleDamage>().DamageVehicle(100f);
+            testObject.GetComponent<VehicleDamage>().DamageVehicle(20f);
         }
         if (Input.GetKeyDown(KeyCode.H))
         {

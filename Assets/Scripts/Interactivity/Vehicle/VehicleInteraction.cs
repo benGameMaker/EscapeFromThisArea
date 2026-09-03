@@ -28,7 +28,6 @@ public class VehicleInteraction : BaseInteractivity
     public override void InteractionBehavior(PlayerController player)
     {
         if (player == null) return;
-        UIManager.Instance.GetPanel<BagPanel>().vc = vehicle;
 
         //记录上车玩家，供下车时恢复
         driver = player;
@@ -97,6 +96,9 @@ public class VehicleInteraction : BaseInteractivity
         rb.excludeLayers = ignorelLayer;
         vehicle.enabled = islaunch;
 
-
+        //同步通过BagLogicProcess启用/停用车辆的PlayerInput：
+        //上车开启输入、下车关闭输入，避免不在车上时车辆的输入仍被监听
+        BagLogicProcess bagLogic = GetComponent<BagLogicProcess>();
+        if (bagLogic != null) bagLogic.SetActiveInput(islaunch);
     }
 }

@@ -16,7 +16,7 @@ public abstract class BaseItemObjData : MonoBehaviour
     public int useBehaviorNumber;
 
     // 在背包中使用时它要执行的行为方法，在子类中实现
-    public abstract void UseBahaivor();
+    public abstract void UseBahaivor(int Integer = 0);
 
     // 数据解耦，与场景中的原物品断开关系
     public virtual void CopyDataFrom(BaseItemObjData other)

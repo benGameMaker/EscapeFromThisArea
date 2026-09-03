@@ -38,13 +38,10 @@ public class PlayerController : BaseObject
     [HideInInspector]
     public WeaponControl curWeapon;
     CinemachineCameraOffset cco;
-    CinemachineFreeLook cfl;
     [HideInInspector]
     public Rig rigAim;
     [HideInInspector]
     public Rig rigGen;
-    [HideInInspector]
-    public BagPanel bp;
     [HideInInspector]
     public VehicleDamage vd;
 
@@ -57,10 +54,8 @@ public class PlayerController : BaseObject
         rigAim = transform.Find("Rig_WeaponAim").GetComponentInChildren<Rig>();
         rigGen = transform.Find("Rig_WeaponPose").GetComponentInChildren<Rig>();
         cco = transform.Find("FreeLook Camera").GetComponent<CinemachineCameraOffset>();
-        cfl = transform.Find("FreeLook Camera").GetComponent<CinemachineFreeLook>();
         BodyParts.Add(transform.Find("Hips_jnt").GetComponent<BoxCollider>());
         pp = UIManager.Instance.GetPanel<PlayerPanel>();
-        bp = UIManager.Instance.GetPanel<BagPanel>();
         if (pp != null) pp.UpdataHP(HP, maxHP);
         else Debug.LogWarning("PlayerPanel获取失败");
     }
@@ -241,25 +236,6 @@ public class PlayerController : BaseObject
         // 通知面板播放换弹进度（时长由当前武器ReloadTime决定）
         if (curWeapon != null) curWeapon.StartReload();
     }
-    public void OpenBag(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            Debug.Log("玩家的控制信号");
-            if (bp.isShow)// 关闭背包
-            {
-                bp.HideMe(() => { });
-                Cursor.lockState = CursorLockMode.Locked;
-            }
-            else// 打开背包
-            {
-                bp.ShowMe();
-                Cursor.lockState = CursorLockMode.Confined;
-            }
-            Cursor.visible = bp.isShow;
-            enableMouseInput(!bp.isShow);
-        }
-    }
 
     void Movement(Vector3 camForwardFlat)
     {
@@ -324,28 +300,6 @@ public class PlayerController : BaseObject
     public void SetAnimationMove(bool isUsing)
     {
         animator.enabled = isUsing;
-    }
-    //启用或关闭鼠标移动带到视角变化以及开火
-    public void enableMouseInput(bool enable)
-    {
-        string x = (enable ? "Mouse X" : "");
-        string y = (enable ? "Mouse Y" : "");
-        //玩家输入由PlayerInput组件驱动，必须禁用组件内部的Fire action；
-        //手动new的PlayerInputActions实例是另一套独立输入，禁用它不会影响组件
-        PlayerInput playerInput = GetComponent<PlayerInput>();
-        if (playerInput != null)
-        {
-            InputAction fireAction = playerInput.actions.FindAction("Fire");
-            if (fireAction != null)
-            {
-                if (enable) fireAction.Enable();
-                else fireAction.Disable();
-                Debug.Log(enable ? "启用鼠标控制开火" : "禁用鼠标控制开火");
-            }
-            else Debug.LogWarning("未找到Fire action");
-        }
-        cfl.m_XAxis.m_InputAxisName = x;
-        cfl.m_YAxis.m_InputAxisName = y;
     }
 
     IEnumerator RaiseGunThenFireCoroutine()

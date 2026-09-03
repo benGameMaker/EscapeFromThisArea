@@ -12,9 +12,7 @@ public class BagPanel : BasePanel
     public Transform iip;   //物品操作面板（BagPanel预制体中的嵌套子物体，右键物品时显示）
 
     [HideInInspector]
-    public PlayerController pc;
-    [HideInInspector]
-    public VehicleController vc;
+    public BagLogicProcess bagOpener;   //记录由哪个可操作物体(BagLogicProcess)打开了背包，关闭按钮据此恢复输入
     [HideInInspector]
     public List<Transform> itemCells;
     //记录每种物品（按名称区分）所占据的格子中的最大下标
@@ -23,14 +21,19 @@ public class BagPanel : BasePanel
     public Dictionary<string, int> itemsNum = new Dictionary<string, int>();
     public override void Init()
     {
-        if (SceneManager.Instance != null) pc = SceneManager.Instance.player;
         btnExit.onClick.AddListener(() =>
         {
-            HideMe(() => { });
-            Cursor.lockState = CursorLockMode.Locked;
-            pc.enableMouseInput(true);
-            if (vc != null) vc.enableMouseInput(true);
-            Cursor.visible = false;
+            //关闭背包并恢复打开者的输入，由记录在bagOpener中的BagLogicProcess处理；未记录时兜底直接隐藏
+            if (bagOpener != null)
+            {
+                bagOpener.CloseBag();
+            }
+            else
+            {
+                HideMe(() => { });
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
         });
         CollectCells();
         //ItemDataLoadCell();
@@ -98,16 +101,21 @@ public class BagPanel : BasePanel
         //布局发生改变，刷新物品占格最大下标记录
         RefreshItemCellMaxIndexAndQuantity();
     }
-    public bool ConsumeItem(string itemName, int num)
+    public bool ConsumeItem(string itemName, int num, int index = -1)
     {
         //消耗数量小于等于0视为成功
         if (num <= 0) return true;
         if (string.IsNullOrEmpty(itemName)) return false;
 
-        //剩余需要消耗的数量
+        //指定了格子下标(>=0)：只消耗该下标格子的物品（供物品操作面板的“使用/丢弃”精确到格子的消耗）
+        if (index >= 0)
+        {
+            return ConsumeItemFromCell(itemName, num, index);
+        }
+
+        //未指定下标(-1)：按原来的逻辑，从该物品占据的最大下标格子开始向前消耗
         int remaining = num;
 
-        //优先从该物品占据的最大下标格子开始消耗（字典缺失时兜底从最后一个格子开始扫描）
         int startIndex = itemCellMaxIndex.TryGetValue(itemName, out int maxIndex) ? maxIndex : itemCells.Count - 1;
         for (int i = startIndex; i >= 0 && remaining > 0; i--)
         {
@@ -142,9 +150,56 @@ public class BagPanel : BasePanel
 
         //布局可能发生改变，刷新物品占格最大下标记录
         RefreshItemCellMaxIndexAndQuantity();
-
+        Debug.Log("已消耗" + itemName + itemsNum.GetValueOrDefault(itemName) + "个");
         //能完全消耗掉指定数量才算成功
         return remaining == 0;
+    }
+    //只消耗指定下标格子中的物品：格子里没有物品或物品名称不匹配时打印警告
+    bool ConsumeItemFromCell(string itemName, int num, int index)
+    {
+        if (index < 0 || index >= itemCells.Count)
+        {
+            Debug.LogWarning("无法消耗" + itemName + "：格子下标" + index + "超出背包范围");
+            return false;
+        }
+        ItemUnit cellItem = GetItemInCell(index);
+        if (cellItem == null)
+        {
+            Debug.LogWarning("无法消耗" + itemName + "：下标" + index + "的格子为空");
+            return false;
+        }
+        if (cellItem.itemName.text != itemName)
+        {
+            Debug.LogWarning("无法消耗" + itemName + "：下标" + index + "的格子里是" + cellItem.itemName.text);
+            return false;
+        }
+
+        int.TryParse(cellItem.curNum.text, out int cur);
+        if (cur <= 0)
+        {
+            //数量为0的空堆叠直接销毁
+            Destroy(cellItem.gameObject);
+            RefreshItemCellMaxIndexAndQuantity();
+            return false;
+        }
+
+        if (cur >= num)
+        {
+            //该格子数量足够，扣除num
+            int left = cur - num;
+            if (left > 0) cellItem.curNum.text = left.ToString();
+            else Destroy(cellItem.gameObject);
+            RefreshItemCellMaxIndexAndQuantity();
+            return true;
+        }
+        else
+        {
+            //该格子数量不足num，只能把现有数量全部消耗掉
+            Destroy(cellItem.gameObject);
+            RefreshItemCellMaxIndexAndQuantity();
+            Debug.LogWarning("消耗" + itemName + "数量不足：下标" + index + "的格子只有" + cur + "个，需要" + num + "个");
+            return false;
+        }
     }
     //重新计算每种物品所占据格子的最大下标，在添加、消耗物品以及布局改变后调用，同时计算每个物品的总数量
     public void RefreshItemCellMaxIndexAndQuantity()
@@ -217,8 +272,14 @@ public class BagPanel : BasePanel
         }
         return null;
     }
+    //获取物品单元当前所在格子的下标：以它实际的父物体为准实时计算，避免使用可能过期的缓存cellIndex
+    public int GetItemCellIndex(ItemUnit itemUnit)
+    {
+        if (itemUnit == null || itemUnit.transform.parent == null) return -1;
+        return itemCells.IndexOf(itemUnit.transform.parent);
+    }
     //创建新的物品单元并放入指定格子中，填充数据后返回
-    ItemUnit CreateItemUnit(Transform cell, string itemName, Sprite itemIcon, int curNum, int maxStackNum, int useBehaviorNumber, int cellIndex, UnityAction action)
+    ItemUnit CreateItemUnit(Transform cell, string itemName, Sprite itemIcon, int curNum, int maxStackNum, int useBehaviorNumber, int cellIndex, UnityAction<int> action)
     {
         //Debug.Log("创建物品单元：" + itemName + "，数量：" + curNum + "，格子下标：" + cellIndex);
         GameObject itemUnitObj = Instantiate(Resources.Load<GameObject>("Prefabs/UI/ItemUnit"));
@@ -282,7 +343,7 @@ public class BagPanel : BasePanel
             }
             CreateItemUnit(itemCells[cell.cellIndex], cell.itemName,
                 Resources.Load<Sprite>("Sprites/" + cell.itemIconName), cell.curNum,
-                cell.maxStackNum, cell.useBehaviorNumber, cell.cellIndex, () => { Debug.Log("Json导入的物品暂时无行为函数"); });
+                cell.maxStackNum, cell.useBehaviorNumber, cell.cellIndex, (v) => { Debug.Log("Json导入的物品暂时无行为函数"); });
         }
     }
     void SaveItemDatasToCellDatas()

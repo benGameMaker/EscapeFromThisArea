@@ -21,7 +21,7 @@ public class ItemUnit : MonoBehaviour, IPointerClickHandler
     //所属背包的物品操作面板（由BagPanel在创建物品单元时赋值）
     [HideInInspector]
     public Transform iip;
-    public UnityAction UseBehavior;
+    public UnityAction<int> UseBehavior;
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -30,15 +30,12 @@ public class ItemUnit : MonoBehaviour, IPointerClickHandler
             ShowInteractionPanel();
     }
 
-    //显示操作面板：物品的直接父物体就是所在格子，面板左上角对齐该格子的右上角
+    //显示操作面板：把自身交给面板，由面板负责定位与记录目标物品
     void ShowInteractionPanel()
     {
         if (transform.parent == null) return;
         ItemInteractionPanel panel = iip != null ? iip.GetComponent<ItemInteractionPanel>() : null;
         if (panel != null)
-        {
-            panel.ShowAtAndSetUseBehavor(transform.parent);
-            panel.PrcessingItem = this;
-        }
+            panel.ShowAt(this);
     }
 }
