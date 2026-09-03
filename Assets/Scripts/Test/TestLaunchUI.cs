@@ -8,6 +8,8 @@ public class TestLauchUI : MonoBehaviour
     public BaseItemObjData item2;
     public Transform ThrowPoint;
     public int consumeNum;
+
+    public LootSpawner spawner;
     BagPanel bp;
     void Start()
     {
@@ -48,6 +50,10 @@ public class TestLauchUI : MonoBehaviour
             {
                 gc.TriggerFuse();
             }
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            spawner.RefreshLoot();
         }
     }
 }
