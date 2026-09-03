@@ -14,6 +14,8 @@ public class BagPanel : BasePanel
     [HideInInspector]
     public PlayerController pc;
     [HideInInspector]
+    public VehicleController vc;
+    [HideInInspector]
     public List<Transform> itemCells;
     //记录每种物品（按名称区分）所占据的格子中的最大下标
     public Dictionary<string, int> itemCellMaxIndex = new Dictionary<string, int>();
@@ -27,6 +29,7 @@ public class BagPanel : BasePanel
             HideMe(() => { });
             Cursor.lockState = CursorLockMode.Locked;
             pc.enableMouseInput(true);
+            if (vc != null) vc.enableMouseInput(true);
             Cursor.visible = false;
         });
         CollectCells();

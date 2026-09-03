@@ -10,7 +10,7 @@ public abstract class BaseInteractivity : MonoBehaviour
     public Vector2 panelOffset;
     InteractionPanel interactionPanel;
 
-    public abstract void InteractionBehavior(GameObject obj);
+    public abstract void InteractionBehavior(PlayerController obj);
 
     InteractionPanel GetInteractionPanel()
     {

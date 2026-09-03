@@ -9,10 +9,9 @@ public class VehicleInteraction : BaseInteractivity
     
     LayerMask originalExcludeLayer;
     Transform DropOffPos;
-    GameObject driver;
     Rigidbody rb;
-
     VehicleController vehicle;
+    PlayerController driver;
     private void Start()
     {
         DropOffPos = transform.Find("DropOffPos");
@@ -26,33 +25,30 @@ public class VehicleInteraction : BaseInteractivity
         
     }
     //玩家在外部使用这个函数来于车辆进行互动
-    public override void InteractionBehavior(GameObject obj)
+    public override void InteractionBehavior(PlayerController player)
     {
-        if (obj == null) return;
+        if (player == null) return;
+        UIManager.Instance.GetPanel<BagPanel>().vc = vehicle;
 
         //记录上车玩家，供下车时恢复
-        driver = obj;
+        driver = player;
 
         //将玩家设置为DropOffPos的子物体，然后失活隐藏
-        obj.transform.SetParent(DropOffPos);
-        obj.transform.localPosition = Vector3.zero;
-        obj.transform.localRotation = Quaternion.identity;
+        driver.transform.SetParent(DropOffPos);
+        driver.transform.localPosition = Vector3.zero;
+        driver.transform.localRotation = Quaternion.identity;
 
-        //上车前退出玩家的瞄准状态（isAim=false），下车后回到普通持枪动作（rigAim=0/rigGen=1）
-        PlayerController playerCtrl = obj.GetComponent<PlayerController>();
-        if (playerCtrl != null)
-        {
-            playerCtrl.isAim = false;
-            playerCtrl.rigAim.weight = 0f;
-            playerCtrl.rigGen.weight = 1f;
-        }
+        driver.isAim = false;
+        driver.rigAim.weight = 0f;
+        driver.rigGen.weight = 1f;
+        driver.vd = GetComponent<VehicleDamage>();
 
-        obj.SetActive(false);
+        driver.gameObject.SetActive(false);
 
         //将玩家信息传给车辆上的武器（子弹伤害归属玩家）
         if (vehicle != null)
         {
-            vehicle.SetWeaponsOwner(obj.GetComponent<BaseObject>());
+            vehicle.SetWeaponsOwner(driver);
             //if (obj.GetComponent<BaseObject>().name != null) Debug.Log("VehicleInteraction传入玩家信息" + obj.GetComponent<BaseObject>().name);
             //else Debug.Log("VehicleInteraction传入玩家信息" + obj.GetComponent<BaseObject>().name+"------失败！！！！！！！！！！");
         }
@@ -79,13 +75,14 @@ public class VehicleInteraction : BaseInteractivity
         //下车后隐藏车辆UI面板
         if (vehicle != null) vehicle.HideVehicleUI();
 
-        driver.SetActive(true);
+        driver.gameObject.SetActive(true);
         rb.excludeLayers = originalExcludeLayer;
 
         //解除父子关系回到场景根节点，位置在世界坐标下与DropOffPos相同
         driver.transform.SetParent(null);
         driver.transform.position = DropOffPos.position;
         driver.transform.rotation = DropOffPos.rotation;
+        driver.vd = null;
 
         driver = null;
     }

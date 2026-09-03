@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,8 +42,11 @@ public class VehicleController : MonoBehaviour
     bool isFiring = false;
     float nextFireTime = 0f;
     Coroutine reloadCoroutine;
+    CinemachineFreeLook cfl;
     bool isBrakeHeld = false;
     bool isCanDrive = true;
+    [HideInInspector]
+    public BagPanel bp;
 
     void Awake()
     {
@@ -56,6 +60,8 @@ public class VehicleController : MonoBehaviour
     void Start()
     {
         mainCameraPos = Camera.main.transform;
+        cfl = transform.Find("CameraPos/FreeLook Camera").GetComponent<CinemachineFreeLook>();
+        if (cfl == null) Debug.Log("获取cfl失败");
         //兜底：若Awake时WeaponPos尚未就绪则在此补齐
         CollectWeapons();
     }
@@ -137,6 +143,26 @@ public class VehicleController : MonoBehaviour
                 return;
             }
             vehicleInteraction.DropOff();
+        }
+    }
+    public void OpenBag(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            Debug.Log("汽车的控制信号");
+            if(bp==null) bp = UIManager.Instance.GetPanel<BagPanel>();
+            if (bp.isShow)// 关闭背包
+            {
+                bp.HideMe(() => { });
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            else// 打开背包
+            {
+                bp.ShowMe();
+                Cursor.lockState = CursorLockMode.Confined;
+            }
+            Cursor.visible = bp.isShow;
+            enableMouseInput(!bp.isShow);
         }
     }
 
@@ -249,6 +275,30 @@ public class VehicleController : MonoBehaviour
             WeaponPos.rotation = Quaternion.LookRotation(dir);
         }
     }
+
+    //启用或关闭鼠标移动带到视角变化以及开火
+    public void enableMouseInput(bool enable)
+    {
+        string x = (enable ? "Mouse X" : "");
+        string y = (enable ? "Mouse Y" : "");
+        //玩家输入由PlayerInput组件驱动，必须禁用组件内部的Fire action；
+        //手动new的PlayerInputActions实例是另一套独立输入，禁用它不会影响组件
+        PlayerInput playerInput = GetComponent<PlayerInput>();
+        if (playerInput != null)
+        {
+            InputAction fireAction = playerInput.actions.FindAction("Fire");
+            if (fireAction != null)
+            {
+                if (enable) fireAction.Enable();
+                else fireAction.Disable();
+                Debug.Log(enable ? "启用鼠标控制开火" : "禁用鼠标控制开火");
+            }
+            else Debug.LogWarning("未找到Fire action");
+        }
+        cfl.m_XAxis.m_InputAxisName = x;
+        cfl.m_YAxis.m_InputAxisName = y;
+    }
+
 
     //移动：当输入方向与当前车速方向相反时先刹车制动，减速到brakeStopSpeed以内再恢复驱动力
     void Move()

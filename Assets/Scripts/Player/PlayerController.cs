@@ -45,6 +45,8 @@ public class PlayerController : BaseObject
     public Rig rigGen;
     [HideInInspector]
     public BagPanel bp;
+    [HideInInspector]
+    public VehicleDamage vd;
 
     void Start()
     {
@@ -243,6 +245,7 @@ public class PlayerController : BaseObject
     {
         if (context.performed)
         {
+            Debug.Log("玩家的控制信号");
             if (bp.isShow)// 关闭背包
             {
                 bp.HideMe(() => { });

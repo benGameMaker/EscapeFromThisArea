@@ -10,7 +10,7 @@ public class BulletInteraction : BaseInteractivity
         bulletItem = GetComponent<BulletItem>();
         if (bulletItem == null) Debug.Log("该子弹缺乏物品数据");
     }
-    public override void InteractionBehavior(GameObject obj)
+    public override void InteractionBehavior(PlayerController obj)
     {
         if (UIManager.Instance.GetPanel<BagPanel>() != null && bulletItem != null)
         {
