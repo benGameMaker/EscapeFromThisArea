@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
@@ -11,14 +9,14 @@ public class WeaponSwitching : MonoBehaviour
 {
     public List<WeaponControl> weaponLists;
 
-    public GameObject Knife;
-    public GameObject Grenade;
-    public Sprite KnifeIcon;
+    public GameObject Knife;      //刀模型
+    public GameObject Grenade;    //手雷模型
+    public Sprite KnifeIcon;      //刀图标
+    public Sprite GrenadeIcon;    //手雷图标
 
-    int lastWeaponKeyID;
-    int curWeaponKeyID;
+    WeaponControl curWeapon;      //当前手持的枪，为null表示手持道具(刀/手雷)
+    GameObject curTool;           //当前手持的非枪道具
 
-    WeaponControl curWeapon;
     Transform LeftHand;
     Transform RightHand;
     Transform weaponHolder;
@@ -37,14 +35,7 @@ public class WeaponSwitching : MonoBehaviour
         RightHand = transform.Find("WeaponHolder/RightHand");
         rigHands = transform.Find("Rig_HandsIK").GetComponentInChildren<Rig>();
         pp = UIManager.Instance.GetPanel<PlayerPanel>();
-        if (pp == null) Debug.LogWarning("WeaponSwitching获取面板失败");
-        else
-        {
-            pp.HideCapacityDataUI();
-            pp.ShowKnifeIcon(KnifeIcon);
-            //Debug.Log("初始化武器数据到UI");
-        }
-
+        if (pp == null) Debug.LogWarning("PlayerPanel获取面板失败");
         weaponLists.Clear();
         if (weaponHolder != null)
         {
@@ -52,71 +43,201 @@ public class WeaponSwitching : MonoBehaviour
             {
                 WeaponControl wc = weaponHolder.GetChild(i).GetComponent<WeaponControl>();
                 // 武器物体初始可能为inactive，Awake不会执行，需手动初始化弹匣
-                wc.InitCapacity();
-                weaponLists.Add(wc);
-                Debug.Log(wc.name + "现有的子弹数为：" + wc.curCapacity);
+                if (wc != null)
+                {
+                    wc.InitCapacity();
+                    weaponLists.Add(wc);
+                    Debug.Log(wc.name + "现有的子弹数为：" + wc.curCapacity);
+                }
             }
+        }
+
+        // 初始默认持刀
+        curTool = Knife;
+        Knife.SetActive(true);
+        Grenade.SetActive(false);
+        if (pp != null)
+        {
+            pp.HideCapacityDataUI();
+            pp.ShowToolIcon(KnifeIcon);
         }
     }
 
     void Update()
     {
-        if (curWeapon != null)
-        {
-            Transform targetRight = curWeapon.transform.Find("RightHandIK");
-            Transform targetLeft = curWeapon.transform.Find("LeftHandIK");
+        if (curWeapon == null) return;
 
-            if (targetRight != null && RightHand != null)
-            {
-                RightHand.SetPositionAndRotation(targetRight.position, targetRight.rotation);
-            }
-            if (targetLeft != null && LeftHand != null)
-            {
-                LeftHand.SetPositionAndRotation(targetLeft.position, targetLeft.rotation);
-            }
+        Transform targetRight = curWeapon.transform.Find("RightHandIK");
+        Transform targetLeft = curWeapon.transform.Find("LeftHandIK");
+        if (targetRight != null && RightHand != null)
+            RightHand.SetPositionAndRotation(targetRight.position, targetRight.rotation);
+        if (targetLeft != null && LeftHand != null)
+            LeftHand.SetPositionAndRotation(targetLeft.position, targetLeft.rotation);
+    }
+
+    // 输入分发：数字键切枪，非数字键按按键名切换到对应道具
+    public void SwitchWeapon(InputAction.CallbackContext context)
+    {
+        if (!context.performed) return;
+        if (cp == null || cp.animator == null || rigHands == null)
+        {
+            Debug.LogError(gameObject.name + " 组件未就绪，跳过切枪");
+            return;
+        }
+        cp.animator.SetBool("Reload_b", false);
+
+        if (int.TryParse(context.control.name, out int gunID))
+            SwitchToGun(gunID);
+        else
+            SwitchToolByKey(context.control.name);
+    }
+
+    // 通用：非数字键按按键名分发到对应道具(Q=刀、G=手雷等)，后续新增道具在此加case即可
+    void SwitchToolByKey(string controlName)
+    {
+        switch (controlName.ToLower())
+        {
+            case "q":
+                EquipTool(Knife, KnifeIcon);   // 刀
+                break;
+            case "g":
+                // 手雷：背包中必须有名为"Grenade"的物品才切换，否则无反应
+                BagPanel bag = UIManager.Instance.GetPanel<BagPanel>();
+                if (bag != null && bag.itemsNum.GetValueOrDefault("Grenade") > 0)
+                    EquipTool(Grenade, GrenadeIcon);
+                break;
         }
     }
 
-    public void SwitchWeapon(InputAction.CallbackContext context)
+    // 切换到编号为gunID(1~N)的枪械
+    void SwitchToGun(int gunID)
     {
-        if (context.performed)
+        if (gunID < 1 || gunID > weaponLists.Count) return;
+        WeaponControl target = weaponLists[gunID - 1];
+        if (target == curWeapon) return;
+
+        bool wasHoldingGun = curWeapon != null;
+        if (wasHoldingGun)
         {
-            cp.animator.SetBool("Reload_b", false);
-            if (cp == null || cp.animator == null || rigHands == null)
-            {
-                Debug.LogError(gameObject.name + " 组件未就绪，跳过切枪");
-                return;
-            }
-            lastWeaponKeyID = curWeaponKeyID;
+            // 放下旧枪，延迟0.3s(等收枪)再拿起新枪
+            LayDownWeapon(curWeapon);
+        }
+        else
+        {
+            // 当前持刀/手雷，先收起道具
+            HideTool();
+        }
 
-            if (int.TryParse(context.control.name, out curWeaponKeyID) && lastWeaponKeyID != curWeaponKeyID)
-            {
-                if (curWeaponKeyID >= 1 && curWeaponKeyID <= weaponLists.Count)
-                {
-                    bool isHoldWeapon = false;
-                    if (curWeapon != null)
-                    {
-                        LayDownWeapon(curWeapon);
-                        isHoldWeapon = true;
-                    }
+        curWeapon = target;
+        pc.curWeapon = target;
 
-                    Knife.SetActive(false);
-                    curWeapon = weaponLists[curWeaponKeyID - 1];
-                    pc.curWeapon = curWeapon;
-                    if (isHoldWeapon) StartCoroutine(DelayExecute(0.3f, curWeapon, TakeUpWeapon));
-                    else TakeUpWeapon(curWeapon);
-                }
-            }
-            else if (lastWeaponKeyID != curWeaponKeyID)
-            {
-                LayDownWeapon(weaponLists[lastWeaponKeyID - 1]);
+        if (wasHoldingGun)
+            StartCoroutine(DelayExecute(0.3f, target, TakeUpWeapon));
+        else
+            TakeUpWeapon(target);
+    }
 
-                Knife.SetActive(true);
-                pp.ShowKnifeIcon(KnifeIcon);
-                pc.isAim = false;
-                pc.AimingAction();
-                curWeapon = null;
+    // 通用：手持指定的非枪道具(刀/手雷)
+    void EquipTool(GameObject toolModel, Sprite toolIcon)
+    {
+        if (curTool == toolModel) return; // 已是该道具，无需重复切换
+
+        if (curWeapon != null)
+            LayDownWeapon(curWeapon);
+
+        curWeapon = null;
+        curTool = toolModel;
+
+        // 道具身上若有刚体(如手雷)，拿在手上时必须保持kinematic，否则会因重力掉落
+        SetModelKinematic(Knife, Knife == toolModel);
+        SetModelKinematic(Grenade, Grenade == toolModel);
+
+        // 只显示目标道具
+        Knife.SetActive(Knife == toolModel);
+        Grenade.SetActive(Grenade == toolModel);
+
+        pp.ShowToolIcon(toolIcon);
+        pc.isAim = false;
+        pc.AimingAction();
+    }
+
+    // 设置模型及其子物体上所有刚体的kinematic状态(拿在手上的模型应冻结物理，避免受重力掉落)
+    void SetModelKinematic(GameObject model, bool kinematic)
+    {
+        if (model == null) return;
+        Rigidbody[] rbs = model.GetComponentsInChildren<Rigidbody>(true);
+        for (int i = 0; i < rbs.Length; i++) rbs[i].isKinematic = kinematic;
+    }
+
+    // 收起当前手持道具(切枪/投掷后调用)
+    public void HideTool()
+    {
+        Knife.SetActive(false);
+        Grenade.SetActive(false);
+        curTool = null;
+    }
+
+    //---------------------- 手雷投掷会话与道具攻击输入 ----------------------
+
+    //是否手持手雷(当前道具为手雷，用于区分投掷与近战)
+    public bool IsHoldingGrenade => curTool == Grenade;
+
+    //背包中是否还有手雷(实时获取背包，避免缓存引用失效导致误判)
+    bool HasGrenadeInBag()
+    {
+        BagPanel bag = UIManager.Instance.GetPanel<BagPanel>();
+        return bag != null && bag.itemsNum.GetValueOrDefault("Grenade") > 0;
+    }
+
+    //道具攻击按下(未持枪时Fire.performed)：手持手雷播放投掷动画(10)，否则播放近战攻击(12)
+    public void OnToolAttackStart()
+    {
+        cp.animator.SetInteger("WeaponType_int", IsHoldingGrenade ? 10 : 12);
+    }
+
+    //道具攻击松开(未持枪时Fire.canceled)：回到待机(0)
+    public void OnToolAttackEnd()
+    {
+        cp.animator.SetInteger("WeaponType_int", 0);
+    }
+
+    //手雷已投出(由动画事件ThrowingObjects生成完投掷物后调用)：
+    //扣除背包一颗手雷并返回是否扣减成功(失败=背包已空)。成功后才允许本轮"投掷动画"发生，
+    //模型显隐统一交给ThrowingOver收尾(有雷装回下一颗/无雷切刀)，避免中途状态与动画错位
+    public bool OnGrenadeThrown()
+    {
+        BagPanel bag = UIManager.Instance.GetPanel<BagPanel>();
+        bool deducted = bag != null && bag.ConsumeItem("Grenade", 1);
+        //先隐藏手中手雷(无论是否还有，等ThrowingOver决定装填还是切刀)
+        if (Grenade != null) Grenade.SetActive(false);
+        return deducted;
+    }
+
+    //投掷动画末尾(由动画事件ThrowingOver调用)：
+    //仍处手雷会话时：背包有雷->把手雷模型放回手中(可继续连投)；没有->切回持刀并强制隐藏手雷。
+    //若鼠标左键仍按住，立即发起下一次攻击(续投或近战12)，保证衔接流畅
+    public void OnThrowOver()
+    {
+        if (IsHoldingGrenade)
+        {
+            if (HasGrenadeInBag())
+            {
+                //装回手中的手雷，为下一次投掷做准备
+                if (Grenade != null) Grenade.SetActive(true);
             }
+            else
+            {
+                //手雷投完：强制隐藏手雷并切回持刀状态(双保险，杜绝模型残留)
+                if (Grenade != null) Grenade.SetActive(false);
+                EquipTool(Knife, KnifeIcon);
+            }
+        }
+
+        //按住左键不松且仍处于道具模式(未持枪)：紧接下一次攻击
+        if (curWeapon == null && Input.GetMouseButton(0))
+        {
+            if (IsHoldingGrenade && HasGrenadeInBag()) cp.animator.SetInteger("WeaponType_int", 10);   //继续投掷
+            else if (!IsHoldingGrenade) cp.animator.SetInteger("WeaponType_int", 12);                  //近战攻击
         }
     }
 

@@ -19,15 +19,25 @@ public class PlayerController : BaseObject
     public Vector3 genOffset = new Vector3(0.38f, -0.15f, -0.84f);
     public Vector3 aimOffset = new Vector3(0.7f, -0.15f, 1f);
     public TextCapacityUI capacityUI;
-
-    Transform mainCameraPos;
-    [SerializeField]
-    Transform Body;
+    public Transform DiscardPoint;
+    [Tooltip("投掷手雷时的初速度大小")]
+    public float throwForce = 15f;
 
     [HideInInspector]
     public bool isHoldingWeapon = false;
     [HideInInspector]
     public bool isAim = false;
+    [HideInInspector]
+    public WeaponControl curWeapon;
+    [HideInInspector]
+    public Rig rigAim;
+    [HideInInspector]
+    public Rig rigGen;
+    [HideInInspector]
+    public VehicleDamage vd;
+    [SerializeField]
+    Transform Body;
+    CinemachineCameraOffset cco;
     bool isAligningAim = false;
     bool isMoving = false;
     bool isHipGunRaised = false;
@@ -35,15 +45,7 @@ public class PlayerController : BaseObject
     ColliderProcessor cp;
     MeleeRange mr;
     PlayerPanel pp;
-    [HideInInspector]
-    public WeaponControl curWeapon;
-    CinemachineCameraOffset cco;
-    [HideInInspector]
-    public Rig rigAim;
-    [HideInInspector]
-    public Rig rigGen;
-    [HideInInspector]
-    public VehicleDamage vd;
+    Transform mainCameraPos;
 
     void Start()
     {
@@ -164,27 +166,33 @@ public class PlayerController : BaseObject
         }
     }
 
-    bool isFire = false;
+    //开火输入分发：持枪走枪械开火；未持枪(持刀/持手雷等道具)交给WeaponSwitching处理道具攻击
+    bool isFire = false;   //举枪连发标记，收枪计时使用
     public void Fire(InputAction.CallbackContext context)
     {
         if (!isHoldingWeapon)
         {
-            if(context.performed)
+            // 未持枪：由WeaponSwitching判断是投掷手雷(10)还是近战攻击(12)
+            WeaponSwitching ws = GetComponent<WeaponSwitching>();
+            if (ws != null)
             {
-                animator.SetInteger("WeaponType_int", 12);
-            }
-            if (context.canceled)
-            {
-                animator.SetInteger("WeaponType_int", 0);
+                if (context.performed) ws.OnToolAttackStart();
+                else if (context.canceled) ws.OnToolAttackEnd();
             }
             return;
         }
+        GunFire(context);
+    }
+    //持枪开火(原Fire中持枪逻辑)：处理空仓换弹、举枪开火与收枪计时
+    void GunFire(InputAction.CallbackContext context)
+    {
         if (curWeapon.curCapacity <= 0)
         {
             animator.SetBool("Reload_b", true);
             // 空仓自动换弹：通知面板播放换弹进度
             curWeapon.StartReload();
         }
+
         if (!isAim)
         {
             if (context.performed)
@@ -266,9 +274,69 @@ public class PlayerController : BaseObject
         animator.SetFloat("Body_Vertical_f", Mathf.Clamp(verticalAngle * (bodyRotationMax_v / 60f), -bodyRotationMax_v, bodyRotationMax_v));
         // 瞄准状态下，若夹角大于60度则开始对齐，持续旋转直到夹角降至10度
     }
+    //-----------动画事件触发的方法----------//
     public void TriggerFire()
     {
         curWeapon.Fire();
+    }
+    //投掷手持道具(手雷)：由投掷动作动画机事件调用。
+    //在世界坐标与手中手雷模型相同的位置生成新手雷，取消kinematic、沿摄像机正方向给出初速度，并触发引信
+    public void ThrowingObjects()
+    {
+        WeaponSwitching ws = GetComponent<WeaponSwitching>();
+        if (ws == null) return;
+
+        // 库存闸(实时查询)：背包已无手雷时绝不生成/投掷，只做收尾，杜绝"无中生有"的手雷
+        BagPanel bag = UIManager.Instance.GetPanel<BagPanel>();
+        if (bag == null || bag.itemsNum.GetValueOrDefault("Grenade") <= 0)
+        {
+            if (ws.Grenade != null && ws.Grenade.activeSelf) ws.OnGrenadeThrown();
+            return;
+        }
+
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/Items/10_Grenade");
+        if (prefab == null)
+        {
+            Debug.LogWarning("未找到手雷预制体 Prefabs/Items/10_Grenade，无法投掷");
+            //仍做一次收尾(扣雷/切刀)，防止预制体缺失时按住左键陷入无限空投循环
+            ws.OnGrenadeThrown();
+            return;
+        }
+
+        //在手中手雷模型的同一位置(世界坐标)生成新手雷
+        GameObject grenade = Instantiate(prefab, ws.Grenade.transform.position, ws.Grenade.transform.rotation);
+        grenade.layer = LayerMask.NameToLayer("Player");
+        Rigidbody rb = grenade.GetComponent<Rigidbody>();
+        if (rb == null) rb = grenade.AddComponent<Rigidbody>();
+        //投掷出去的实体必须是动态刚体，取消kinematic
+        rb.isKinematic = false;
+        //方向与摄像机正方向平行
+        Transform cam = mainCameraPos != null ? mainCameraPos : (Camera.main != null ? Camera.main.transform : null);
+        if (cam == null)
+        {
+            Debug.LogWarning("找不到主摄像机，无法确定投掷方向");
+            Destroy(grenade);
+            return;
+        }
+        rb.velocity = cam.forward * throwForce;
+
+        //拉环，waitTime秒后爆炸
+        GrenadeControl gc = grenade.GetComponent<GrenadeControl>();
+        if (gc != null) gc.TriggerFuse();
+        else Debug.LogWarning("手雷预制体上没有GrenadeControl，无法触发爆炸");
+
+        //扣除背包手雷并隐藏手中模型；若扣减失败(极端竞争：库存在这一帧被耗尽)则回收刚生成的雷
+        if (!ws.OnGrenadeThrown())
+        {
+            Destroy(grenade);
+        }
+    }
+    //投掷动画末尾事件(在投掷动画最后插入事件帧调用)：
+    //背包中还有手雷则把手雷模型放回手中(可连续投掷)，没有则切换为持刀状态
+    public void ThrowingOver()
+    {
+        WeaponSwitching ws = GetComponent<WeaponSwitching>();
+        if (ws != null) ws.OnThrowOver();
     }
     public void TriggerMeleeAtk(float time)
     {
@@ -279,6 +347,8 @@ public class PlayerController : BaseObject
         animator.SetBool("Reload_b", false);
         curWeapon.Reload();
     }
+    //--------------------------------------//
+
     public void AimingAction()
     {
         // 举枪

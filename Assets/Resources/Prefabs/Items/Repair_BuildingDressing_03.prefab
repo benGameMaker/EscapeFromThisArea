@@ -106,7 +106,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
@@ -151,6 +151,7 @@ MonoBehaviour:
   itemName: RepairItem
   curNum: 10
   maxStackNum: 30
+  itemPrefabsName: Repair_BuildingDressing_03
   useBehaviorNumber: 0
 --- !u!114 &5259834180215793321
 MonoBehaviour:

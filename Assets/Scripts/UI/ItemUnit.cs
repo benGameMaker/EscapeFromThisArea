@@ -15,7 +15,8 @@ public class ItemUnit : MonoBehaviour, IPointerClickHandler
     public TextMeshProUGUI curNum;
     public TextMeshProUGUI itemName;
     public int maxStackNum;
-    public int useBehaviorNumber;
+    //用于丢弃时加载场景物品预制体的名称(Resources/Prefabs/Items下的名称)
+    public string itemPrefabsName;
     public int cellIndex;
 
     //所属背包的物品操作面板（由BagPanel在创建物品单元时赋值）

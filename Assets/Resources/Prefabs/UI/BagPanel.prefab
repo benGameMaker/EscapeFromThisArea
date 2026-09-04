@@ -816,7 +816,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 832dc47f954b5d843af20685385106b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isShow: 1
+  isShow: 0
   btnExit: {fileID: 3378669013096193686}
   Cells: {fileID: 9081258598068588394}
   iip: {fileID: 1923975685840150945}
@@ -2107,7 +2107,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 714, y: -85.264}
+  m_AnchoredPosition: {x: 642, y: -130}
   m_SizeDelta: {x: 141.3002, y: 155.21808}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &8992977217699182000
@@ -2164,7 +2164,7 @@ MonoBehaviour:
   btnUse: {fileID: 3552279287140075406}
   btnDiscard: {fileID: 8893742998876249048}
   ipfNum: {fileID: 2418941771971776990}
-  PrcessingItem: {fileID: 0}
+  ProcessingItem: {fileID: 0}
 --- !u!225 &5351538190988903905
 CanvasGroup:
   m_ObjectHideFlags: 0

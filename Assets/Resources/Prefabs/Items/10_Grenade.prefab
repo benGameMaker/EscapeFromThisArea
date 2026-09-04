@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 7599682903819629711}
   - component: {fileID: 1145053864246761067}
   m_Layer: 0
-  m_Name: 10_Wep_Grenade
+  m_Name: 10_Grenade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -108,7 +108,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
@@ -190,7 +190,7 @@ MonoBehaviour:
   itemName: Grenade
   curNum: 1
   maxStackNum: 3
-  useBehaviorNumber: 0
+  itemPrefabsName: 10_Grenade
 --- !u!114 &1145053864246761067
 MonoBehaviour:
   m_ObjectHideFlags: 0

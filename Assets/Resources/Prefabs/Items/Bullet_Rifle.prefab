@@ -106,7 +106,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
@@ -151,6 +151,7 @@ MonoBehaviour:
   itemName: RifteBullet
   curNum: 15
   maxStackNum: 60
+  itemPrefabsName: Bullet_Rifle
   useBehaviorNumber: 0
 --- !u!114 &-5780764905737716419
 MonoBehaviour:

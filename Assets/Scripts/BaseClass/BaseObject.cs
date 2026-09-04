@@ -12,9 +12,9 @@ public class BaseObject : MonoBehaviour
     public float moveSpeedMultiplier = 1;
     [Tooltip("物体转身速度")]
     public float rotationSpeed = 5f;
+    public Vector3 floatingDamageOffSet;
     [Tooltip("受伤时会浮现出该物体受到的伤害数值")]
     public bool floatingDamage = false;
-    public Vector3 floatingDamageOffSet;
 
     [HideInInspector]
     public Vector2 moveVector;

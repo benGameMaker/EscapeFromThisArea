@@ -12,8 +12,8 @@ public abstract class BaseItemObjData : MonoBehaviour
     public int curNum;
     //在背包格子中的该物品的最大堆叠数量
     public int maxStackNum;
-    //在背包使用它时，所要执行的行为函数编号
-    public int useBehaviorNumber;
+    //用于丢弃/生成场景物品时加载的预制体名(Resources/Prefabs/Items下的名称)
+    public string itemPrefabsName;
 
     // 在背包中使用时它要执行的行为方法，在子类中实现
     public abstract void UseBahaivor(int Integer = 0);
@@ -25,6 +25,6 @@ public abstract class BaseItemObjData : MonoBehaviour
         itemName = other.itemName;
         curNum = other.curNum;
         maxStackNum = other.maxStackNum;
-        useBehaviorNumber = other.useBehaviorNumber;
+        itemPrefabsName = other.itemPrefabsName;
     }
 }

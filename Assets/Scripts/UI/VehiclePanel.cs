@@ -25,6 +25,8 @@ public class VehiclePanel : BasePanel
 
     // 当前绑定的武器，用于事件退订
     WeaponControl curWeapon;
+    // 订阅的背包面板，用于OnDestroy退订
+    BagPanel bagRef;
 
     // 换弹进度协程
     Coroutine reloadProgressCoroutine;
@@ -34,6 +36,18 @@ public class VehiclePanel : BasePanel
         //初始隐藏弹药数据，等上车切换武器后再显示
         if (CapacityData != null) CapacityData.SetActive(true);
         //maxIntegritywidth = IntegrityBack.rectTransform.rect.width;
+        //订阅背包数据变化，背包物品数量变化(如拾取/消耗子弹)时实时刷新HUD的余量
+        bagRef = UIManager.Instance.GetPanel<BagPanel>();
+        if (bagRef != null) bagRef.OnBagItemsChanged += OnBagItemsChanged;
+    }
+    void OnDestroy()
+    {
+        if (bagRef != null) bagRef.OnBagItemsChanged -= OnBagItemsChanged;
+    }
+    //背包数据变化：刷新当前武器子弹的余量显示
+    void OnBagItemsChanged()
+    {
+        RefreshMaxCapacity();
     }
     bool isInitialized;
     public void UpdataCurIntegrity(float curIntegrity, float maxIntegrity)
@@ -47,6 +61,8 @@ public class VehiclePanel : BasePanel
     public void UpdataCurCapacity(int cur)
     {
         CurCapacity.text = cur.ToString();
+        //开火/换弹等弹药数量变化后，同步刷新背包中该武器子弹的余量(MaxCapacity)
+        RefreshMaxCapacity();
         // 弹药数量恢复（换弹完成），结束换弹进度显示
         EndReloadProgress();
     }
@@ -57,6 +73,12 @@ public class VehiclePanel : BasePanel
 
     public void ShowCapacityDataToUI(WeaponControl weaponControl)
     {
+        //确保已订阅背包数据变化事件(面板可能比背包更早初始化)
+        if (bagRef == null)
+        {
+            bagRef = UIManager.Instance.GetPanel<BagPanel>();
+            if (bagRef != null) bagRef.OnBagItemsChanged += OnBagItemsChanged;
+        }
         //退订上一把武器，订阅当前武器的事件，实现实时刷新
         if (curWeapon != null) curWeapon.OnCapacityChanged -= UpdataCurCapacity;
         if (curWeapon != null) curWeapon.OnReloadStart -= StartReloadProgress;
@@ -65,10 +87,24 @@ public class VehiclePanel : BasePanel
         weaponControl.OnReloadStart += StartReloadProgress;
 
         CapacityData.SetActive(true);
-        MaxCapacity.text = weaponControl.capacity.ToString();
+        //CurCapacity=弹匣现有数量，MaxCapacity=该子弹在背包中的总数
         CurCapacity.text = weaponControl.curCapacity.ToString();
+        MaxCapacity.text = GetBagAmmoCount(weaponControl).ToString();
         WeaponIcon.sprite = weaponControl.WeaponIcon;
         Separator.sprite = weaponControl.BulletIcon;
+    }
+    //背包中指定武器所用子弹的总数量
+    int GetBagAmmoCount(WeaponControl wc)
+    {
+        if (wc == null) return 0;
+        BagPanel bag = UIManager.Instance.GetPanel<BagPanel>();
+        return bag != null ? bag.itemsNum.GetValueOrDefault(wc.bulletTypeName) : 0;
+    }
+    //用当前绑定武器的子弹类型刷新MaxCapacity(背包余量)
+    void RefreshMaxCapacity()
+    {
+        if (curWeapon == null) return;
+        MaxCapacity.text = GetBagAmmoCount(curWeapon).ToString();
     }
     public void HideCapacityDataUI()
     {

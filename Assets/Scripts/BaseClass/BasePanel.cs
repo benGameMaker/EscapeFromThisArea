@@ -8,7 +8,7 @@ public abstract class BasePanel : MonoBehaviour
     public bool isShow = false;
 
     float alphaSpeed = 10.0f;
-    CanvasGroup canvasGroup;
+    protected CanvasGroup canvasGroup;
 
     protected Camera cam;
     protected Canvas canvas;

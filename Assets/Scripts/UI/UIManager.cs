@@ -29,8 +29,7 @@ public class UIManager
 
         T panel = panelObj.GetComponent<T>();
         panelDic.Add(panelName, panel);
-        if (onlyInti) panel.HideMe(() => { });
-        else panel.ShowMe();
+        if (!onlyInti) panel.ShowMe();
 
         return panel;
     }

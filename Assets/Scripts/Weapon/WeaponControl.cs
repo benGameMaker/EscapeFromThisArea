@@ -92,19 +92,28 @@ public class WeaponControl : MonoBehaviour
         }
 
     }
+    //换弹：按 弹匣最大容量capacity - 弹匣现有数量curCapacity 的差值从背包补充对应子弹
     public void Reload()
     {
         if (bp == null) bp = UIManager.Instance.GetPanel<BagPanel>();
-        if (bp.itemsNum.GetValueOrDefault(bulletTypeName) >= capacity)
+        if (bp == null) return;
+
+        //本次需要从背包补充的数量
+        int need = capacity - curCapacity;
+        if (need > 0)
         {
-            curCapacity = capacity;
-            bp.ConsumeItem(bulletTypeName, capacity);
+            //背包中该种子弹的剩余数量
+            int bagAmmo = bp.itemsNum.GetValueOrDefault(bulletTypeName);
+            //实际补充数量不超过背包余量
+            int take = Mathf.Min(need, bagAmmo);
+            if (take > 0)
+            {
+                curCapacity += take;
+                bp.ConsumeItem(bulletTypeName, take);
+            }
         }
-        else
-        {
-            curCapacity = bp.itemsNum.GetValueOrDefault(bulletTypeName);
-            bp.ConsumeItem(bulletTypeName, bp.itemsNum.GetValueOrDefault(bulletTypeName));
-        }
+
+        //通知UI刷新弹匣数量（面板会同时重新读取背包余量刷新MaxCapacity）
         OnCapacityChanged?.Invoke(curCapacity);
     }
 

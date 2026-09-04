@@ -13,7 +13,7 @@ public class TestLauchUI : MonoBehaviour
     BagPanel bp;
     void Start()
     {
-
+        
     }
 
     // Update is called once per frame
@@ -54,6 +54,11 @@ public class TestLauchUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             spawner.RefreshLoot();
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            if (UIManager.Instance.GetPanel<PromptPanel>() == null) UIManager.Instance.ShowPanel<PromptPanel>();
+            UIManager.Instance.GetPanel<PromptPanel>().ShowPromptText("Test text");
         }
     }
 }

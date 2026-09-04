@@ -19,6 +19,10 @@ public class BagPanel : BasePanel
     public Dictionary<string, int> itemCellMaxIndex = new Dictionary<string, int>();
     //记录每种物品（按名称区分）在背包中总数量
     public Dictionary<string, int> itemsNum = new Dictionary<string, int>();
+    //背包中物品数据(数量/分布)重新计算后触发，供HUD(PlayerPanel/VehiclePanel等)实时刷新显示
+    public event UnityAction OnBagItemsChanged;
+    [Tooltip("丢弃物品时施加的初速度大小")]
+    public float throwSpeed = 8f;
     public override void Init()
     {
         btnExit.onClick.AddListener(() =>
@@ -78,6 +82,9 @@ public class BagPanel : BasePanel
                 cellItem.UseBehavior = null;
                 AttachItemBehavior(cellItem, item);
             }
+            //若该格原本没有记录预制体名(例如从存档生成)，补上当前拾取物的预制体名，保证丢弃时可生成场景物品
+            if (string.IsNullOrEmpty(cellItem.itemPrefabsName))
+                cellItem.itemPrefabsName = item.itemPrefabsName;
 
             remaining -= add;
         }
@@ -92,7 +99,7 @@ public class BagPanel : BasePanel
             if (emptyIndex >= 0)
             {
                 ItemUnit newUnit = CreateItemUnit(itemCells[emptyIndex], item.itemName, item.itemIcon,
-                    remaining, item.maxStackNum, item.useBehaviorNumber, emptyIndex, null);
+                    remaining, item.maxStackNum, item.itemPrefabsName, emptyIndex, null);
                 AttachItemBehavior(newUnit, item);
                 remaining = 0;
             }
@@ -201,6 +208,95 @@ public class BagPanel : BasePanel
             return false;
         }
     }
+    //丢弃入口：把指定格子中的物品丢弃num个到场景中（步行/驾车通用）。
+    //丢弃点取当前操作物体(打开背包的BagLogicProcess对应物体)上的DiscardPoint，朝其正前方抛出。
+    public bool DiscardItem(ItemUnit itemUnit, int num)
+    {
+        if (itemUnit == null || num <= 0) return false;
+
+        int index = GetItemCellIndex(itemUnit);
+        ItemUnit cellItem = GetItemInCell(index);
+        if (cellItem == null)
+        {
+            Debug.LogWarning("丢弃失败：格子为空或物品已被移动");
+            return false;
+        }
+
+        int.TryParse(cellItem.curNum.text, out int cur);
+        if (cur <= 0) return false;
+        //丢弃数量不能超过该堆叠现有数量(输入超过则整堆丢弃)
+        int count = Mathf.Min(num, cur);
+
+        Transform point = GetDiscardPoint();
+        if (point == null)
+        {
+            Debug.LogWarning("丢弃失败：未找到可用的丢弃点DiscardPoint");
+            return false;
+        }
+
+        //先在场中生成被丢弃物品，成功后再从背包扣除，避免物品凭空消失
+        if (!SpawnDroppedItem(cellItem, count, point))
+            return false;
+
+        ConsumeItemFromCell(cellItem.itemName.text, count, index);
+        return true;
+    }
+
+    //在丢弃点正前方生成被丢弃的物品，把数据与数量装载到其BaseItemObjData组件上，并给它初速度
+    bool SpawnDroppedItem(ItemUnit source, int count, Transform point)
+    {
+        //优先取格子单元上记录的预制体名，其次取随格子存活的行为组件上的
+        string prefabName = source.itemPrefabsName;
+        BaseItemObjData srcData = source.GetComponent<BaseItemObjData>();
+        if (string.IsNullOrEmpty(prefabName) && srcData != null)
+            prefabName = srcData.itemPrefabsName;
+        if (string.IsNullOrEmpty(prefabName))
+        {
+            Debug.LogWarning("丢弃失败：" + source.itemName.text + " 未配置itemPrefabsName");
+            return false;
+        }
+
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/Items/" + prefabName);
+        if (prefab == null)
+        {
+            Debug.LogWarning("丢弃失败：未找到预制体 Prefabs/Items/" + prefabName);
+            return false;
+        }
+
+        GameObject drop = Instantiate(prefab, point.position, point.rotation);
+        BaseItemObjData data = drop.GetComponent<BaseItemObjData>();
+        if (data != null)
+        {
+            if (srcData != null)
+                data.CopyDataFrom(srcData);
+            else
+            {
+                //格子单元未附带行为组件时，用格子单元自身信息填充
+                data.itemName = source.itemName.text;
+                data.itemIcon = source.itemIcon.sprite;
+                data.maxStackNum = source.maxStackNum;
+                data.itemPrefabsName = prefabName;
+            }
+            //本次丢弃数量以输入为准
+            data.curNum = count;
+        }
+
+        //从丢弃点的正前方抛出
+        Rigidbody rb = drop.GetComponent<Rigidbody>();
+        if (rb != null) rb.velocity = point.forward * throwSpeed;
+
+        return true;
+    }
+
+    //获取当前操作的丢弃点：优先用打开背包的可操作物体(BagLogicProcess)上的，否则退回玩家
+    Transform GetDiscardPoint()
+    {
+        if (bagOpener != null && bagOpener.DiscardPoint != null)
+            return bagOpener.DiscardPoint;
+        PlayerController pc = SceneManager.Instance != null ? SceneManager.Instance.player : null;
+        if (pc != null && pc.DiscardPoint != null) return pc.DiscardPoint;
+        return null;
+    }
     //重新计算每种物品所占据格子的最大下标，在添加、消耗物品以及布局改变后调用，同时计算每个物品的总数量
     public void RefreshItemCellMaxIndexAndQuantity()
     {
@@ -221,6 +317,13 @@ public class BagPanel : BasePanel
         {
             Debug.Log(kvp.Key + ": " + kvp.Value);
         }
+        //通知HUD等外部(如PlayerPanel/VehiclePanel)背包数据已变化，刷新显示
+        OnBagItemsChanged?.Invoke();
+    }
+    void OnDestroy()
+    {
+        //清空事件，避免面板销毁后残留引用导致空引用
+        OnBagItemsChanged = null;
     }
     //将拖拽的物品堆叠到目标格子：能装下则数量全部并入并销毁被拖物品单元；
     //装不下则目标格子装到上限，剩余数量保留在被拖物品单元中，并把它放入下标最小的空格子（无空格子则回到原格子）
@@ -279,7 +382,7 @@ public class BagPanel : BasePanel
         return itemCells.IndexOf(itemUnit.transform.parent);
     }
     //创建新的物品单元并放入指定格子中，填充数据后返回
-    ItemUnit CreateItemUnit(Transform cell, string itemName, Sprite itemIcon, int curNum, int maxStackNum, int useBehaviorNumber, int cellIndex, UnityAction<int> action)
+    ItemUnit CreateItemUnit(Transform cell, string itemName, Sprite itemIcon, int curNum, int maxStackNum, string itemPrefabsName, int cellIndex, UnityAction<int> action)
     {
         //Debug.Log("创建物品单元：" + itemName + "，数量：" + curNum + "，格子下标：" + cellIndex);
         GameObject itemUnitObj = Instantiate(Resources.Load<GameObject>("Prefabs/UI/ItemUnit"));
@@ -289,7 +392,7 @@ public class BagPanel : BasePanel
         itemUnit.itemName.text = itemName;
         itemUnit.curNum.text = curNum.ToString();
         itemUnit.maxStackNum = maxStackNum;
-        itemUnit.useBehaviorNumber = useBehaviorNumber;
+        itemUnit.itemPrefabsName = itemPrefabsName;
         itemUnit.cellIndex = cellIndex;
         itemUnit.UseBehavior += action;
         itemUnit.iip = iip;
@@ -343,7 +446,7 @@ public class BagPanel : BasePanel
             }
             CreateItemUnit(itemCells[cell.cellIndex], cell.itemName,
                 Resources.Load<Sprite>("Sprites/" + cell.itemIconName), cell.curNum,
-                cell.maxStackNum, cell.useBehaviorNumber, cell.cellIndex, (v) => { Debug.Log("Json导入的物品暂时无行为函数"); });
+                cell.maxStackNum, "", cell.cellIndex, (v) => { Debug.Log("Json导入的物品暂时无行为函数"); });
         }
     }
     void SaveItemDatasToCellDatas()
@@ -368,7 +471,6 @@ public class BagPanel : BasePanel
                 cellData.itemName = itemUnit.itemName.text;
                 cellData.curNum = int.Parse(itemUnit.curNum.text);
                 cellData.maxStackNum = itemUnit.maxStackNum;
-                cellData.useBehaviorNumber = itemUnit.useBehaviorNumber;
                 cellData.cellIndex = itemUnit.cellIndex;
                 GameDataMgr.Instance.cellDatas.Add(cellData);
             }

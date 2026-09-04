@@ -10,21 +10,18 @@ public class VehicleController : MonoBehaviour
     public WheelCollider frWheel;
     public WheelCollider rlWheel;
     public WheelCollider rrWheel;
-
     public Transform flWheelModel;
     public Transform frWheelModel;
     public Transform rlWheelModel;
     public Transform rrWheelModel;
-
     public float motorTorque;
     public float brakeTorque;
     public float maxSteeringAngle;
-
     [Tooltip("摄像机瞄准射线的最大距离，超过该距离武器指向射线末端")]
     public float aimRayDistance = 100f;
-
     [Tooltip("反向行驶刹车时，车速（本地Z轴速度）降到该值以下才恢复驱动力")]
     public float brakeStopSpeed = 1f;
+    public Transform DiscardPoint;
 
     float fireRate = 10f;
 

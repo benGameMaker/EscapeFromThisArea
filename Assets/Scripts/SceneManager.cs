@@ -14,6 +14,7 @@ public class SceneManager : MonoBehaviour
         instance = this;
         UIManager.Instance.ShowPanel<PlayerPanel>();
         UIManager.Instance.ShowPanel<BagPanel>(true);
+        UIManager.Instance.ShowPanel<PromptPanel>(true);
     }
     void Start()
     {
@@ -25,12 +26,12 @@ public class SceneManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.G))
+        if (Input.GetKeyDown(KeyCode.K))
         {
             //testObject.Injured(testObject, 1f);
             testObject.GetComponent<VehicleDamage>().DamageVehicle(20f);
         }
-        if (Input.GetKeyDown(KeyCode.H))
+        if (Input.GetKeyDown(KeyCode.J))
         {
             testObject.GetComponent<VehicleDamage>().RepairVehicle(10);
         }

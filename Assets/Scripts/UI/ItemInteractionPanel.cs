@@ -28,14 +28,9 @@ public class ItemInteractionPanel : BasePanel
 
     public override void Init()
     {
-        //优先使用场景/预制体中的引用；缺失时按节点名查找兜底
-        if (btnUse == null) btnUse = transform.Find("btnUse")?.GetComponent<Button>();
-        if (btnDiscard == null) btnDiscard = transform.Find("btnDiscard")?.GetComponent<Button>();
-        if (ipfNum == null) ipfNum = transform.Find("InputField (TMP)")?.GetComponent<TMP_InputField>();
-
-        if (btnUse != null) btnUse.onClick.AddListener(OnUse);
-        if (btnDiscard != null) btnDiscard.onClick.AddListener(OnDiscard);
-
+        btnUse.onClick.AddListener(OnUse);
+        btnDiscard.onClick.AddListener(OnDiscard);
+        
         //若创建后被同帧的右键打开过则保持显示，否则默认隐藏
         if (!isShow) HideMe(() => { });
     }
@@ -53,12 +48,6 @@ public class ItemInteractionPanel : BasePanel
                     HideMe(() => { });
             }
         }
-    }
-
-    //判断屏幕坐标点是否落在面板矩形范围内
-    bool IsPointerInside(Vector2 screenPos)
-    {
-        return RectTransformUtility.RectangleContainsScreenPoint(loaclRt, screenPos, canvas.worldCamera);
     }
 
     //在目标物品所在格子的右上角显示操作面板，并记录该物品及其所在格子下标
@@ -86,13 +75,17 @@ public class ItemInteractionPanel : BasePanel
         ShowMe();
     }
 
-    //点击"使用"：执行该物品绑定的使用行为，然后关闭面板
+    //判断屏幕坐标点是否落在面板矩形范围内
+    bool IsPointerInside(Vector2 screenPos)
+    {
+        return RectTransformUtility.RectangleContainsScreenPoint(loaclRt, screenPos, canvas.worldCamera);
+    }
+    //点击"使用"：执行该物品绑定的使用行为，面板保持显示，直到点击面板外部/关闭背包
     void OnUse()
     {
         if (ProcessingItem == null || curCellIndex < 0)
         {
             Debug.LogWarning("使用物品失败：未正确记录目标物品或其格子下标");
-            HideMe(() => { });
             return;
         }
         if (ProcessingItem.UseBehavior != null)
@@ -104,27 +97,47 @@ public class ItemInteractionPanel : BasePanel
         {
             Debug.LogWarning("该物品没有可用的使用行为：" + ProcessingItem.itemName.text);
         }
-        //使用结束后关闭操作面板
-        HideMe(() => { });
     }
-
-    //[丢弃功能预告-尚未实现] 点击"丢弃"：预期流程为——
-    //1. 读取 ipfNum 输入的数量num；
-    //2. 调用 BagPanel.ConsumeItem(ProcessingItem.itemName.text, num, curCellIndex) 扣除该格数量，
-    //   数量被扣到0时会销毁格子内的物品单元(ConsumeItem已处理)；
-    //3. 用一份携带BaseItemObjData的物品预制体装载被丢弃物品的数据与数量，
-    //   从玩家物体(如腹部)朝某方向(如正前方)施加力/速度把它丢到场景中。
-    //待实现丢弃时需要用到：丢弃发射点/方向/力度等引用字段，届时在此补充即可。
+    //点击"丢弃"：读取输入框中的数量，从该格扣除并把物品从当前操作物体的DiscardPoint正前方丢出
     void OnDiscard()
     {
-        //TODO(丢弃预告)：实现上述丢弃逻辑
-    }
+        BagPanel bag = GetBag();
+        if (ProcessingItem == null || bag == null)
+        {
+            Debug.LogWarning("丢弃失败：未正确记录目标物品或找不到背包");
+            UIManager.Instance.GetPanel<PromptPanel>().ShowPromptText("内部发生错误，拖动后再尝试", 2f);
+            return;
+        }
 
+        //读取输入框数值；为空或非法时按0处理(不丢弃)
+        int num = 0;
+        if (ipfNum != null) int.TryParse(ipfNum.text, out num);
+
+        if (num > 0)
+        {
+            bag.DiscardItem(ProcessingItem, num);
+        }
+        else
+        {
+            Debug.LogWarning("请输入有效的丢弃数量");
+        }
+    }
     //获取所属背包（面板是BagPanel的子物体，找不到时回退到UIManager）
     BagPanel GetBag()
     {
         BagPanel bag = GetComponentInParent<BagPanel>();
         if (bag == null) bag = UIManager.Instance.GetPanel<BagPanel>();
         return bag;
+    }
+
+    public override void ShowMe()
+    {
+        base.ShowMe();
+        canvasGroup.blocksRaycasts = true;
+    }
+    public override void HideMe(UnityAction callback)
+    {
+        base.HideMe(callback);
+        canvasGroup.blocksRaycasts = false;
     }
 }
