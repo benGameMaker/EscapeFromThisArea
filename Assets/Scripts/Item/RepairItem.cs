@@ -6,14 +6,14 @@ public class RepairItem : BaseItemObjData
 {
     public override void UseBahaivor(int Integer)
     {
-        if (SceneManager.Instance.player.vd != null)
+        if (SceneMgr.Instance.player.vd != null)
         {
-            if (SceneManager.Instance.player.vd.curIntegrity >= 100)
+            if (SceneMgr.Instance.player.vd.curIntegrity >= 100)
             {
                 UIManager.Instance.GetPanel<PromptPanel>().ShowPromptText("The vehicle has been repaired");
                 return;
             }
-            SceneManager.Instance.player.vd.RepairVehicle(1);
+            SceneMgr.Instance.player.vd.RepairVehicle(1);
             UIManager.Instance.GetPanel<BagPanel>().ConsumeItem(itemName, 1, Integer);
             Debug.Log("进行车辆修补");
         }

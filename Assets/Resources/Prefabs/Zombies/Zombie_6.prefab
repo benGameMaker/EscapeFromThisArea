@@ -1007,6 +1007,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   harmMulitpler: 1
+  BloodEffect: {fileID: 0}
 --- !u!1 &2066816564119022994
 GameObject:
   m_ObjectHideFlags: 0
@@ -1811,7 +1812,7 @@ GameObject:
   - component: {fileID: 4037464971117716143}
   - component: {fileID: 2694195902517243703}
   m_Layer: 6
-  m_Name: Zombie_Pilot
+  m_Name: Zombie_6
   m_TagString: Zombie
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1923,15 +1924,15 @@ MonoBehaviour:
   HP: 0
   maxHP: 100
   atk: 10
-  moveSpeedMultiplier: 1
   rotationSpeed: 5
-  floatingDamage: 1
   floatingDamageOffSet: {x: 0, y: 2, z: 0}
+  floatingDamage: 1
   moveVector: {x: 0, y: 0}
   animator: {fileID: 0}
   isDead: 0
   atkDistance: 2
   bashAtkDistance: 1.5
+  kinematicRestoreDelay: 0.8
 --- !u!114 &7102493281363062535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1952,11 +1953,15 @@ MonoBehaviour:
   TrackTargets:
     serializedVersion: 2
     m_Bits: 8
-  detectionVisualFieldVisualization: 1
-  traceVisualFieldVisualization: 1
+  ignoreObstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  detectionVisualFieldVisualization: 0
+  traceVisualFieldVisualization: 0
   DetectionPoint: {fileID: 8470921979092147042}
   distance: -1
   agent: {fileID: 0}
+  isNavigationPaused: 0
   detectionGizmoColor: {r: 0, g: 1, b: 0, a: 1}
   traceGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!54 &4037464971117716143
@@ -6505,3 +6510,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   harmMulitpler: 1.5
+  BloodEffect: {fileID: 0}

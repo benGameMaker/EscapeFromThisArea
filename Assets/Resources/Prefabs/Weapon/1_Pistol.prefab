@@ -622,6 +622,7 @@ MonoBehaviour:
   bulletTypeName: PistolBullet
   bulletPoolDefaultCapacity: 10
   bulletPoolMaxSize: 100
+  attractiveDistance: 10
   ignorelLayer:
     serializedVersion: 2
     m_Bits: 0

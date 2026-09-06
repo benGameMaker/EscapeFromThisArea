@@ -11,10 +11,11 @@ GameObject:
   - component: {fileID: 1790471726337377180}
   - component: {fileID: 334203490217880738}
   - component: {fileID: 7884693414992020592}
-  - component: {fileID: 3098952667876112733}
-  - component: {fileID: 5824628651614976582}
+  - component: {fileID: -433993419428028337}
   - component: {fileID: 1679784249349127078}
   - component: {fileID: 5259834180215793321}
+  - component: {fileID: 3098952667876112733}
+  - component: {fileID: 5824628651614976582}
   m_Layer: 0
   m_Name: Repair_BuildingDressing_03
   m_TagString: Untagged
@@ -87,6 +88,52 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-433993419428028337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3241064774651626488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de184164d24fe3e44954aff9bc9612be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 3241064774651626488}
+  weight: 25
+--- !u!114 &1679784249349127078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3241064774651626488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5e3f22ebf974564e949d50ef0172c9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemIcon: {fileID: 21300000, guid: 50a606222ec928c439b67e2e1cbfcc26, type: 3}
+  itemName: RepairItem
+  curNum: 10
+  maxStackNum: 30
+  itemPrefabsName: Repair_BuildingDressing_03
+--- !u!114 &5259834180215793321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3241064774651626488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc75d03937ae15841940f8f70b819964, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guidingText: Pass E to pick
+  itemName: Vehicle repair items
+  panelOffset: {x: 0, y: 1}
 --- !u!54 &3098952667876112733
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -106,7 +153,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 200
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
@@ -135,36 +182,3 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.986145, y: 1.8596764, z: 0.28674316}
   m_Center: {x: 0.009918213, y: 0, z: -0.024719238}
---- !u!114 &1679784249349127078
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3241064774651626488}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5e3f22ebf974564e949d50ef0172c9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemIcon: {fileID: 21300000, guid: 50a606222ec928c439b67e2e1cbfcc26, type: 3}
-  itemName: RepairItem
-  curNum: 10
-  maxStackNum: 30
-  itemPrefabsName: Repair_BuildingDressing_03
-  useBehaviorNumber: 0
---- !u!114 &5259834180215793321
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3241064774651626488}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc75d03937ae15841940f8f70b819964, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  guidingText: Pass E to pick
-  itemName: Vehicle repair items
-  panelOffset: {x: 0, y: 1}

@@ -11,10 +11,11 @@ GameObject:
   - component: {fileID: 1691303477935845291}
   - component: {fileID: 2434820272220246496}
   - component: {fileID: 8866901029456950716}
-  - component: {fileID: 9136789296691940511}
-  - component: {fileID: 8112260460189768019}
+  - component: {fileID: -4200261668780612681}
   - component: {fileID: 8320570563278559806}
   - component: {fileID: 3997140513532006514}
+  - component: {fileID: 9136789296691940511}
+  - component: {fileID: 8112260460189768019}
   m_Layer: 0
   m_Name: Repair_Tape
   m_TagString: Untagged
@@ -87,6 +88,52 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-4200261668780612681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7567496606618584078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de184164d24fe3e44954aff9bc9612be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 7567496606618584078}
+  weight: 25
+--- !u!114 &8320570563278559806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7567496606618584078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5e3f22ebf974564e949d50ef0172c9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemIcon: {fileID: 21300000, guid: 50a606222ec928c439b67e2e1cbfcc26, type: 3}
+  itemName: RepairItem
+  curNum: 10
+  maxStackNum: 30
+  itemPrefabsName: Repair_Tape
+--- !u!114 &3997140513532006514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7567496606618584078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc75d03937ae15841940f8f70b819964, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  guidingText: Pass E to pick
+  itemName: Vehicle repair items
+  panelOffset: {x: 0, y: 1}
 --- !u!65 &9136789296691940511
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -127,7 +174,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 200
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
@@ -135,36 +182,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8320570563278559806
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7567496606618584078}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5e3f22ebf974564e949d50ef0172c9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemIcon: {fileID: 21300000, guid: 50a606222ec928c439b67e2e1cbfcc26, type: 3}
-  itemName: RepairItem
-  curNum: 10
-  maxStackNum: 30
-  itemPrefabsName: Repair_Tape
-  useBehaviorNumber: 0
---- !u!114 &3997140513532006514
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7567496606618584078}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc75d03937ae15841940f8f70b819964, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  guidingText: Pass E to pick
-  itemName: Vehicle repair items
-  panelOffset: {x: 0, y: 1}

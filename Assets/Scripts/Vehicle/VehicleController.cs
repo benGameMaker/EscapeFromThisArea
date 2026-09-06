@@ -169,7 +169,7 @@ public class VehicleController : MonoBehaviour
         curWeapon = weaponLists[curWeaponIndex];
         fireRate = curWeapon.fireRate;
 
-        //切枪后刷新车辆UI面板的武器数据（面板未显示时GetPanel返回null，不处理）
+        //切枪后刷新车辆UI面板的武器数据
         VehiclePanel vp = UIManager.Instance.GetPanel<VehiclePanel>();
         if (vp != null) vp.ShowCapacityDataToUI(curWeapon);
     }
@@ -205,7 +205,7 @@ public class VehicleController : MonoBehaviour
         //Debug.Log(name + "拥有" + weaponLists.Count + "把武器");
         for (int i = 0; i < weaponLists.Count; i++)
         {
-            Debug.Log("正在给" + weaponLists[i].name + "传入拥有者");
+            //Debug.Log("正在给" + weaponLists[i].name + "传入拥有者");
             if (weaponLists[i] != null)
             {
                 weaponLists[i].SetOwner(owner);
@@ -250,6 +250,18 @@ public class VehicleController : MonoBehaviour
     //移动：当输入方向与当前车速方向相反时先刹车制动，减速到brakeStopSpeed以内再恢复驱动力
     void Move()
     {
+        // 车辆损坏期间(isCanDrive=false，由VehicleDamage在curIntegrity<=0时置false、
+        // 维修恢复到80后置true)强制刹停：清掉残留驾驶输入，不再施加驱动力，只持续刹车，
+        // 避免损坏后车辆仍按原速度继续滑行
+        if (!isCanDrive)
+        {
+            inputAxis = Vector2.zero;
+            ApplyBrake(brakeTorque);
+            rlWheel.motorTorque = 0;
+            rrWheel.motorTorque = 0;
+            return;
+        }
+
         float inputY = inputAxis.y;
         float speed = vd != null ? vd.curVelocity : 0f;
 

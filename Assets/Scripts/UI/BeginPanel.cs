@@ -12,11 +12,14 @@ public class BeginPanel : BasePanel
     {
         btnStart.onClick.AddListener(() =>
         {
-
+            // 载入完成后显示IntroPanel（开场文本交互）
+            UIManager.Instance.HidePanel<BeginPanel>();
+            LoadingMgr.Instance.LoadSceneAsync("GameScene", "开始游戏", true);
+            if (UIManager.Instance.GetPanel<SettingPanel>() != null) UIManager.Instance.HidePanel<SettingPanel>();
         });
         btnSetting.onClick.AddListener(() =>
         {
-            UIManager.Instance.ShowPanel<InteractionPanel>();
+            UIManager.Instance.ShowPanel<SettingPanel>();
         });
         btnQuit.onClick.AddListener(() =>
         {

@@ -11,9 +11,10 @@ public class TestLauchUI : MonoBehaviour
 
     public LootSpawner spawner;
     BagPanel bp;
+
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame

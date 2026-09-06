@@ -84,7 +84,7 @@ public class RayPointAndShowInteraction : MonoBehaviour
             else bi.InteractionBehavior(GetComponent<PlayerController>());
             if (gameObject.CompareTag("Bullet"))
             {
-                UIManager.Instance.GetPanel<PlayerPanel>().ShowCapacityDataToUI(SceneManager.Instance.player.curWeapon);
+                UIManager.Instance.GetPanel<PlayerPanel>().ShowCapacityDataToUI(SceneMgr.Instance.player.curWeapon);
             }
         }
     }

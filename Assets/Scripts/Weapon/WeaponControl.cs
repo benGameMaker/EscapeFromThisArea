@@ -18,6 +18,8 @@ public class WeaponControl : MonoBehaviour
     public string bulletTypeName;
     public int bulletPoolDefaultCapacity = 10;
     public int bulletPoolMaxSize = 100;
+    [Tooltip("使用这把武器开枪时会吸引僵尸的最远距离")]
+    public float attractiveDistance;
     [Tooltip("在启用子弹忽略层级，这把武器打出的子弹不会命中的层级")]
     public LayerMask ignorelLayer;
     public bool enableExclusionLayer;
@@ -32,6 +34,8 @@ public class WeaponControl : MonoBehaviour
 
     public event UnityAction<int> OnCapacityChanged;
     public event UnityAction<float> OnReloadStart;
+    [Tooltip("开火事件：每实际打出一发子弹触发一次（参数为该武器），供枪声吸引僵尸等系统监听")]
+    public event UnityAction<WeaponControl> OnFired;
     BagPanel bp;
     // 子弹对象池
     ObjectPool <GameObject> bulletPool;
@@ -89,6 +93,8 @@ public class WeaponControl : MonoBehaviour
             bulletPool.Get();
             // 生成火焰特效
             Destroy(Instantiate(FirePre, FirePoint.transform.position, FirePoint.transform.rotation), 0.1f);
+            // 广播该次开火（携带武器引用），供DetectionZombies根据attractiveDistance把附近僵尸吸引到开枪位置
+            OnFired?.Invoke(this);
         }
 
     }

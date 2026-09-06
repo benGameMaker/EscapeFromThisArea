@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5007796909624866895}
   - component: {fileID: 2186276108546893494}
   - component: {fileID: 3547256371150691272}
+  - component: {fileID: -2981643005674485608}
   - component: {fileID: 389819019409508687}
   - component: {fileID: 1905510465355740344}
   - component: {fileID: 1508928427952322628}
@@ -87,6 +88,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-2981643005674485608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1650907409513361453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de184164d24fe3e44954aff9bc9612be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 1650907409513361453}
+  weight: 20
 --- !u!54 &389819019409508687
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -106,7 +121,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 200
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
@@ -152,7 +167,6 @@ MonoBehaviour:
   curNum: 30
   maxStackNum: 60
   itemPrefabsName: Bullet_Handgun
-  useBehaviorNumber: 0
 --- !u!114 &-4914081285857255183
 MonoBehaviour:
   m_ObjectHideFlags: 0

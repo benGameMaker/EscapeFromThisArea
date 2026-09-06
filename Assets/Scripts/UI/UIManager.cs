@@ -65,4 +65,16 @@ public class UIManager
 
         return null;
     }
+
+    public void ClearAllUI()
+    {
+        foreach (var panel in panelDic.Values)
+        {
+            panel.HideMe(() =>
+            {
+                GameObject.Destroy(panel.gameObject);
+            });
+        }
+        panelDic.Clear();
+    }
 }

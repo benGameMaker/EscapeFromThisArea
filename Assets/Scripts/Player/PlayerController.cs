@@ -18,7 +18,6 @@ public class PlayerController : BaseObject
     public float bodyRotationMax_v = 0.4f;
     public Vector3 genOffset = new Vector3(0.38f, -0.15f, -0.84f);
     public Vector3 aimOffset = new Vector3(0.7f, -0.15f, 1f);
-    public TextCapacityUI capacityUI;
     public Transform DiscardPoint;
     [Tooltip("投掷手雷时的初速度大小")]
     public float throwForce = 15f;

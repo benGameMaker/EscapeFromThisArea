@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameDataMgr
@@ -9,12 +10,15 @@ public class GameDataMgr
 
     public MusicData musicData;
     public List<CellData> cellDatas;
+    public List<ZombieInfo> ZombieInfos;
 
     GameDataMgr()
     {
         musicData = JsonMgr.Instance.LoadData<MusicData>("MusicData");
         cellDatas = JsonMgr.Instance.LoadData<List<CellData>>("CellData");
-        Debug.Log("GameDataMgr initialized. MusicData and CellData loaded.");
+        ZombieInfos = JsonMgr.Instance.LoadData<List<ZombieInfo>>("ZombieInfo");
+        //Debug.Log(ZombieInfos.Count);
+        //foreach (var zomb in ZombieInfos) Debug.Log($"ZombieInfo: {zomb.id}, Health: {zomb.HP}, Speed: {zomb.speed}");
     }
 
     public void SaveMusicData()
@@ -24,5 +28,18 @@ public class GameDataMgr
     public void SaveCellData()
     {
         JsonMgr.Instance.SaveData(cellDatas, "CellData");
+    }
+
+    public void PlaySound(string resName)
+    {
+        GameObject musicObj = new GameObject();
+        AudioSource a = musicObj.AddComponent<AudioSource>();
+        a.clip = Resources.Load<AudioClip>(resName);
+        a.volume = musicData.soundValue;
+        a.mute = musicData.soundOpen;
+
+        a.Play();
+
+        GameObject.Destroy(musicObj, 1f);
     }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6684005234623068700}
   - component: {fileID: 8959603924658999390}
   - component: {fileID: 7469297716212322177}
+  - component: {fileID: -8349727788951917011}
   - component: {fileID: 793834790568953635}
   - component: {fileID: 4229168526544706911}
   - component: {fileID: 6416604753037369181}
@@ -87,6 +88,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-8349727788951917011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8480260085500299970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de184164d24fe3e44954aff9bc9612be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 8480260085500299970}
+  weight: 25
 --- !u!65 &793834790568953635
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -127,7 +142,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 200
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
@@ -152,7 +167,6 @@ MonoBehaviour:
   curNum: 10
   maxStackNum: 30
   itemPrefabsName: Repair_ToiletPaper
-  useBehaviorNumber: 0
 --- !u!114 &1437686345007356724
 MonoBehaviour:
   m_ObjectHideFlags: 0

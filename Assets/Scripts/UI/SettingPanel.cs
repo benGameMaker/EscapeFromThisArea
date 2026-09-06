@@ -46,6 +46,6 @@ public class SettingPanel : BasePanel
 
     protected override void Update()
     {
-        
+        base.Update();
     }
 }

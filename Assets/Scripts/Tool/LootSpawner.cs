@@ -4,7 +4,7 @@ using UnityEngine;
 public class LootSpawner : MonoBehaviour
 {
     [Header("生成配置")]
-    public GameObject[] lootPrefabs;      // 可生成的资源预制体列表
+    public List<LootItem> lootItems;      // 可生成的资源预制体列表
     public int spawnCount = 10;           // 每次刷新生成的数量
     public LayerMask groundLayerMask;     // 地面层，用于检测地面位置
     public float spawnHeightOffset = 0.1f; // 生成时沿法线方向向上偏移的距离
@@ -17,6 +17,36 @@ public class LootSpawner : MonoBehaviour
     {
         areaCollider = GetComponent<BoxCollider>();
         SpawnLoot();
+    }
+
+    private GameObject GetWeightedRandomLoot()
+    {
+        // 1. 计算总权重
+        int totalWeight = 0;
+        foreach (LootItem item in lootItems)
+        {
+            totalWeight += item.weight;
+        }
+
+        // 2. 如果总权重为0，返回空（防止死循环）
+        if (totalWeight == 0) return null;
+
+        // 3. 生成一个随机数，范围 [0, totalWeight)
+        int randomValue = Random.Range(0, totalWeight);
+
+        // 4. 遍历列表，找到随机数落到的区间
+        int cumulative = 0;
+        foreach (LootItem item in lootItems)
+        {
+            cumulative += item.weight;
+            if (randomValue < cumulative)
+            {
+                //Debug.Log($"[LootSpawner] 权重随机选择成功，选中物体: {item.prefab.name}，权重: {item.weight}");
+                return item.prefab;
+            }
+        }
+        //Debug.Log("[LootSpawner] 权重随机选择失败，可能是权重设置有误。");
+        return null; // 保底返回
     }
 
     void SpawnLoot()
@@ -41,7 +71,8 @@ public class LootSpawner : MonoBehaviour
                 // 3. 计算生成位置：沿法线方向向上偏移
                 Vector3 spawnPosition = hit.point + hit.normal * spawnHeightOffset;
                 // 5. 从列表里随机选一个预制体
-                GameObject selectedPrefab = lootPrefabs[Random.Range(0, lootPrefabs.Length)];
+                GameObject selectedPrefab = GetWeightedRandomLoot();
+                if (selectedPrefab == null) continue;
                 // 6. 生成物体，并随机旋转
                 GameObject newLoot = Instantiate(selectedPrefab, spawnPosition, Quaternion.Euler(0, Random.Range(0f, 360f), 0));
                 spawnedCount++;

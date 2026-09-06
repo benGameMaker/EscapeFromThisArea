@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SceneManager : MonoBehaviour
+public class SceneMgr : MonoBehaviour
 {
-    static SceneManager instance;
-    public static SceneManager Instance => instance;
+    static SceneMgr instance;
+    public static SceneMgr Instance => instance;
     public GameObject testObject;
     public BaseObject atker;
     public PlayerController player;
@@ -15,6 +15,7 @@ public class SceneManager : MonoBehaviour
         UIManager.Instance.ShowPanel<PlayerPanel>();
         UIManager.Instance.ShowPanel<BagPanel>(true);
         UIManager.Instance.ShowPanel<PromptPanel>(true);
+        Debug.Log("初始化UI");
     }
     void Start()
     {
@@ -28,7 +29,7 @@ public class SceneManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.K))
         {
-            //testObject.Injured(testObject, 1f);
+            //player.Injured(player, 1f);
             testObject.GetComponent<VehicleDamage>().DamageVehicle(20f);
         }
         if (Input.GetKeyDown(KeyCode.J))

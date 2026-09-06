@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5502054759959386537
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 113165164840195651}
+  - component: {fileID: 4484464287812546557}
+  - component: {fileID: 227093437961002990}
+  m_Layer: 0
+  m_Name: SpawnArea
+  m_TagString: Untagged
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &113165164840195651
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5502054759959386537}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -14.95, y: 0.36, z: -4.348}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4484464287812546557
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5502054759959386537}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 11.8438835, y: 1, z: 11.098629}
+  m_Center: {x: 0.44246292, y: 0, z: 1.9304895}
+--- !u!114 &227093437961002990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5502054759959386537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da7583dd68ff06b4c8dbaed1327ab641, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lootItems:
+  - {fileID: -5780492757144693183, guid: 17c91c405eedbb942815771db6687f0a, type: 3}
+  - {fileID: -2981643005674485608, guid: a81737832beaff14c9b35354a3aa395c, type: 3}
+  - {fileID: 4950930057517869107, guid: 3fd360a43fa0bfe4c97898b40e001fdf, type: 3}
+  - {fileID: -433993419428028337, guid: 0376eb4644559ea48b8af9c00f487d89, type: 3}
+  - {fileID: 8238613736929057549, guid: 7c651b831207e204c9787d6b4ce241aa, type: 3}
+  - {fileID: -4200261668780612681, guid: 7ec93ca7efcb4c04fb5daa172c2ee183, type: 3}
+  - {fileID: 3832650353655387613, guid: 5f645fd9853c8e742bfa58943273ea4a, type: 3}
+  - {fileID: -8349727788951917011, guid: 888ceaaa09cf6a34c91ab11776e7ed30, type: 3}
+  - {fileID: -8863088593516844916, guid: 6b063c4c2377028498f7d997c7e4f7cc, type: 3}
+  spawnCount: 10
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  spawnHeightOffset: 0.1

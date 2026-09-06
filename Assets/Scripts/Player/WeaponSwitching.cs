@@ -29,7 +29,7 @@ public class WeaponSwitching : MonoBehaviour
     void Start()
     {
         weaponHolder = transform.Find("WeaponHolder");
-        pc = SceneManager.Instance.player;
+        pc = SceneMgr.Instance.player;
         cp = GetComponentInChildren<ColliderProcessor>();
         LeftHand = transform.Find("WeaponHolder/LeftHand");
         RightHand = transform.Find("WeaponHolder/RightHand");
@@ -47,7 +47,7 @@ public class WeaponSwitching : MonoBehaviour
                 {
                     wc.InitCapacity();
                     weaponLists.Add(wc);
-                    Debug.Log(wc.name + "现有的子弹数为：" + wc.curCapacity);
+                    //Debug.Log(wc.name + "现有的子弹数为：" + wc.curCapacity);
                 }
             }
         }
@@ -109,8 +109,8 @@ public class WeaponSwitching : MonoBehaviour
         }
     }
 
-    // 切换到编号为gunID(1~N)的枪械
-    void SwitchToGun(int gunID)
+    // 切换到编号为gunID(1~N)的枪械（public：治疗完成后恢复之前持枪状态用）
+    public void SwitchToGun(int gunID)
     {
         if (gunID < 1 || gunID > weaponLists.Count) return;
         WeaponControl target = weaponLists[gunID - 1];
@@ -148,6 +148,10 @@ public class WeaponSwitching : MonoBehaviour
         curWeapon = null;
         curTool = toolModel;
 
+        // 手持道具(刀/手雷)不使用双手IK，始终为0。
+        // 治疗动画是手K、需要rigHands=1，治疗结束/被打断后切回道具时必须归零（否则残留1）
+        if (rigHands != null) rigHands.weight = 0f;
+
         // 道具身上若有刚体(如手雷)，拿在手上时必须保持kinematic，否则会因重力掉落
         SetModelKinematic(Knife, Knife == toolModel);
         SetModelKinematic(Grenade, Grenade == toolModel);
@@ -175,6 +179,50 @@ public class WeaponSwitching : MonoBehaviour
         Knife.SetActive(false);
         Grenade.SetActive(false);
         curTool = null;
+    }
+
+    //---------------------- 治疗/道具使用流程使用的公开接口 ----------------------
+
+    // 当前是否正拿着枪或道具（治疗流程用它检测"玩家是否切枪/切刀/切雷而打断"）
+    public bool IsHoldingWeaponTool => curWeapon != null || curTool != null;
+
+    // 当前手持枪在weaponLists中的序号(1~N)，未持枪时为0
+    public int CurGunIndex => curWeapon == null ? 0 : weaponLists.IndexOf(curWeapon) + 1;
+
+    // 立刻收起当前枪/道具，进入徒手待机（模型立即隐藏不走0.3s延迟，避免与治疗动画冲突）
+    public void HolsterAll()
+    {
+        if (curWeapon != null)
+        {
+            curWeapon.gameObject.SetActive(false);
+            pp.HideCapacityDataUI();
+            //因为是手k的动画，所以收枪后rigHands要立即恢复为1，手才会动起来
+            rigHands.weight = 1f;
+            pc.rigAim.weight = 0f;
+            pc.rigGen.weight = 1f;
+            pc.isHoldingWeapon = false;
+            pc.curWeapon = null;
+            curWeapon = null;
+        }
+        else
+        {
+            HideTool();
+            rigHands.weight = 1f;
+        }
+        pc.isAim = false;
+        if (pc.animator != null) pc.animator.SetInteger("WeaponType_int", 0);
+    }
+
+    // 恢复为手持刀（治疗完成后默认切回）
+    public void EquipKnife()
+    {
+        EquipTool(Knife, KnifeIcon);
+    }
+
+    // 恢复为手持手雷（治疗完成时若此前持雷且背包仍有雷）
+    public void EquipGrenade()
+    {
+        EquipTool(Grenade, GrenadeIcon);
     }
 
     //---------------------- 手雷投掷会话与道具攻击输入 ----------------------

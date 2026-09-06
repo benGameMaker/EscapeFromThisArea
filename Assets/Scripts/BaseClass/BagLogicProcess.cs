@@ -95,7 +95,7 @@ public class BagLogicProcess : MonoBehaviour
     }
 
     //启用或禁用本物体的鼠标视角、开火与切枪输入
-    void EnableGameplayInput(bool enable)
+    public void EnableGameplayInput(bool enable)
     {
         //鼠标转动视角：通过清空/恢复CinemachineFreeLook的输入轴名实现
         if (freeLook != null)
@@ -104,7 +104,7 @@ public class BagLogicProcess : MonoBehaviour
             freeLook.m_YAxis.m_InputAxisName = enable ? "Mouse Y" : "";
         }
 
-        //开火/切枪：背包打开时禁用本物体PlayerInput中的Fire与SwitchWeapon动作，关闭时恢复
+        //开火/切枪/瞄准：背包打开时禁用本物体PlayerInput中的Fire、SwitchWeapon与Aim动作，关闭时恢复
         if (playerInput != null && playerInput.actions != null)
         {
             InputAction fire = playerInput.actions.FindAction("Fire");
@@ -119,6 +119,15 @@ public class BagLogicProcess : MonoBehaviour
             {
                 if (enable) switchWeapon.Enable();
                 else switchWeapon.Disable();
+            }
+            //持枪时右键瞄准(玩家Aim动作)在背包打开时一并禁用；
+            //注意：这里只禁用"玩法输入动作"，背包UI里右键物品的互动(EventSystem/IPointerClickHandler/Input.GetMouseButtonDown)
+            //不属于InputAction，不受影响
+            InputAction aim = playerInput.actions.FindAction("Aim");
+            if (aim != null)
+            {
+                if (enable) aim.Enable();
+                else aim.Disable();
             }
         }
     }

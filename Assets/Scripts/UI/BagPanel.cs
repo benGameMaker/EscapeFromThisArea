@@ -293,7 +293,7 @@ public class BagPanel : BasePanel
     {
         if (bagOpener != null && bagOpener.DiscardPoint != null)
             return bagOpener.DiscardPoint;
-        PlayerController pc = SceneManager.Instance != null ? SceneManager.Instance.player : null;
+        PlayerController pc = SceneMgr.Instance != null ? SceneMgr.Instance.player : null;
         if (pc != null && pc.DiscardPoint != null) return pc.DiscardPoint;
         return null;
     }
@@ -312,7 +312,7 @@ public class BagPanel : BasePanel
             //升序遍历，后写入的即为该物品的最大下标
             itemCellMaxIndex[name] = i;
         }
-        Debug.Log("当前每个物品的总数量为：");
+        //Debug.Log("当前每个物品的总数量为：");
         foreach (var kvp in itemsNum)
         {
             Debug.Log(kvp.Key + ": " + kvp.Value);

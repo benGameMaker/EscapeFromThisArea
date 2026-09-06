@@ -124,7 +124,7 @@ public class VehiclePanel : BasePanel
 
         if (IsOrNo) VehicleDamagedNotice.SetActive(true);
         else VehicleDamagedNotice.SetActive(false);
-        Debug.Log("通知面板：" + VehicleDamagedNotice.activeSelf);
+        //Debug.Log("通知面板：" + VehicleDamagedNotice.activeSelf);
     }
 
     // 换弹开始事件回调：按武器ReloadTime匀速将准星填充从0补到1

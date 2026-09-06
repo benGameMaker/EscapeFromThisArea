@@ -6,6 +6,7 @@ public class BulletControl : MonoBehaviour
 {
     public float speed = 40f;
     public GameObject effectPrefab;
+    public GameObject BloodPrefab;
     public float lifetime = 1f;
 
     Rigidbody rb;
@@ -74,20 +75,24 @@ public class BulletControl : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        var go = Instantiate(effectPrefab, transform.position, Quaternion.LookRotation(collision.contacts[0].normal));
-        Destroy(go, 1f);
+        GameObject go;
         if (owner == null) Debug.Log("owner为空");
         if (collision.gameObject.CompareTag("Zombie"))
         {
+
+            Quaternion rotation = Quaternion.LookRotation(collision.contacts[0].normal) * Quaternion.Euler(0, -90, 0);
+            go = Instantiate(BloodPrefab, transform.position, rotation);
             string part = collision.collider.gameObject.tag;
             Debug.Log("子弹击中了" + collision.gameObject.name + "的" + part);
             collision.gameObject.GetComponentInParent<BaseObject>().Injured(owner, (part == "Zombie_Body" ? weaponControl.harmMultiplier : weaponControl.harmMultiplier * 1.5f));
         }
         else
         {
+            go = Instantiate(effectPrefab, transform.position, Quaternion.LookRotation(collision.contacts[0].normal));
             Debug.Log("子弹击中的" + collision.gameObject.name+"不是对象基类，他的类型是"+collision.gameObject.tag);
 
         }
+        Destroy(go, 1f);
         // 碰撞后回收子弹到对象池
         ReleaseToPool();
     }

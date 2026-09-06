@@ -581,7 +581,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee314889603af3741acb40ef90bbb516, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FirePoint: {fileID: 0}
+  FirePoint: {fileID: 8536886428620536535}
   BulletPre: {fileID: 7829902662320680386, guid: 72dcc63a7f150cd46916577bf8c711f0, type: 3}
   FirePre: {fileID: 4785327272306611209, guid: c3b808182c1d8614fbf842ee0b701698, type: 3}
   fireRate: 5
@@ -591,6 +591,7 @@ MonoBehaviour:
   bulletTypeName: RifteBullet
   bulletPoolDefaultCapacity: 10
   bulletPoolMaxSize: 100
+  attractiveDistance: 20
   ignorelLayer:
     serializedVersion: 2
     m_Bits: 0

@@ -8,8 +8,6 @@ public class BaseObject : MonoBehaviour
     public float HP;
     public float maxHP = 100f;
     public float atk = 10f;
-    [Tooltip("基于动画自带的速度改变物体移速的倍率")]
-    public float moveSpeedMultiplier = 1;
     [Tooltip("物体转身速度")]
     public float rotationSpeed = 5f;
     public Vector3 floatingDamageOffSet;
@@ -92,12 +90,19 @@ public class BaseObject : MonoBehaviour
         }
     }
 
+    public virtual void Treated(float heal)
+    {
+        HP += heal;
+        if (HP > maxHP) HP = maxHP;
+    }
     protected virtual void Move()
     {
         if (isDead || !animator.enabled) return;
     }
     protected virtual void Death()
     {
+        if (isDead) return;   // 防止重复触发死亡逻辑
+        isDead = true;
         if (animator != null)
             animator.SetBool("isDead_b", true);
         foreach (Collider part in BodyParts) part.enabled = false;

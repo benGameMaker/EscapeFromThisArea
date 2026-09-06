@@ -12,6 +12,11 @@ public class VehicleInteraction : BaseInteractivity
     Rigidbody rb;
     VehicleController vehicle;
     PlayerController driver;
+
+    [Tooltip("上车后DetectionZombies相对DropOffPos的局部偏移（沿+X方向微调让射线能瞄准到车身，y/z一般保持0）")]
+    public Vector3 vehicleDetectorOffset = new Vector3(0.5f, 0f, 0f);
+    DetectionZombies rideDetector;         // 上车后随车的检测器引用（下车时挂回玩家）
+    Vector3 rideDetectorLocalOffset;       // 上车前检测器相对玩家根节点的局部偏移（下车时恢复）
     private void Start()
     {
         DropOffPos = transform.Find("DropOffPos");
@@ -41,6 +46,17 @@ public class VehicleInteraction : BaseInteractivity
         driver.rigAim.weight = 0f;
         driver.rigGen.weight = 1f;
         driver.vd = GetComponent<VehicleDamage>();
+
+        // 检测器随车挂载：下面玩家整体会被SetActive(false)，
+        // 先把DetectionZombies从玩家改挂到驾驶位并保持激活，保证车载武器开火时也能吸引僵尸。
+        // 注意：不再保留玩家身上(0,1.58,0)的站立偏移，否则检测点会高出车顶导致射线瞄不到车身，
+        // 而是放在DropOffPos并沿其+X方向做小幅偏移，让僵尸锥形视野的射线能命中车身。
+        rideDetector = driver.GetComponentInChildren<DetectionZombies>(true);
+        if (rideDetector != null)
+        {
+            rideDetectorLocalOffset = rideDetector.transform.localPosition; // 记录徒步时的局部偏移，下车时恢复
+            MoveDetector(rideDetector, DropOffPos != null ? DropOffPos : transform, vehicleDetectorOffset);
+        }
 
         driver.gameObject.SetActive(false);
 
@@ -83,7 +99,23 @@ public class VehicleInteraction : BaseInteractivity
         driver.transform.rotation = DropOffPos.rotation;
         driver.vd = null;
 
+        // 下车：把DetectionZombies挂回玩家根节点并恢复徒步时的局部偏移
+        if (rideDetector != null)
+            MoveDetector(rideDetector, driver.transform, rideDetectorLocalOffset);
+        rideDetector = null;
+
         driver = null;
+    }
+
+    // 把DetectionZombies检测器整体改挂到targetParent下，并设置局部偏移/姿态、保持激活，
+    // 使检测器在徒步（挂玩家根节点）与驾驶（挂车辆驾驶位）时都能正常运行
+    void MoveDetector(DetectionZombies detector, Transform targetParent, Vector3 localOffset)
+    {
+        if (detector == null || targetParent == null) return;
+        detector.transform.SetParent(targetParent, false);
+        detector.transform.localPosition = localOffset;
+        detector.transform.localRotation = Quaternion.identity;
+        detector.gameObject.SetActive(true);
     }
     //设置车辆物体上的驾驶车辆脚本的激活状态
     public void SetVehicleBehaviour(bool islaunch)

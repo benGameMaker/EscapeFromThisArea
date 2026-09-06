@@ -125,7 +125,8 @@ public class PlayerPanel : BasePanel
     }
 
     // 换弹开始事件回调：按武器ReloadTime匀速将准星填充从0补到1
-    void StartReloadProgress(float duration)
+    // (public：治疗等需要时长进度显示的流程也会调用它)
+    public void StartReloadProgress(float duration)
     {
         if (reloadProgressCoroutine != null) StopCoroutine(reloadProgressCoroutine);
         reloadProgressCoroutine = StartCoroutine(ReloadProgressCoroutine(Mathf.Max(0.01f, duration)));
@@ -145,7 +146,8 @@ public class PlayerPanel : BasePanel
     }
 
     // 换弹完成：停止进度并清空准星填充
-    void EndReloadProgress()
+    // (public：治疗被打断/完成时需要清除进度显示)
+    public void EndReloadProgress()
     {
         if (reloadProgressCoroutine != null)
         {

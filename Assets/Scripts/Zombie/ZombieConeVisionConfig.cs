@@ -22,6 +22,8 @@ public class ZombieConeVisionConfig : MonoBehaviour
     public bool checkObstacle = true;
     [Tooltip("要追踪的目标")]
     public LayerMask TrackTargets;
+    [Tooltip("忽略的障碍物层级")]
+    public LayerMask ignoreObstacleLayer;
 
     public bool detectionVisualFieldVisualization = false;
     public bool traceVisualFieldVisualization = false;
@@ -30,24 +32,37 @@ public class ZombieConeVisionConfig : MonoBehaviour
     [HideInInspector]
     public float distance = -1f;
     [HideInInspector]
-    public NavMeshAgent agent;
+
+    NavMeshAgent _agent;
+    public NavMeshAgent agent
+    {
+        get
+        {
+            if (_agent == null)
+                _agent = GetComponent<NavMeshAgent>();
+            return _agent;
+        }
+    }
     Transform TracekedTarget = null;
+
+    // 是否暂停追逐/导航（僵尸已接触到车辆、原地攻击时由ZombieConrtol置位），
+    // 暂停期间不刷新追踪目标，也不响应外部的NavigationToTargetPoint指令（如枪声吸引）
+    public bool isNavigationPaused = false;
 
     private void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
     }
 
     private void FixedUpdate()
     {
-        if (TracekedTarget != null) ExecutionTraceTarget(TracekedTarget);
+        if (!isNavigationPaused && TracekedTarget != null) ExecutionTraceTarget(TracekedTarget);
     }
 
     public void VisibilityDetection(Transform target)
     {
         // 避免重复计入同一个目标
         if (TracekedTarget != null) return;
-        Debug.Log("开始追踪" + target.name);
+        //Debug.Log("开始追踪" + target.name);
         if (checkObstacle)
         {
             // 发射射线检测是否有障碍物遮挡
@@ -57,7 +72,7 @@ public class ZombieConeVisionConfig : MonoBehaviour
             }
             else
             {
-                Debug.Log("有遮挡，" + name + "没能看见" + target.name + "||" + target.tag);
+                //Debug.Log("有遮挡，" + name + "没能看见" + target.name + "||" + target.tag);
             }
         }
         else
@@ -68,8 +83,24 @@ public class ZombieConeVisionConfig : MonoBehaviour
 
     public void NavigationToTargetPoint(Vector3 targetPoint)
     {
+        // 已暂停（如正在攻击车辆）时不接受新的导航目标
+        if (isNavigationPaused) return;
         agent.isStopped = false;
         agent.SetDestination(targetPoint);
+    }
+
+    // 暂停追逐/导航（由ZombieConrtol在僵尸接触车辆开始攻击时调用）
+    public void PauseChasing()
+    {
+        isNavigationPaused = true;
+        if (agent != null) agent.isStopped = true;
+    }
+
+    // 恢复追逐/导航（僵尸离开车辆后由ZombieConrtol调用）
+    public void ResumeChasing()
+    {
+        isNavigationPaused = false;
+        if (agent != null) agent.isStopped = false;
     }
     //持续追踪目标，直至目标超出追踪范围或有障碍物遮挡视野
     public void ExecutionTraceTarget(Transform target)
@@ -84,22 +115,24 @@ public class ZombieConeVisionConfig : MonoBehaviour
         {
             TracekedTarget = null;
             distance = -1f;
-            Debug.Log(gameObject.name + "跟丢玩家");
+            //Debug.Log(gameObject.name + "跟丢玩家");
         }
-        Debug.Log(gameObject.name + "正在追踪玩家");
+        //Debug.Log(gameObject.name + "正在追踪玩家");
         NavigationToTargetPoint(target.parent.position);
     }
 
     bool RaycastTag(Transform target, float length)
     {
         RaycastHit hit;
-        return Physics.Raycast(
+        bool f =Physics.Raycast(
             DetectionPoint.position,
             target.position - DetectionPoint.position,
             out hit,
             length,
             TrackTargets
         );
+        //Debug.Log("射线检测结果：" + f + "，碰撞物体：" + (hit.collider != null ? hit.collider.name : "无") + "，目标物体：" + target.name);
+        return f;
     }
 
     #region 调试可视化（在Scene视图中绘制锥形）

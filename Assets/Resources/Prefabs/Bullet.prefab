@@ -390,6 +390,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 40
   effectPrefab: {fileID: 8071125864802962671, guid: c600322c863effc4b999b7b9efa459e2, type: 3}
+  BloodPrefab: {fileID: 6133257635431110752, guid: a49ccbabe2f443841a55c04f9fc08afe, type: 3}
   lifetime: 1
 --- !u!1 &8029020003325934720
 GameObject:

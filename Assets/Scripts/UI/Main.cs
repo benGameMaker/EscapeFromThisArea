@@ -8,10 +8,4 @@ public class Main : MonoBehaviour
     {
         UIManager.Instance.ShowPanel<BeginPanel>();
     }
-
-
-    void Update()
-    {
-        
-    }
 }

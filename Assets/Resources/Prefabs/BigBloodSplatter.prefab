@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1506690980429373606
+--- !u!1 &7795820725027745745
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,40 +8,40 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5619511402119482395}
-  - component: {fileID: 1483901822433108220}
-  - component: {fileID: 5108643914074781249}
+  - component: {fileID: 6052628323333803564}
+  - component: {fileID: 4581357952060122700}
+  - component: {fileID: 6965356029180817072}
   m_Layer: 0
-  m_Name: FX_BloodSplatter_Alt
+  m_Name: BigBloodSplatter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5619511402119482395
+--- !u!4 &6052628323333803564
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1506690980429373606}
+  m_GameObject: {fileID: 7795820725027745745}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.6533754, w: -0.7570342}
-  m_LocalPosition: {x: -192.2803, y: 4.18, z: -815.50635}
+  m_LocalRotation: {x: -0, y: 0.7090467, z: -0, w: 0.7051616}
+  m_LocalPosition: {x: -192.89919, y: 1.906, z: -823.82916}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 278.40698}
---- !u!198 &1483901822433108220
+  m_LocalEulerAnglesHint: {x: 0, y: 90.315, z: 0}
+--- !u!198 &4581357952060122700
 ParticleSystem:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1506690980429373606}
+  m_GameObject: {fileID: 7795820725027745745}
   serializedVersion: 8
-  lengthInSec: 1
+  lengthInSec: 0.3
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 3
@@ -116,8 +116,8 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 1.5
-      minScalar: 1
+      scalar: 0.5
+      minScalar: 0.05
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -958,7 +958,7 @@ ParticleSystem:
     m_BurstCount: 1
     m_Bursts:
     - serializedVersion: 2
-      time: 0.1
+      time: 0.05
       countCurve:
         serializedVersion: 2
         minMaxState: 0
@@ -1026,8 +1026,8 @@ ParticleSystem:
         serializedVersion: 2
         m_Curve:
         - serializedVersion: 3
-          time: 0.004878049
-          value: 0.4934498
+          time: 0
+          value: 0.20179331
           inSlope: 0.19937925
           outSlope: 0.19937925
           tangentMode: 0
@@ -1072,7 +1072,7 @@ ParticleSystem:
         m_RotationOrder: 4
     y:
       serializedVersion: 2
-      minMaxState: 1
+      minMaxState: 2
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -1125,7 +1125,7 @@ ParticleSystem:
         m_RotationOrder: 4
     z:
       serializedVersion: 2
-      minMaxState: 1
+      minMaxState: 2
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -4694,14 +4694,14 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
---- !u!199 &5108643914074781249
+--- !u!199 &6965356029180817072
 ParticleSystemRenderer:
   serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1506690980429373606}
+  m_GameObject: {fileID: 7795820725027745745}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
