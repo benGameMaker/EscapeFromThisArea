@@ -46,6 +46,8 @@ public class VehicleInteraction : BaseInteractivity
         driver.rigAim.weight = 0f;
         driver.rigGen.weight = 1f;
         driver.vd = GetComponent<VehicleDamage>();
+        // 上车会隐藏玩家并切换到车载武器：打断仍在进行中的徒步换弹，避免换弹状态残留
+        driver.CancelReload();
 
         // 检测器随车挂载：下面玩家整体会被SetActive(false)，
         // 先把DetectionZombies从玩家改挂到驾驶位并保持激活，保证车载武器开火时也能吸引僵尸。
@@ -126,6 +128,8 @@ public class VehicleInteraction : BaseInteractivity
             return;
         }
         rb.excludeLayers = ignorelLayer;
+        // 下车时打断仍在进行中的换弹（停协程/复位武器状态/清车辆UI进度），避免下次上车残留换弹状态
+        if (!islaunch) vehicle.CancelReload();
         vehicle.enabled = islaunch;
 
         //同步通过BagLogicProcess启用/停用车辆的PlayerInput：

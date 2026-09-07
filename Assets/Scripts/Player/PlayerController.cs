@@ -185,10 +185,25 @@ public class PlayerController : BaseObject
     //持枪开火(原Fire中持枪逻辑)：处理空仓换弹、举枪开火与收枪计时
     void GunFire(InputAction.CallbackContext context)
     {
+        if (curWeapon == null) return;
+
+        // 换弹中：任何开火输入都忽略（不重置换弹进度、不尝试举枪/开火）
+        if (curWeapon.isReloading)
+        {
+            // 松开时清掉开火/举枪标记，避免换弹完成后残留
+            if (context.canceled)
+            {
+                isFire = false;
+                animator.SetBool("Shoot_b", false);
+            }
+            return;
+        }
+
+        // 空仓：自动进入换弹（StartReload内部去重，已在换弹时不会重置换弹进度），
+        // 其余流程照旧（举枪/开火姿态），打不出子弹也不会影响换弹
         if (curWeapon.curCapacity <= 0)
         {
             animator.SetBool("Reload_b", true);
-            // 空仓自动换弹：通知面板播放换弹进度
             curWeapon.StartReload();
         }
 
@@ -239,9 +254,21 @@ public class PlayerController : BaseObject
     }
     public void Reload(InputAction.CallbackContext context)
     {
+        if (!context.canceled) return;
+        // 未持枪或已在换弹中：重复按换弹键忽略，不重置换弹进度、不打断换弹
+        if (!isHoldingWeapon || curWeapon == null || curWeapon.isReloading) return;
+
         animator.SetBool("Reload_b", true);
-        // 通知面板播放换弹进度（时长由当前武器ReloadTime决定）
-        if (curWeapon != null) curWeapon.StartReload();
+        curWeapon.StartReload();
+    }
+
+    // 打断徒步换弹（上车切换归属等场景使用）：复位武器换弹状态、退出换弹动画并清掉准星进度
+    public void CancelReload()
+    {
+        if (curWeapon != null) curWeapon.CancelReload();
+        if (animator != null) animator.SetBool("Reload_b", false);
+        PlayerPanel panel = UIManager.Instance.GetPanel<PlayerPanel>();
+        if (panel != null) panel.EndReloadProgress();
     }
 
     void Movement(Vector3 camForwardFlat)

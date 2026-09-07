@@ -140,6 +140,8 @@ public class VehicleController : MonoBehaviour
     void TryFire()
     {
         if (curWeapon == null) return;
+        // 换弹中禁止开火（不影响换弹流程与准星进度）
+        if (curWeapon.isReloading) return;
 
         if (curWeapon.curCapacity <= 0)
         {
@@ -153,17 +155,35 @@ public class VehicleController : MonoBehaviour
     }
     void DoReload()
     {
-        if (curWeapon == null || reloadCoroutine != null) return; //换弹中不重复触发
+        // 已在换弹中不重复触发，避免重置换弹进度
+        if (curWeapon == null || curWeapon.isReloading) return;
 
         //通知面板播放换弹进度，ReloadTime秒后完成补弹
         curWeapon.StartReload();
         reloadCoroutine = StartCoroutine(ReloadAfterDelay(curWeapon));
     }
 
+    // 打断当前武器的换弹：停掉换弹协程、复位武器换弹状态并清掉车辆UI准星进度。
+    // 目前仅"切换武器/下车"这类会切换武器归属的行为允许调用
+    public void CancelReload()
+    {
+        if (reloadCoroutine != null)
+        {
+            StopCoroutine(reloadCoroutine);
+            reloadCoroutine = null;
+        }
+        if (curWeapon != null) curWeapon.CancelReload();
+
+        VehiclePanel vp = UIManager.Instance.GetPanel<VehiclePanel>();
+        if (vp != null) vp.EndReloadProgress();
+    }
+
     void SwitchToWeapon(int index)
     {
         if (weaponLists.Count == 0) return;
 
+        // 切换武器会打断换弹：停掉换弹协程、复位武器换弹状态并清掉准星进度
+        CancelReload();
 
         curWeaponIndex = ((index % weaponLists.Count) + weaponLists.Count) % weaponLists.Count;
         curWeapon = weaponLists[curWeaponIndex];

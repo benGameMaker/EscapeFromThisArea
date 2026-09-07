@@ -148,8 +148,8 @@ public class VehiclePanel : BasePanel
         reloadProgressCoroutine = null;
     }
 
-    // 换弹完成：停止进度并清空准星填充
-    void EndReloadProgress()
+    // 换弹完成：停止进度并清空准星填充（public：切枪打断换弹时由VehicleController调用）
+    public void EndReloadProgress()
     {
         if (reloadProgressCoroutine != null)
         {

@@ -84,6 +84,12 @@ public class WeaponSwitching : MonoBehaviour
             Debug.LogError(gameObject.name + " 组件未就绪，跳过切枪");
             return;
         }
+        // 切换武器是唯一允许打断换弹的行为：复位武器换弹状态并清掉准星换弹进度
+        if (curWeapon != null && curWeapon.isReloading)
+        {
+            curWeapon.CancelReload();
+            if (pp != null) pp.EndReloadProgress();
+        }
         cp.animator.SetBool("Reload_b", false);
 
         if (int.TryParse(context.control.name, out int gunID))
@@ -194,6 +200,7 @@ public class WeaponSwitching : MonoBehaviour
     {
         if (curWeapon != null)
         {
+            curWeapon.CancelReload();   // 收枪同样打断换弹，避免换弹状态残留
             curWeapon.gameObject.SetActive(false);
             pp.HideCapacityDataUI();
             //因为是手k的动画，所以收枪后rigHands要立即恢复为1，手才会动起来
@@ -307,6 +314,7 @@ public class WeaponSwitching : MonoBehaviour
 
     void LayDownWeapon(WeaponControl Weapon)
     {
+        if (Weapon != null && Weapon.isReloading) Weapon.CancelReload();  // 放下旧枪打断其换弹
         cp.animator.SetInteger("WeaponType_int", 0);
         rigHands.weight = 0f;
         // 切枪时先回到普通持枪动作（rigAim=0/rigGen=1），作为瞄准切枪的过渡动作

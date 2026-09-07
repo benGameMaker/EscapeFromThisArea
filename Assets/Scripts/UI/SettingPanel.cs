@@ -31,7 +31,7 @@ public class SettingPanel : BasePanel
         });
         togSound.onValueChanged.AddListener((v) =>
         {
-            GameDataMgr.Instance.musicData.soundOpen = v;
+            GameDataMgr.Instance.musicData.soundOpen = !v;
         });
         sliderMusic.onValueChanged.AddListener((v) =>
         {

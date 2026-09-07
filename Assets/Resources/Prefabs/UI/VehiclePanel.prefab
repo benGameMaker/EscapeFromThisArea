@@ -1613,13 +1613,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Vehicle has Damaged, and need material to repair it.
-
-    Restore the
-    vehicle''s integrity to above 80 and you can drive it'
+  m_text: "\u8F66\u8F86\u5DF2\u53D7\u635F\uFF0C\u9700\u8981\u6750\u6599\u6765\u4FEE\u590D\u5B83\u3002\u5C06\u8F66\u8F86\u7684\u5B8C\u6574\u6027\u6062\u590D\u5230<color=red>80\u4EE5\u4E0A</color>\uFF0C\u4F60\u5C31\u53EF\u4EE5\u9A7E\u9A76\u5B83\u4E86\u3002"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e8550817ea7ea014b83ff9f480a73c93, type: 2}
+  m_sharedMaterial: {fileID: -6131018682508601089, guid: e8550817ea7ea014b83ff9f480a73c93, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

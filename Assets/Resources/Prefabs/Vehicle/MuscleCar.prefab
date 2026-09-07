@@ -468,7 +468,6 @@ GameObject:
   - component: {fileID: 1227211729889869915}
   - component: {fileID: 3146482880054916122}
   - component: {fileID: 1970447245050356220}
-  - component: {fileID: 184109448262588627}
   - component: {fileID: 6928680526971863939}
   - component: {fileID: 7071518494022169807}
   - component: {fileID: 1444910462245955744}
@@ -551,27 +550,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 9d99b6fe034dd764db7821138ed419d9, type: 3}
---- !u!65 &184109448262588627
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3107206931578146080}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3.0873566, y: 0.5968635, z: 0.7307129}
-  m_Center: {x: -0.05454254, y: 1.2312142, z: 3.7315674}
 --- !u!114 &6928680526971863939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -610,9 +588,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2775a7be4e54094298c972606994964, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guidingText: Pass E to drive vehicle
-  itemName: Moonsday Muscle Car
+  guidingText: "\u6309E\u9A7E\u9A76\u8F66\u8F86"
+  itemName: "\u672B\u65E5\u808C\u8089\u8F66"
   panelOffset: {x: 0, y: 200}
+  audio: {fileID: 0}
   ignorelLayer:
     serializedVersion: 2
     m_Bits: 1032

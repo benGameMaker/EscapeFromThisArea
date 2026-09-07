@@ -33,6 +33,9 @@ public class WeaponControl : MonoBehaviour
     public int curCapacity;
     [HideInInspector]
     public BaseObject owner;
+    [Tooltip("当前是否处于换弹中（用于阻止重复触发/换弹中开火等打断行为）")]
+    [HideInInspector]
+    public bool isReloading = false;
 
     public event UnityAction<int> OnCapacityChanged;
     public event UnityAction<float> OnReloadStart;
@@ -104,6 +107,9 @@ public class WeaponControl : MonoBehaviour
     //换弹：按 弹匣最大容量capacity - 弹匣现有数量curCapacity 的差值从背包补充对应子弹
     public void Reload()
     {
+        // 换弹完成（或被打断后恢复数据）：复位换弹状态，之后开火/换弹输入才重新生效
+        isReloading = false;
+
         if (bp == null) bp = UIManager.Instance.GetPanel<BagPanel>();
         if (bp == null) return;
 
@@ -129,8 +135,19 @@ public class WeaponControl : MonoBehaviour
     // 开始换弹：广播换弹开始事件（携带ReloadTime），由外部（玩家/车辆）在换弹行为发生时调用
     public void StartReload()
     {
+        // 已在换弹中：忽略重复触发（再按换弹键/空仓开火键不得重置换弹进度，也不得打断换弹）
+        if (isReloading) return;
+        isReloading = true;
+
+        Debug.Log("WeaponControl: StartReload");
         GameDataMgr.Instance.PlaySound(reloadSound);
         OnReloadStart?.Invoke(ReloadTime);
+    }
+
+    // 中断换弹（目前仅"切换武器"允许）：复位换弹状态，UI进度由调用方(面板/控制器)一并清除
+    public void CancelReload()
+    {
+        isReloading = false;
     }
 
     GameObject CreateBullet()
