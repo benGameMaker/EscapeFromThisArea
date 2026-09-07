@@ -16,6 +16,8 @@ public class WeaponControl : MonoBehaviour
     public float harmMultiplier = 1;
     public int capacity;
     public string bulletTypeName;
+    public AudioClip gunShot;
+    public AudioClip reloadSound;
     public int bulletPoolDefaultCapacity = 10;
     public int bulletPoolMaxSize = 100;
     [Tooltip("使用这把武器开枪时会吸引僵尸的最远距离")]
@@ -85,6 +87,7 @@ public class WeaponControl : MonoBehaviour
     {
         if (curCapacity > 0)
         {
+            GameDataMgr.Instance.PlaySound(gunShot);
             curCapacity--;
             if(curCapacity < 0) { curCapacity = 0; }
             // 广播弹药数量变化，由订阅的面板（PlayerPanel/VehiclePanel等）刷新显示
@@ -126,6 +129,7 @@ public class WeaponControl : MonoBehaviour
     // 开始换弹：广播换弹开始事件（携带ReloadTime），由外部（玩家/车辆）在换弹行为发生时调用
     public void StartReload()
     {
+        GameDataMgr.Instance.PlaySound(reloadSound);
         OnReloadStart?.Invoke(ReloadTime);
     }
 

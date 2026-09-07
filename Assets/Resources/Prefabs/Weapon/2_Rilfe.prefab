@@ -589,6 +589,8 @@ MonoBehaviour:
   harmMultiplier: 2
   capacity: 30
   bulletTypeName: RifteBullet
+  gunShot: {fileID: 8300000, guid: 7545f240f394d814082edc8310b577e1, type: 3}
+  reloadSound: {fileID: 8300000, guid: 60376a133b01d14498d1cc95c7d21b54, type: 3}
   bulletPoolDefaultCapacity: 10
   bulletPoolMaxSize: 100
   attractiveDistance: 20

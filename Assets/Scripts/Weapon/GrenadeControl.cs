@@ -11,6 +11,7 @@ public class GrenadeControl : MonoBehaviour
     //可以穿透障碍物进行伤害
     public bool isIgnoreObstacle = false;
 
+    public AudioClip audio;
     SphereCollider sc;
     //同一物体在爆炸瞬间只结算一次伤害，避免多碰撞体重复扣血
     HashSet<BaseObject> damagedObjects = new HashSet<BaseObject>();
@@ -35,6 +36,7 @@ public class GrenadeControl : MonoBehaviour
 
     void Explode()
     {
+        GameDataMgr.Instance.PlaySound(audio);
         GameObject explodeEff = Instantiate(Resources.Load<GameObject>("Prefabs/GrenadeExplode"), transform.position, Quaternion.identity);
         sc.enabled = true;
         Destroy(gameObject, 0.5f);

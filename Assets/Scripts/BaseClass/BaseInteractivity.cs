@@ -8,6 +8,7 @@ public abstract class BaseInteractivity : MonoBehaviour
     public string itemName;
 
     public Vector2 panelOffset;
+    public AudioClip audio;
     InteractionPanel interactionPanel;
 
     public abstract void InteractionBehavior(PlayerController obj);

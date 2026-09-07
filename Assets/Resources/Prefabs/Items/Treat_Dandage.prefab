@@ -134,9 +134,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15305e6b85529804595baec7b55b40bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guidingText: Pass E to pick
-  itemName: Dandage
+  guidingText: "\u6309E\u62FE\u53D6"
+  itemName: "\u81EA\u7597\u7EF7\u5E26"
   panelOffset: {x: 0, y: 1}
+  audio: {fileID: 0}
 --- !u!65 &-6889721798685215152
 BoxCollider:
   m_ObjectHideFlags: 0

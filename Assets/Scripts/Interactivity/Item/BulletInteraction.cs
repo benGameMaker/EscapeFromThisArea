@@ -6,6 +6,7 @@ public class BulletInteraction : BaseInteractivity
 {
     public override void InteractionBehavior(PlayerController obj)
     {
+        GameDataMgr.Instance.PlaySound(audio);
         PickToBag<BulletItem>();
     }
 }

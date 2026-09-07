@@ -620,6 +620,8 @@ MonoBehaviour:
   harmMultiplier: 1.5
   capacity: 10
   bulletTypeName: PistolBullet
+  gunShot: {fileID: 8300000, guid: c74f87c2379f1454eb8b9fde7aa61689, type: 3}
+  reloadSound: {fileID: 8300000, guid: 21bc67ccecdd22a41b0c8a49f3c28768, type: 3}
   bulletPoolDefaultCapacity: 10
   bulletPoolMaxSize: 100
   attractiveDistance: 10

@@ -30,16 +30,16 @@ public class GameDataMgr
         JsonMgr.Instance.SaveData(cellDatas, "CellData");
     }
 
-    public void PlaySound(string resName)
+    public void PlaySound(AudioClip audio)
     {
         GameObject musicObj = new GameObject();
         AudioSource a = musicObj.AddComponent<AudioSource>();
-        a.clip = Resources.Load<AudioClip>(resName);
+        a.clip = audio;
         a.volume = musicData.soundValue;
         a.mute = musicData.soundOpen;
 
         a.Play();
 
-        GameObject.Destroy(musicObj, 1f);
+        GameObject.Destroy(musicObj, 3f);
     }
 }

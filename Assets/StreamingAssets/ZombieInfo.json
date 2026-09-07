@@ -1,0 +1,9 @@
+[
+{"id":1,"res":"Prefabs/Zombies/Zombie_1","HP":120,"atk":10,"speed":3},
+{"id":2,"res":"Prefabs/Zombies/Zombie_2","HP":150,"atk":15,"speed":2},
+{"id":3,"res":"Prefabs/Zombies/Zombie_3","HP":200,"atk":15,"speed":2.5},
+{"id":4,"res":"Prefabs/Zombies/Zombie_4","HP":250,"atk":20,"speed":1.5},
+{"id":5,"res":"Prefabs/Zombies/Zombie_5","HP":190,"atk":15,"speed":1.8},
+{"id":6,"res":"Prefabs/Zombies/Zombie_6","HP":160,"atk":10,"speed":4},
+{"id":7,"res":"Prefabs/Zombies/Zombie_7","HP":110,"atk":10,"speed":5}
+]

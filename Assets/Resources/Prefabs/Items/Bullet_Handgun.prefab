@@ -179,6 +179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de2284a4588389d4c8c2a308e83d6ad8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guidingText: Pass E to pick
-  itemName: Pistol bullet
+  guidingText: "\u6309E\u62FE\u53D6"
+  itemName: "\u624B\u67AA\u5B50\u5F39"
   panelOffset: {x: 0, y: 0.5}
+  audio: {fileID: 0}

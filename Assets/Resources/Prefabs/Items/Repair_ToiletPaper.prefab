@@ -179,6 +179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc75d03937ae15841940f8f70b819964, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guidingText: Pass E to pick
-  itemName: Vehicle repair items
+  guidingText: "\u6309E\u62FE\u53D6"
+  itemName: "\u8F66\u8F86\u7EF4\u4FEE\u6750\u6599"
   panelOffset: {x: 0, y: 1}
+  audio: {fileID: 0}
