@@ -62,7 +62,18 @@ public class PlayerController : BaseObject
         BodyParts.Add(transform.Find("Hips_jnt").GetComponent<BoxCollider>());
         pp = UIManager.Instance.GetPanel<PlayerPanel>();
         if (pp != null) pp.UpdataHP(HP, maxHP);
-        else Debug.LogWarning("PlayerPanel获取失败");
+        else
+        {
+            Debug.LogWarning("PlayerPanel获取失败，尝试重试获取");
+            UIManager.Instance.ShowPanel<PlayerPanel>();
+            pp = UIManager.Instance.GetPanel<PlayerPanel>();
+            if (pp != null)
+            {   
+                Debug.Log("PlayerPanel获取成功");
+                pp.UpdataHP(HP, maxHP);
+            }
+            else Debug.LogWarning("PlayerPanel获取失败");
+        }
     }
 
     protected override void Update()

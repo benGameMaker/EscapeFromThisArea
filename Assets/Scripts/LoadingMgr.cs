@@ -52,6 +52,7 @@ public class LoadingMgr : MonoBehaviour
         // 1. 先显示LoadPanel，进度初始化为0
         LoadPanel loadPanel = UIManager.Instance.ShowPanel<LoadPanel>();
         loadPanel.transform.SetAsLastSibling();   // 保证盖住其它面板
+        loadPanel.SetLoadText(displayName);
         loadPanel.SetProgress(0f);
         OnProgressUpdate?.Invoke(0f, displayName);
 
@@ -80,6 +81,14 @@ public class LoadingMgr : MonoBehaviour
         // 5. 再激活场景
         asyncLoad.allowSceneActivation = true;
         yield return asyncLoad;   // 等待场景真正完成切换
+
+        // 场景激活后刷新环境光照：
+        // 异步切换场景时Unity可能沿用上一场景的天空盒/环境光(RenderSettings)或未重新计算环境探针，
+        // 导致新场景整体偏暗(Scene窗口也会同步变暗)。这里强制把新场景设为活动场景并重算环境光照。
+        Scene loadedScene = SceneManager.GetSceneByName(sceneName);
+        if (loadedScene.IsValid() && SceneManager.GetActiveScene() != loadedScene)
+            SceneManager.SetActiveScene(loadedScene);
+        DynamicGI.UpdateEnvironment();
 
         // 场景激活时GameScene会创建HUD面板，重新把LoadPanel提到最上层盖住它们
         loadPanel.transform.SetAsLastSibling();

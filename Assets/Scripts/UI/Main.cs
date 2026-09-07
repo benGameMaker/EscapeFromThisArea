@@ -7,5 +7,7 @@ public class Main : MonoBehaviour
     void Start()
     {
         UIManager.Instance.ShowPanel<BeginPanel>();
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
     }
 }

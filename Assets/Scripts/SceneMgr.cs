@@ -9,6 +9,8 @@ public class SceneMgr : MonoBehaviour
     public GameObject testObject;
     public BaseObject atker;
     public PlayerController player;
+    public BagLogicProcess pblp;
+    public BagLogicProcess vblp;
     private void Awake()
     {
         instance = this;
@@ -22,6 +24,8 @@ public class SceneMgr : MonoBehaviour
         if (player == null) Debug.Log("玩家物体未初始化");
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        // 场景经由异步加载进入时，环境光可能未被重新计算导致画面整体偏暗，这里主动刷新一次
+        DynamicGI.UpdateEnvironment();
     }
 
 
@@ -35,6 +39,11 @@ public class SceneMgr : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.J))
         {
             testObject.GetComponent<VehicleDamage>().RepairVehicle(10);
+        }
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            if (UIManager.Instance.GetPanel<GameSettingPanel>() != null) UIManager.Instance.HidePanel<GameSettingPanel>();
+            else UIManager.Instance.ShowPanel<GameSettingPanel>();
         }
     }
 }

@@ -14,7 +14,7 @@ public class BeginPanel : BasePanel
         {
             // 载入完成后显示IntroPanel（开场文本交互）
             UIManager.Instance.HidePanel<BeginPanel>();
-            LoadingMgr.Instance.LoadSceneAsync("GameScene", "开始游戏", true);
+            LoadingMgr.Instance.LoadSceneAsync("GameScene", "正在为你的求生做准备...", true);
             if (UIManager.Instance.GetPanel<SettingPanel>() != null) UIManager.Instance.HidePanel<SettingPanel>();
         });
         btnSetting.onClick.AddListener(() =>

@@ -37,6 +37,13 @@ public class LoadPanel : BasePanel
         sizeDelta.x = fullWidth * progress;
         barRect.sizeDelta = sizeDelta;
     }
+    public void SetLoadText(string text)
+    {
+        if (LoadText != null)
+        {
+            LoadText.text = text;
+        }
+    }
 
     protected override void Update()
     {
