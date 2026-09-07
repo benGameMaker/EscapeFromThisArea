@@ -9,7 +9,7 @@ public class VehicleDamage : MonoBehaviour
     public float maxIntegrity = 100f;
     public bool isBroke = false;
     public GameObject brokenEffectPrefab;
-
+    public AudioClip brokenSound;
     [HideInInspector]
     public float curVelocity;
     [HideInInspector]
@@ -66,11 +66,12 @@ public class VehicleDamage : MonoBehaviour
             isBroke = true;
             if (vc != null) vc.SetVehicleState(false);
             if (vp != null) vp.ShowOrHideNotice(true);
+            GameDataMgr.Instance.PlaySound(brokenSound, 1f);
             //Debug.Log("车辆已损坏");
         }
     }
 
-    // 新增：初始化特效
+    // 初始化特效
     private void InitializeEffect()
     {
         if (brokenEffectPrefab != null)
@@ -95,7 +96,7 @@ public class VehicleDamage : MonoBehaviour
             Debug.LogWarning("brokenEffectPrefab 未赋值！");
         }
     }
-    // 新增：设置 Emission Rate
+    // 设置 Emission Rate
     private void SetEmissionRate(float rate)
     {
         if (!isEffectInitialized) return;
@@ -104,7 +105,7 @@ public class VehicleDamage : MonoBehaviour
         rateOverTime.constant = rate;
         emissionModule.rateOverTime = rateOverTime;
     }
-    // 新增：更新烟雾特效
+    // 更新烟雾特效
     private void UpdateSmokeEffect()
     {
         if (!isEffectInitialized) return;

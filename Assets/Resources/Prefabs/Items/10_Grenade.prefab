@@ -189,7 +189,7 @@ MonoBehaviour:
   minHarm: 30
   waitTime: 1
   isIgnoreObstacle: 0
-  audio: {fileID: 0}
+  audio: {fileID: 8300000, guid: 97ee1384ed606754d993e8bd26416677, type: 3}
 --- !u!114 &7599682903819629711
 MonoBehaviour:
   m_ObjectHideFlags: 0

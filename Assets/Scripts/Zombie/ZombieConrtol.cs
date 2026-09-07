@@ -9,6 +9,12 @@ public class ZombieConrtol : BaseObject
     public float bashAtkDistance;
     [Tooltip("僵尸离开车辆后延迟多久恢复Rigidbody的Kinematic（给车辆时间把僵尸推开）")]
     public float kinematicRestoreDelay;
+    [Tooltip("僵尸受伤时播放的音频(不循环)")]
+    public AudioClip hurtSound;
+    [Tooltip("僵尸死亡时播放的音频(不循环)")]
+    public AudioClip deathSound;
+    [Tooltip("僵尸只有玩家在该距离内受伤/死亡时才会播放声音")]
+    public float soundHearRange = 30f;
 
     MeleeRange mrAtk;
     MeleeRange mrBashAtk;
@@ -60,9 +66,29 @@ public class ZombieConrtol : BaseObject
         ZombieConfig.agent.isStopped = !ZombieConfig.agent.isStopped;
     }
 
+    //受伤音(不循环)：仅玩家在soundHearRange距离内时才播放
+    public override void Injured(float harm)
+    {
+        base.Injured(harm);
+        //致死那一次由Death播放死亡音，此处不重复播
+        if (!isDead && hurtSound != null && IsPlayerInSoundRange())
+            GameDataMgr.Instance.PlaySound(hurtSound);
+    }
+
+    //判断玩家是否在僵尸声音可听见范围内
+    bool IsPlayerInSoundRange()
+    {
+        PlayerController player = SceneMgr.Instance != null ? SceneMgr.Instance.player : null;
+        if (player == null) return false;
+        return Vector3.Distance(transform.position, player.transform.position) <= soundHearRange;
+    }
+
     protected override void Death()
     {
         if (isDead) return;   // 已在死亡流程中，避免重复执行
+        //僵尸死亡音(不循环)：仅玩家在一定距离内才播放
+        if (deathSound != null && IsPlayerInSoundRange())
+            GameDataMgr.Instance.PlaySound(deathSound);
         if (animator != null)
             animator.SetBool("isDead_b", true);
         // 清理车辆攻击状态，避免残留协程/触发器干扰

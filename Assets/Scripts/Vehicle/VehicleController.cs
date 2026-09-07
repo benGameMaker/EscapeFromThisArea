@@ -22,6 +22,13 @@ public class VehicleController : MonoBehaviour
     [Tooltip("反向行驶刹车时，车速（本地Z轴速度）降到该值以下才恢复驱动力")]
     public float brakeStopSpeed = 1f;
     public Transform DiscardPoint;
+    [Tooltip("玩家上车时播放的音频(不循环)")]
+    public AudioClip mountSound;
+    [Tooltip("驾驶时循环播放的音频(上车开始播放，下车停止)")]
+    public AudioClip drivingLoopSound;
+
+    //驾驶中循环音频的播放源(挂在车辆上，不受VehicleController脚本启停影响)
+    AudioSource drivingSource;
 
     float fireRate = 10f;
 
@@ -40,6 +47,33 @@ public class VehicleController : MonoBehaviour
     Coroutine reloadCoroutine;
     bool isBrakeHeld = false;
     bool isCanDrive = true;
+
+    //上车(由VehicleInteraction调用)：播放上车提示音(不循环)，并开始循环播放驾驶音
+    public void PlayDrivingAudio()
+    {
+        if (mountSound != null) GameDataMgr.Instance.PlaySound(mountSound);
+
+        if (drivingSource == null)
+        {
+            drivingSource = GetComponent<AudioSource>();
+            if (drivingSource == null) drivingSource = gameObject.AddComponent<AudioSource>();
+            drivingSource.playOnAwake = false;
+            drivingSource.loop = true;
+        }
+        if (drivingLoopSound != null)
+        {
+            drivingSource.clip = drivingLoopSound;
+            drivingSource.volume = GameDataMgr.Instance.musicData.soundValue;
+            drivingSource.mute = GameDataMgr.Instance.musicData.soundOpen;
+            if (!drivingSource.isPlaying) drivingSource.Play();
+        }
+    }
+
+    //下车(由VehicleInteraction调用)：停止循环播放的驾驶音
+    public void StopDrivingAudio()
+    {
+        if (drivingSource != null) drivingSource.Stop();
+    }
 
     void Awake()
     {

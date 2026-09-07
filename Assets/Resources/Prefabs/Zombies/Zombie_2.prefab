@@ -1658,6 +1658,9 @@ MonoBehaviour:
   atkDistance: 2
   bashAtkDistance: 1.5
   kinematicRestoreDelay: 0.8
+  hurtSound: {fileID: 8300000, guid: 7def9142a4c3bda44b95ef13f46449d0, type: 3}
+  deathSound: {fileID: 8300000, guid: 3d460c5668cee7e4fbc9a6bc09920e95, type: 3}
+  soundHearRange: 30
 --- !u!114 &-5880317157872736194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1685,7 +1688,6 @@ MonoBehaviour:
   traceVisualFieldVisualization: 0
   DetectionPoint: {fileID: 54003454177017736}
   distance: -1
-  agent: {fileID: 0}
   isNavigationPaused: 0
   detectionGizmoColor: {r: 0, g: 1, b: 0, a: 1}
   traceGizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

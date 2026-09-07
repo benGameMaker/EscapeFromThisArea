@@ -21,6 +21,10 @@ public class PlayerController : BaseObject
     public Transform DiscardPoint;
     [Tooltip("投掷手雷时的初速度大小")]
     public float throwForce = 15f;
+    [Tooltip("玩家受伤时播放的音频(不循环)")]
+    public AudioClip hurtSound;
+    [Tooltip("玩家死亡时播放的音频(不循环)")]
+    public AudioClip deathSound;
 
     [HideInInspector]
     public bool isHoldingWeapon = false;
@@ -455,6 +459,9 @@ public class PlayerController : BaseObject
     }
     protected override void Death()
     {
+        if (isDead) return;   // 防止死亡流程重复触发导致重复播放死亡音
+        //玩家死亡音(不循环)
+        if (deathSound != null) GameDataMgr.Instance.PlaySound(deathSound);
         base.Death();
         PlayerInput playerInput = GetComponent<PlayerInput>();
         playerInput.enabled = false;
@@ -462,6 +469,8 @@ public class PlayerController : BaseObject
     public override void Injured(BaseObject attacker, float extraHarm)
     {
         base.Injured(attacker, extraHarm);
+        //玩家受伤音(不循环；致死的那次由Death播放死亡音，此处不重复播)
+        if (!isDead && hurtSound != null) GameDataMgr.Instance.PlaySound(hurtSound);
         pp.UpdataHP(HP, maxHP);
     }
 }

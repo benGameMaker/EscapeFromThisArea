@@ -132,6 +132,10 @@ public class VehicleInteraction : BaseInteractivity
         if (!islaunch) vehicle.CancelReload();
         vehicle.enabled = islaunch;
 
+        //上车播放"上车提示音(不循环)+驾驶循环音"，下车停止驾驶循环音
+        if (islaunch) vehicle.PlayDrivingAudio();
+        else vehicle.StopDrivingAudio();
+
         //同步通过BagLogicProcess启用/停用车辆的PlayerInput：
         //上车开启输入、下车关闭输入，避免不在车上时车辆的输入仍被监听
         BagLogicProcess bagLogic = GetComponent<BagLogicProcess>();

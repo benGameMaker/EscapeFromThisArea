@@ -134,7 +134,7 @@ MonoBehaviour:
   guidingText: "\u6309E\u62FE\u53D6"
   itemName: "\u8F66\u8F86\u7EF4\u4FEE\u6750\u6599"
   panelOffset: {x: 0, y: 1}
-  audio: {fileID: 0}
+  audio: {fileID: 8300000, guid: a552a8814a9804b43933ecb1ae4faff6, type: 3}
 --- !u!54 &3098952667876112733
 Rigidbody:
   m_ObjectHideFlags: 0
