@@ -18,6 +18,15 @@ public class VehicleDamage : MonoBehaviour
     public VehicleController vc;
     Rigidbody rb;
 
+    [Tooltip("吸引僵尸的球形触发器(挂在车辆上，玩家驾驶时进入范围的僵尸会被导航来攻击车辆；不拖拽则自动在子物体上查找)")]
+    public SphereCollider attractTrigger;
+    [Tooltip("当前是否正被玩家驾驶(由VehicleInteraction上/下车时通过SetDriven设置)")]
+    bool isDriven = false;
+    // 当前活跃的检测器(DetectionZombies)，代表玩家当前控制的实体(徒步=玩家、开车=车辆)
+    DetectionZombies detector;
+    // 通过球形触发器进入吸引范围的僵尸名单，下车时统一切回攻击玩家
+    readonly List<ZombieConrtol> attractedZombies = new List<ZombieConrtol>();
+
 
     // 新增：粒子系统引用
     private ParticleSystem brokenParticleSystem;
@@ -28,6 +37,8 @@ public class VehicleDamage : MonoBehaviour
         curIntegrity = maxIntegrity;
         rb = GetComponent<Rigidbody>();
         vc = GetComponent<VehicleController>();
+        // 未在Inspector拖拽球形触发器时，自动在子物体上查找第一个SphereCollider
+        if (attractTrigger == null) attractTrigger = GetComponentInChildren<SphereCollider>(true);
         InitializeEffect();
     }
 
@@ -66,7 +77,7 @@ public class VehicleDamage : MonoBehaviour
             isBroke = true;
             if (vc != null) vc.SetVehicleState(false);
             if (vp != null) vp.ShowOrHideNotice(true);
-            GameDataMgr.Instance.PlaySound(brokenSound, 1f);
+            GameDataMgr.Instance.PlaySound(brokenSound, 0.9f);
             //Debug.Log("车辆已损坏");
         }
     }
@@ -161,5 +172,52 @@ public class VehicleDamage : MonoBehaviour
         if (Mathf.Abs(curVelocity) > 20f) DamageVehicle(damageCoefficientt * 0.8f * curVelocity);
         else if (Mathf.Abs(curVelocity) > 15f) DamageVehicle(damageCoefficientt * 0.5f * curVelocity);
         else if (Mathf.Abs(curVelocity) > 5f) DamageVehicle(damageCoefficientt * 0.3f * curVelocity);
+    }
+
+    /// <summary>
+    /// 由 VehicleInteraction 在上/下车时调用，同步"玩家当前控制的实体"到车辆。
+    /// 上车(driven=true)：进入球形触发器的僵尸将被吸引攻击车辆；
+    /// 下车(driven=false)：把仍在被本车吸引的僵尸统一切回攻击玩家。
+    /// activeDetector 为当前活跃的 DetectionZombies（上下车时它会被改挂到玩家/车辆下）。
+    /// </summary>
+    public void SetDriven(bool driven, DetectionZombies activeDetector)
+    {
+        isDriven = driven;
+        detector = activeDetector;
+
+        // 下车：切换目标回玩家（检测器此时已挂回玩家，僵尸据此自动追玩家）
+        if (!driven) RetargetAttractedZombies();
+    }
+
+    // 球形触发器：玩家驾驶时，僵尸进入范围就强制追踪当前控制实体(车辆)
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!isDriven || detector == null) return;
+
+        ZombieConrtol zombie = other.GetComponentInParent<ZombieConrtol>();
+        if (zombie == null || zombie.isDead) return;
+        if (attractedZombies.Contains(zombie)) return;
+
+        attractedZombies.Add(zombie);
+        zombie.ForceChaseTarget(detector.transform);
+    }
+
+    // 球形触发器：僵尸离开范围时从名单移除(不额外打断其当前行为)
+    private void OnTriggerExit(Collider other)
+    {
+        ZombieConrtol zombie = other.GetComponentInParent<ZombieConrtol>();
+        if (zombie != null) attractedZombies.Remove(zombie);
+    }
+
+    // 下车时把被本车吸引的僵尸统一切回攻击玩家，并清空名单
+    void RetargetAttractedZombies()
+    {
+        Transform target = detector != null ? detector.transform : null;
+        for (int i = 0; i < attractedZombies.Count; i++)
+        {
+            if (attractedZombies[i] != null)
+                attractedZombies[i].ForceChaseTarget(target);
+        }
+        attractedZombies.Clear();
     }
 }

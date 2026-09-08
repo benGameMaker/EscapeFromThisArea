@@ -26,8 +26,7 @@ public class GameSettingPanel : BasePanel
         btnClose.onClick.AddListener(() =>
         {
             GameDataMgr.Instance.SaveMusicData();
-            UIManager.Instance.HidePanel<SettingPanel>();
-            Debug.Log("点击了设置面板的关闭按钮");
+            UIManager.Instance.HidePanel<GameSettingPanel>();
         });
         togMusic.onValueChanged.AddListener((v) =>
         {

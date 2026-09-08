@@ -481,7 +481,7 @@ public class PlayerController : BaseObject
     {
         base.Injured(attacker, extraHarm);
         //玩家受伤音(不循环；致死的那次由Death播放死亡音，此处不重复播)
-        if (!isDead && hurtSound != null) GameDataMgr.Instance.PlaySound(hurtSound);
+        if (!isDead && hurtSound != null) GameDataMgr.Instance.PlaySound(hurtSound, 0.7f);
         pp.UpdataHP(HP, maxHP);
     }
 }

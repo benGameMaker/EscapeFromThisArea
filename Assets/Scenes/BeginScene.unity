@@ -17725,6 +17725,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1838739758569461150, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
+      propertyPath: m_FollowOffset.y
+      value: 3.310546
+      objectReference: {fileID: 0}
+    - target: {fileID: 1838739758569461150, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
+      propertyPath: m_FollowOffset.z
+      value: -5.74041
+      objectReference: {fileID: 0}
     - target: {fileID: 3107206931578146080, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
       propertyPath: m_Name
       value: MuscleCar
@@ -17732,6 +17740,22 @@ PrefabInstance:
     - target: {fileID: 3146482880054916122, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
       propertyPath: m_IsKinematic
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4244518994670496300, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
+      propertyPath: m_FollowOffset.y
+      value: 3.310546
+      objectReference: {fileID: 0}
+    - target: {fileID: 4244518994670496300, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
+      propertyPath: m_FollowOffset.z
+      value: -5.74041
+      objectReference: {fileID: 0}
+    - target: {fileID: 8741547746585153674, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
+      propertyPath: m_FollowOffset.y
+      value: 3.310546
+      objectReference: {fileID: 0}
+    - target: {fileID: 8741547746585153674, guid: c7849ed61e215d248a1379f8c3570cac, type: 3}
+      propertyPath: m_FollowOffset.z
+      value: -5.74041
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -1536,6 +1536,7 @@ GameObject:
   - component: {fileID: -5880317157872736194}
   - component: {fileID: 8698036101293705985}
   - component: {fileID: -646174974689696582}
+  - component: {fileID: 4570810298147465135}
   m_Layer: 6
   m_Name: Zombie_2
   m_TagString: Zombie
@@ -1657,6 +1658,7 @@ MonoBehaviour:
   isDead: 0
   atkDistance: 2
   bashAtkDistance: 1.5
+  attackInterval: 1.5
   kinematicRestoreDelay: 0.8
   hurtSound: {fileID: 8300000, guid: 7def9142a4c3bda44b95ef13f46449d0, type: 3}
   deathSound: {fileID: 8300000, guid: 3d460c5668cee7e4fbc9a6bc09920e95, type: 3}
@@ -1673,14 +1675,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 837fd2ba7f42b2747b671eae77c4d07b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRadius: 10
-  traceRadius: 15
-  detectionHalfAngle: 45
-  traceHalfAngle: 85
+  detectionRadius: 30
+  traceRadius: 45
+  detectionHalfAngle: 60
+  traceHalfAngle: 120
   checkObstacle: 1
   TrackTargets:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 136
   ignoreObstacleLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -1740,6 +1742,27 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!65 &4570810298147465135
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1594153965016783132}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0816069, y: 2.9585807, z: 1}
+  m_Center: {x: -0.009416103, y: 1.5630981, z: 0}
 --- !u!1 &1892689504817985254
 GameObject:
   m_ObjectHideFlags: 0

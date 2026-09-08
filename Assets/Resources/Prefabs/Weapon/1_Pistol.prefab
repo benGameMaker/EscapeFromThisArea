@@ -624,7 +624,7 @@ MonoBehaviour:
   reloadSound: {fileID: 8300000, guid: 21bc67ccecdd22a41b0c8a49f3c28768, type: 3}
   bulletPoolDefaultCapacity: 10
   bulletPoolMaxSize: 100
-  attractiveDistance: 10
+  attractiveDistance: 30
   ignorelLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -633,3 +633,4 @@ MonoBehaviour:
   BulletIcon: {fileID: 21300000, guid: 54078cb9c407e6c4fb687599315c869f, type: 3}
   curCapacity: 0
   owner: {fileID: 0}
+  isReloading: 0

@@ -160,7 +160,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 915150739365918674}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.17408687, y: 0, z: 0, w: 0.9847303}
+  m_LocalRotation: {x: 0.17408684, y: 0, z: 0, w: 0.9847303}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -473,6 +473,7 @@ GameObject:
   - component: {fileID: 1444910462245955744}
   - component: {fileID: 8135223117060507196}
   - component: {fileID: 293083259599017135}
+  - component: {fileID: 4848960191523660416}
   m_Layer: 7
   m_Name: MuscleCar
   m_TagString: Vehicle
@@ -576,6 +577,8 @@ MonoBehaviour:
   aimRayDistance: 100
   brakeStopSpeed: 1
   DiscardPoint: {fileID: 7041932899070256177}
+  mountSound: {fileID: 8300000, guid: ecf6664ccfcd518479b25c42b8a374ad, type: 3}
+  drivingLoopSound: {fileID: 8300000, guid: ea437f7186dd48d42b736c396a7ff7db, type: 3}
 --- !u!114 &7071518494022169807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -612,9 +615,11 @@ MonoBehaviour:
   maxIntegrity: 100
   isBroke: 0
   brokenEffectPrefab: {fileID: 4735226687870509891}
+  brokenSound: {fileID: 8300000, guid: 989d7f5e9503b304290a30bba812a2f6, type: 3}
   curVelocity: 0
   vp: {fileID: 0}
   vc: {fileID: 0}
+  attractTrigger: {fileID: 0}
 --- !u!114 &8135223117060507196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -769,6 +774,27 @@ MonoBehaviour:
   m_DefaultActionMap: VehicleNormal
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!135 &4848960191523660416
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3107206931578146080}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 30
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!1 &3642590629814149719
 GameObject:
   m_ObjectHideFlags: 3
@@ -794,7 +820,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3642590629814149719}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.20221916, y: 0, z: 0, w: 0.9793403}
+  m_LocalRotation: {x: 0.2022191, y: 0, z: 0, w: 0.9793403}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1083,7 +1109,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4231456317460846177}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.17087057, y: 0, z: 0, w: 0.9852935}
+  m_LocalRotation: {x: 0.17087053, y: 0, z: 0, w: 0.9852935}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6061,9 +6087,9 @@ GameObject:
   - component: {fileID: 7253325549364745467}
   - component: {fileID: 5609557942086499676}
   - component: {fileID: 4818152146237692397}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: TailCollisionInjury
-  m_TagString: Vehicle
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6365,9 +6391,9 @@ GameObject:
   - component: {fileID: 8722256776051613059}
   - component: {fileID: 2732301374678510534}
   - component: {fileID: 8808950168690072404}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: FrontalCollisionInjury
-  m_TagString: Vehicle
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6785,7 +6811,7 @@ Transform:
   m_GameObject: {fileID: 8957371184552708079}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.6647005, z: -3.8161378}
+  m_LocalPosition: {x: 0, y: 5.6647, z: -3.8161378}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

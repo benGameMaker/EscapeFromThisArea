@@ -1,7 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class ZombieConrtol : BaseObject
 {
@@ -15,14 +13,19 @@ public class ZombieConrtol : BaseObject
     public AudioClip deathSound;
     [Tooltip("僵尸只有玩家在该距离内受伤/死亡时才会播放声音")]
     public float soundHearRange = 30f;
+    [Tooltip("僵尸最后一次接触车辆后，超过该时长仍无新的接触事件才判定离开车辆")]
+    public float vehicleTouchGrace = 1.2f;
 
     MeleeRange mrAtk;
     MeleeRange mrBashAtk;
     ZombieConeVisionConfig ZombieConfig;
 
-    // 车辆接触攻击状态：僵尸(追车/玩家开车)碰触到车辆 → 取消kinematic以便车辆推动，并原地攻击车辆
-    int touchingVehicleCount;
+    // 车辆接触状态：僵尸(追车/玩家开车)碰到车辆 → 立即原地持续攻击车。
+    // 接触期间取消kinematic让车辆能推动僵尸；离开后延迟恢复kinematic并继续追逐。
+    // 不依赖 Enter/Exit 配对计数(攻击碰撞体会与车身多个Collider反复进出)，
+    // 而是靠"最后一次接触事件" + vehicleTouchGrace 保持/清除贴车状态
     bool isTouchingVehicle;
+    float lastVehicleTouchTime = float.NegativeInfinity;
     Coroutine restoreRbCoroutine;
 
     protected override void Awake()
@@ -40,8 +43,20 @@ public class ZombieConrtol : BaseObject
     {
         base.Update();
         if (isDead) return;   // 死亡后不再执行任何移动/攻击行为
+        UpdateVehicleTouch();
         Move(1f);
         TriggerMelee();
+    }
+
+    // 接触结束判定：一段时间没有新的接触事件 → 视为已离开车辆，恢复导航并延迟恢复kinematic
+    void UpdateVehicleTouch()
+    {
+        if (!isTouchingVehicle) return;
+        if (Time.time - lastVehicleTouchTime < vehicleTouchGrace) return;
+
+        isTouchingVehicle = false;
+        if (restoreRbCoroutine == null)
+            restoreRbCoroutine = StartCoroutine(RestoreKinematicAndChase());
     }
 
     public void Inti(ZombieInfo info)
@@ -51,6 +66,7 @@ public class ZombieConrtol : BaseObject
         ZombieConfig.agent.speed = info.speed;
     }
 
+    // 攻击动画事件调用：开启本次攻击的伤害判定（一次攻击只结算一次，见MeleeRange）
     public void TriggerMeleeAtk(float time)
     {
         mrAtk.TriggerMeleeAtk(time);
@@ -91,9 +107,9 @@ public class ZombieConrtol : BaseObject
             GameDataMgr.Instance.PlaySound(deathSound);
         if (animator != null)
             animator.SetBool("isDead_b", true);
-        // 清理车辆攻击状态，避免残留协程/触发器干扰
+        // 清理车辆接触状态，避免残留协程/触发器干扰
         isTouchingVehicle = false;
-        touchingVehicleCount = 0;
+        lastVehicleTouchTime = float.NegativeInfinity;
         if (restoreRbCoroutine != null)
         {
             StopCoroutine(restoreRbCoroutine);
@@ -132,23 +148,27 @@ public class ZombieConrtol : BaseObject
             return;
         }
 
-        NavMeshAgent agent = ZombieConfig.agent;
+        UnityEngine.AI.NavMeshAgent agent = ZombieConfig.agent;
         // 未到达目的点（仍在寻路/移动中，含路径计算中或剩余距离大于停止半径）
         bool isMoving = agent.pathPending || agent.remainingDistance > agent.stoppingDistance;
         animator.SetFloat("MoveSpeed", isMoving ? speedMultiplier : 0f);
     }
+
     void TriggerMelee()
     {
         if (isDead || animator == null) return;
 
-        // 贴车状态：原地持续用普通攻击打车辆
+        // 僵尸身体碰到车辆(追车)时：立即并持续播放重击动画攻击车辆。
+        // 不控制朝向/攻击频率；伤害由攻击动画机事件调用TriggerMeleeBashAtk，
+        // 交给MeleeRange结算（一次攻击只结算一次）
         if (isTouchingVehicle)
         {
-            animator.SetTrigger("isAtk_t");
+            animator.SetTrigger("isBashAtk_t");
             return;
         }
-        if (ZombieConfig.distance == -1) return;
-        //Debug.Log(ZombieConfig.distance);
+
+        // 追击玩家等普通目标：按目标距离触发普攻/重击动画
+        if (ZombieConfig == null || ZombieConfig.distance == -1) return;
         if (ZombieConfig.distance <= bashAtkDistance) animator.SetTrigger("isBashAtk_t");
         else if (ZombieConfig.distance <= atkDistance) animator.SetTrigger("isAtk_t");
     }
@@ -158,17 +178,37 @@ public class ZombieConrtol : BaseObject
         base.Move();
     }
 
+    // 碰到车辆(玩家驾驶时被吸引追车)：身体或攻击碰撞体与车身接触都算，立即进入贴车攻击。
+    // 跳过Trigger(如车上检测器的球形触发器、伤害区等)只算真接触车身
     private void OnTriggerEnter(Collider other)
     {
-        // 僵尸的"车辆接触"触发器：追车（玩家开车）时碰到车辆就进入贴车攻击状态。
-        // 跳过Trigger（如DetectionZombies的球形触发器挂在车上时会误判为接触车辆）
         if (isDead || other.isTrigger) return;
-        if (other.GetComponentInParent<VehicleDamage>() == null) return;
+        if (other.GetComponentInParent<VehicleDamage>() != null) EnterVehicleContact();
+    }
 
-        touchingVehicleCount++;
-        if (touchingVehicleCount > 1) return; // 已有其他部位接触，保持当前状态
+    private void OnTriggerExit(Collider other)
+    {
+        // 退出不做状态判定，统一由 UpdateVehicleTouch 的 vehicleTouchGrace 处理，
+        // 避免攻击窗口启停造成 Exit 抖动导致贴车状态被误清除
+        if (isDead || other.isTrigger) return;
+        if (other.GetComponentInParent<VehicleDamage>() != null)
+            lastVehicleTouchTime = Time.time;
+    }
 
-        // 取消离开时待执行的恢复协程（可能是刚被推开又再次贴上）
+    // 物理碰撞兜底：僵尸身体(非Trigger碰撞体)真正压到车身也立刻进入贴车攻击
+    // (NavMesh把僵尸带到车边时，身体可能刚好贴上，走这里比攻击碰撞体更可靠)
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (isDead) return;
+        if (collision.transform.GetComponentInParent<VehicleDamage>() != null) EnterVehicleContact();
+    }
+
+    // 进入贴车攻击：刷新最后接触时间并开始攻击车辆(已处于贴车状态则只刷新时间)
+    void EnterVehicleContact()
+    {
+        lastVehicleTouchTime = Time.time;
+        if (isTouchingVehicle) return; // 已在贴车状态，无需重复处理
+
         if (restoreRbCoroutine != null)
         {
             StopCoroutine(restoreRbCoroutine);
@@ -176,25 +216,11 @@ public class ZombieConrtol : BaseObject
         }
         isTouchingVehicle = true;
 
-        // 让车辆能推动自己：接触瞬间取消kinematic
+        // 让车辆能撞动僵尸(僵尸不再推车)：接触期间取消kinematic
         if (rb != null) rb.isKinematic = false;
-        // 停止追逐/导航，原地开始攻击车辆
+        // 暂停导航，原地攻击车辆（避免NavMeshAgent与物理冲突）
         if (ZombieConfig != null) ZombieConfig.PauseChasing();
-        if (animator != null) animator.SetTrigger("isAtk_t");
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (isDead || other.isTrigger) return;
-        if (other.GetComponentInParent<VehicleDamage>() == null) return;
-        touchingVehicleCount--;
-        if (touchingVehicleCount > 0) return;
-        if (touchingVehicleCount < 0) touchingVehicleCount = 0;
-
-        // 离开车辆：停止攻击，延迟恢复kinematic后继续按原规则追逐
-        isTouchingVehicle = false;
-        if (restoreRbCoroutine == null)
-            restoreRbCoroutine = StartCoroutine(RestoreKinematicAndChase());
+        if (animator != null) animator.SetTrigger("isBashAtk_t");
     }
 
     IEnumerator RestoreKinematicAndChase()
@@ -205,5 +231,28 @@ public class ZombieConrtol : BaseObject
         if (isDead) yield break;
 
         if (rb != null) rb.isKinematic = true;
+    }
+
+    /// <summary>
+    /// 外部强制切换僵尸的追逐目标（车辆球形触发器吸引、玩家上/下车切换控制实体时使用）。
+    /// 会先清理"贴车攻击"状态并恢复刚体/navmesh导航，再把持续追踪目标切到指定检测器。
+    /// 检测器(DetectionZombies)在玩家与车辆间改挂，僵尸据此自动攻击玩家当前控制的实体。
+    /// </summary>
+    public void ForceChaseTarget(Transform target)
+    {
+        if (isDead) return;
+
+        // 结束贴车攻击状态：恢复刚体、停止"离开车辆后延迟恢复"的协程
+        isTouchingVehicle = false;
+        lastVehicleTouchTime = float.NegativeInfinity;
+        if (restoreRbCoroutine != null)
+        {
+            StopCoroutine(restoreRbCoroutine);
+            restoreRbCoroutine = null;
+        }
+        if (rb != null) rb.isKinematic = true;
+
+        // 切换持续追踪目标（target 为检测器时自动跟随玩家当前控制的实体）
+        if (ZombieConfig != null) ZombieConfig.ForceTraceTarget(target);
     }
 }

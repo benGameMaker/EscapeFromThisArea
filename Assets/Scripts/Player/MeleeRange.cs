@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MeleeRange : MonoBehaviour
@@ -9,8 +8,11 @@ public class MeleeRange : MonoBehaviour
     BaseObject executor;
     BoxCollider MeleeRangeBox;
     Coroutine activeCoroutine;
+    // 本次攻击(一次TriggerMeleeAtk窗口)是否已结算过伤害。
+    // 僵尸打玩家时正常；打车辆时该碰撞体会与车身多个Collider同时接触，
+    // 一次窗口会连续触发多次OnTriggerEnter，此标记保证"一次攻击只结算一次伤害"
+    bool strikeSettled;
 
-    // Start is called before the first frame update
     void Start()
     {
         executor = GetComponentInParent<BaseObject>();
@@ -23,19 +25,19 @@ public class MeleeRange : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+    /// <summary>
+    /// 由攻击动画事件调用：开启本次攻击的伤害判定窗口。
+    /// 一个窗口(本次攻击)内无论碰撞体与多少个Collider接触，只结算一次伤害。
+    /// </summary>
     public void TriggerMeleeAtk(float time)
     {
         if (MeleeRangeBox == null) return;
 
-        // 重新激活前先取消旧的失活协程，避免连续调用导致提前失活
+        // 重新激活前先取消旧的失活协程，避免连续调用导致提前失活/窗口叠加
         if (activeCoroutine != null)
             StopCoroutine(activeCoroutine);
+        activeCoroutine = null;
+        strikeSettled = false;          // 新一次攻击：重置结算标记
         MeleeRangeBox.enabled = true;
         activeCoroutine = StartCoroutine(DisableAfterSeconds(time));
     }
@@ -50,6 +52,7 @@ public class MeleeRange : MonoBehaviour
         }
         if (MeleeRangeBox != null)
             MeleeRangeBox.enabled = false;
+        strikeSettled = false;
     }
 
     IEnumerator DisableAfterSeconds(float time)
@@ -58,34 +61,41 @@ public class MeleeRange : MonoBehaviour
         if (MeleeRangeBox != null)
             MeleeRangeBox.enabled = false;
         activeCoroutine = null;
+        strikeSettled = false;
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        // 本次攻击已结算过：忽略同一窗口内的后续触发（打车辆时车身多Collider会重复触发）
+        if (strikeSettled) return;
+
         // 近战可以破坏车辆（玩家与僵尸的近战都适用），车辆没有BaseObject，单独走VehicleDamage
         VehicleDamage vehicle = other.GetComponentInParent<VehicleDamage>();
         if (vehicle != null)
         {
             if (executor == null) return;
-            Debug.Log(other.name + "车辆被" + executor.gameObject.name + "近战攻击");
             vehicle.DamageVehicle(executor.atk * harmMulitpler * 0.3f);
+            EndCurrentStrike();   // 结算后立即关闭本次攻击窗口
             return;
         }
 
         BaseObject obj = other.GetComponentInParent<BaseObject>();
-        Debug.Log("攻击到" + (other.transform.parent==null ? other.name : other.transform.parent.name));
-        // 打到自己/同阵营/无BaseObject的目标时忽略
-        if (obj == null || obj == executor || other.CompareTag(gameObject.tag))
-        {
-            Debug.Log("刀到了" + gameObject.tag + "||" + gameObject.name);
-            return;
-        }
-        if(BloodEffect != null)
+        // 打到自己/同阵营/无BaseObject的目标时忽略（不消耗本次攻击）
+        if (obj == null || obj == executor || other.CompareTag(gameObject.tag)) return;
+
+        if (BloodEffect != null)
         {
             GameObject blood = Instantiate(BloodEffect, transform.position, transform.rotation);
             Destroy(blood, 1f);
         }
-        Debug.Log(other.gameObject.transform.parent.name + "被" + gameObject.transform.parent.name + "攻击了");
         obj.Injured(executor, harmMulitpler);
+        EndCurrentStrike();   // 结算后立即关闭本次攻击窗口
+    }
+
+    // 本次攻击已结算：标记后立即结束窗口，防止后续帧/后续Collider再触发
+    void EndCurrentStrike()
+    {
+        strikeSettled = true;
+        CancelMelee();
     }
 }

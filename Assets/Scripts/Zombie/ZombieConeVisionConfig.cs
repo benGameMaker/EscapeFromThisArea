@@ -102,6 +102,20 @@ public class ZombieConeVisionConfig : MonoBehaviour
         isNavigationPaused = false;
         if (agent != null) agent.isStopped = false;
     }
+
+    // 外部强制切换持续追踪目标（车辆球形触发器吸引 / 上下车切换玩家与车辆时使用）：
+    // 直接覆盖当前追踪目标，无需经过锥形视野判定；传 null 表示停止追踪。
+    // TracekedTarget 约定指向"被控制实体的一个子物体（检测器DetectionZombies）"，
+    // FixedUpdate 里会导航到 target.parent.position，从而自动跟随玩家当前控制的实体。
+    public void ForceTraceTarget(Transform target)
+    {
+        // 解除贴车暂停，恢复导航（否则即使设了目标也不会停下来追击）
+        isNavigationPaused = false;
+        if (agent != null) agent.isStopped = false;
+
+        TracekedTarget = target;
+        if (target == null) distance = -1f;
+    }
     //持续追踪目标，直至目标超出追踪范围或有障碍物遮挡视野
     public void ExecutionTraceTarget(Transform target)
     {

@@ -11,6 +11,7 @@ public class VehicleInteraction : BaseInteractivity
     Transform DropOffPos;
     Rigidbody rb;
     VehicleController vehicle;
+    VehicleDamage vehicleDamage;
     PlayerController driver;
 
     [Tooltip("上车后DetectionZombies相对DropOffPos的局部偏移（沿+X方向微调让射线能瞄准到车身，y/z一般保持0）")]
@@ -22,6 +23,7 @@ public class VehicleInteraction : BaseInteractivity
         DropOffPos = transform.Find("DropOffPos");
         if (DropOffPos == null) Debug.LogWarning("DropOffPos获取失败");
         vehicle = GetComponent<VehicleController>();
+        vehicleDamage = GetComponent<VehicleDamage>();
         rb = GetComponent<Rigidbody>();
         originalExcludeLayer = rb.excludeLayers;
     }
@@ -73,6 +75,9 @@ public class VehicleInteraction : BaseInteractivity
 
         SetVehicleBehaviour(true);
 
+        // 通知车辆：玩家已上车，进入车辆球形触发器的僵尸改为攻击车辆
+        if (vehicleDamage != null) vehicleDamage.SetDriven(true, rideDetector);
+
         //上车后显示车辆UI面板并展示当前武器数据
         if (vehicle != null) vehicle.ShowVehicleUI();
 
@@ -104,6 +109,10 @@ public class VehicleInteraction : BaseInteractivity
         // 下车：把DetectionZombies挂回玩家根节点并恢复徒步时的局部偏移
         if (rideDetector != null)
             MoveDetector(rideDetector, driver.transform, rideDetectorLocalOffset);
+
+        // 通知车辆：玩家已下车，把被本车吸引的僵尸统一切回攻击玩家
+        if (vehicleDamage != null) vehicleDamage.SetDriven(false, rideDetector);
+
         rideDetector = null;
 
         driver = null;
