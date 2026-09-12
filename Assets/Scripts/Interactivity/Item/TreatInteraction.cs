@@ -6,6 +6,7 @@ public class TreatInteraction : BaseInteractivity
 {
     public override void InteractionBehavior(PlayerController obj)
     {
+        GameDataMgr.Instance.PlaySound(audio);
         PickToBag<TreatItem>();
     }
 }

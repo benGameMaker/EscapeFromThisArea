@@ -134,7 +134,9 @@ public class BagPanel : BasePanel
             int.TryParse(cellItem.curNum.text, out int cur);
             if (cur <= 0)
             {
-                //数量为0的格子直接销毁物品单元
+                //数量为0的格子直接销毁物品单元(先清零文本：Destroy延迟到帧末才生效，
+                //若不带数量重算itemsNum会把该格旧数量又统计进去)
+                cellItem.curNum.text = "0";
                 Destroy(cellItem.gameObject);
                 continue;
             }
@@ -150,7 +152,8 @@ public class BagPanel : BasePanel
             }
             else
             {
-                //该格子的物品被消耗完，销毁格子中的物品单元
+                //该格子的物品被消耗完，先清零文本再销毁，保证同帧Refresh统计准确
+                cellItem.curNum.text = "0";
                 Destroy(cellItem.gameObject);
             }
         }
@@ -184,7 +187,8 @@ public class BagPanel : BasePanel
         int.TryParse(cellItem.curNum.text, out int cur);
         if (cur <= 0)
         {
-            //数量为0的空堆叠直接销毁
+            //数量为0的空堆叠直接销毁(先清零文本，避免延迟销毁期间Refresh统计旧值)
+            cellItem.curNum.text = "0";
             Destroy(cellItem.gameObject);
             RefreshItemCellMaxIndexAndQuantity();
             return false;
@@ -195,13 +199,18 @@ public class BagPanel : BasePanel
             //该格子数量足够，扣除num
             int left = cur - num;
             if (left > 0) cellItem.curNum.text = left.ToString();
-            else Destroy(cellItem.gameObject);
+            else
+            {
+                cellItem.curNum.text = "0";
+                Destroy(cellItem.gameObject);
+            }
             RefreshItemCellMaxIndexAndQuantity();
             return true;
         }
         else
         {
             //该格子数量不足num，只能把现有数量全部消耗掉
+            cellItem.curNum.text = "0";
             Destroy(cellItem.gameObject);
             RefreshItemCellMaxIndexAndQuantity();
             Debug.LogWarning("消耗" + itemName + "数量不足：下标" + index + "的格子只有" + cur + "个，需要" + num + "个");
@@ -347,8 +356,9 @@ public class BagPanel : BasePanel
 
         if (draggedNum <= capacity)
         {
-            //目标格子能装下全部数量，并入后销毁被拖物品单元
+            //目标格子能装下全部数量，并入后销毁被拖物品单元(先清零文本，避免延迟销毁期间Refresh重复统计)
             targetItem.curNum.text = (targetNum + draggedNum).ToString();
+            draggedItem.curNum.text = "0";
             Destroy(draggedItem.gameObject);
         }
         else

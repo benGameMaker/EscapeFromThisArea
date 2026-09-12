@@ -26,6 +26,8 @@ public class VehicleController : MonoBehaviour
     public AudioClip mountSound;
     [Tooltip("驾驶时循环播放的音频(上车开始播放，下车停止)")]
     public AudioClip drivingLoopSound;
+    //排除车辆所在层（Vehicle），避免瞄准射线打到车辆自身
+    public LayerMask ignoreVehicle;
 
     //驾驶中循环音频的播放源(挂在车辆上，不受VehicleController脚本启停影响)
     AudioSource drivingSource;
@@ -64,7 +66,7 @@ public class VehicleController : MonoBehaviour
         {
             drivingSource.clip = drivingLoopSound;
             drivingSource.volume = GameDataMgr.Instance.musicData.soundValue;
-            drivingSource.mute = GameDataMgr.Instance.musicData.soundOpen;
+            drivingSource.mute = GameDataMgr.Instance.musicData.soundMuted;
             if (!drivingSource.isPlaying) drivingSource.Play();
         }
     }
@@ -116,6 +118,14 @@ public class VehicleController : MonoBehaviour
         UpdataWheelModelsRot();
         UpdateWeaponAim();
         if (isFiring) TryFire();
+
+        // 驾驶循环音实时跟随音效设置(音量/静音开关)
+        if (drivingSource != null && drivingSource.isPlaying)
+        {
+            MusicData data = GameDataMgr.Instance.musicData;
+            drivingSource.volume = data.soundValue;
+            drivingSource.mute = data.soundMuted;
+        }
     }
     private void FixedUpdate()
     {
@@ -244,6 +254,32 @@ public class VehicleController : MonoBehaviour
         vd.vp = UIManager.Instance.GetPanel<VehiclePanel>();
     }
 
+    //玩家上车后把玩家当前手持枪械的弹匣剩余子弹(curCapacity)同步到车上同编号武器，
+    //避免车上的同款枪仍保留旧弹量(如满弹匣/上次遗留)，造成弹药量不一致。
+    //对应规则：按武器物体名首字符(1/2/3…)与玩家数字切枪编号一致来匹配；
+    //玩家未持枪(持刀/手雷)或车辆没有该编号武器时不做同步。
+    public void SyncPlayerHeldGunAmmo(PlayerController player)
+    {
+        if (player == null || player.curWeapon == null) return;
+        CollectWeapons();   //兜底：确保车辆武器列表已就绪
+        if (weaponLists.Count == 0) return;
+
+        WeaponControl held = player.curWeapon;
+        string heldName = held.gameObject.name;
+        if (string.IsNullOrEmpty(heldName)) return;
+        char key = heldName[0];
+
+        foreach (WeaponControl vw in weaponLists)
+        {
+            if (vw == null || string.IsNullOrEmpty(vw.gameObject.name)) continue;
+            if (vw.gameObject.name[0] == key)
+            {
+                vw.curCapacity = held.curCapacity;
+                break;
+            }
+        }
+    }
+
     //下车时隐藏车辆UI面板、重新显示玩家面板（由VehicleInteraction调用）
     public void HideVehicleUI()
     {
@@ -287,9 +323,7 @@ public class VehicleController : MonoBehaviour
         //默认目标为射线末端
         Vector3 targetPos = mainCameraPos.position + mainCameraPos.forward * aimRayDistance;
 
-        //排除车辆所在层（Vehicle），避免瞄准射线打到车辆自身
-        LayerMask ignoreVehicle = ~LayerMask.GetMask("Vehicle");
-        if (Physics.Raycast(ray, out RaycastHit hit, aimRayDistance, ignoreVehicle))
+        if (Physics.Raycast(ray, out RaycastHit hit, aimRayDistance, ~ignoreVehicle))
         {
                 targetPos = hit.point;
         }

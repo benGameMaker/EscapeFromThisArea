@@ -36,7 +36,8 @@ public class GameDataMgr
         AudioSource a = musicObj.AddComponent<AudioSource>();
         a.clip = audio;
         a.volume = musicData.soundValue;
-        a.mute = musicData.soundOpen;
+        // soundMuted=true(面板"音效"未勾选)时静音
+        a.mute = musicData.soundMuted;
 
         a.Play();
 

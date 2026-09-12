@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5259834180215793321}
   - component: {fileID: 3098952667876112733}
   - component: {fileID: 5824628651614976582}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Repair_BuildingDressing_03
   m_TagString: Untagged
   m_Icon: {fileID: 0}

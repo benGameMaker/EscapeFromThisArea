@@ -5,6 +5,7 @@ using static UnityEngine.ParticleSystem;
 
 public class VehicleDamage : MonoBehaviour
 {
+    public bool intiVehicleDamage = false;// 初始化时就将车辆损毁
     public float curIntegrity;
     public float maxIntegrity = 100f;
     public bool isBroke = false;
@@ -20,6 +21,9 @@ public class VehicleDamage : MonoBehaviour
 
     [Tooltip("吸引僵尸的球形触发器(挂在车辆上，玩家驾驶时进入范围的僵尸会被导航来攻击车辆；不拖拽则自动在子物体上查找)")]
     public SphereCollider attractTrigger;
+    [Tooltip("对同一目标两次碰撞结算车辆伤害的最小间隔(秒)，避免接触抖动导致每帧重复扣血")]
+    public float hitInterval = 0.5f;
+    readonly Dictionary<Transform, float> nextHitTimes = new Dictionary<Transform, float>();
     [Tooltip("当前是否正被玩家驾驶(由VehicleInteraction上/下车时通过SetDriven设置)")]
     bool isDriven = false;
     // 当前活跃的检测器(DetectionZombies)，代表玩家当前控制的实体(徒步=玩家、开车=车辆)
@@ -40,10 +44,15 @@ public class VehicleDamage : MonoBehaviour
         // 未在Inspector拖拽球形触发器时，自动在子物体上查找第一个SphereCollider
         if (attractTrigger == null) attractTrigger = GetComponentInChildren<SphereCollider>(true);
         InitializeEffect();
+        if(intiVehicleDamage)
+        {
+            DamageVehicle(maxIntegrity);
+        }
     }
 
     private void FixedUpdate()
     {
+        PruneHitTimers();
         curVelocity = transform.InverseTransformDirection(rb.velocity).z;
         if (vp != null && vp.isShow) vp.UpdataCurVelocity(curVelocity);
         //else Debug.Log("未获取到VehiclePanel面板或者该面板已经隐藏");
@@ -53,7 +62,7 @@ public class VehicleDamage : MonoBehaviour
 
     public void RepairVehicle(int num)
     {
-        curIntegrity += num * Random.Range(0.2f, 2f);
+        curIntegrity += num * Random.Range(1f, 5f);
         //Debug.Log("车辆恢复了" + curIntegrity + "完整度");
         if (curIntegrity > maxIntegrity) curIntegrity = maxIntegrity;
         if (vp != null) vp.UpdataCurIntegrity(curIntegrity, maxIntegrity);
@@ -70,6 +79,10 @@ public class VehicleDamage : MonoBehaviour
         if (curIntegrity <= 0) return; // 已损坏无需重复处理
         curIntegrity -= value;
         if (curIntegrity < 0) curIntegrity = 0;
+        if(curIntegrity >= maxIntegrity)
+        {
+            curIntegrity = maxIntegrity;
+        }
         //Debug.Log("这次撞击损失了" + value + "车辆完整度");
         if (vp != null) vp.UpdataCurIntegrity(curIntegrity, maxIntegrity);
         if (curIntegrity <= 0)
@@ -164,14 +177,34 @@ public class VehicleDamage : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
+        //Debug.Log($"{collision.gameObject.name} frame={Time.frameCount} t={Time.fixedTime}");
         if (collision.gameObject.CompareTag("Player")) return;
         //Debug.Log("车辆碰撞了" + collision.gameObject.name + "，此时速度为：" + curVelocity);
+
+        // 简单节流：碰撞体抖动会导致同一物体每物理帧"重新进入"，
+        // 对同一目标(以碰撞体根节点区分)在hitInterval内只结算一次车辆伤害。
+        Transform otherRoot = collision.transform.root;
+        if (nextHitTimes.TryGetValue(otherRoot, out float nextTime) && Time.time < nextTime) return;
+
         float damageCoefficientt;
         if (collision.gameObject.CompareTag("Zombie")) damageCoefficientt = 2f;
         else damageCoefficientt = 5f;
         if (Mathf.Abs(curVelocity) > 20f) DamageVehicle(damageCoefficientt * 0.8f * curVelocity);
         else if (Mathf.Abs(curVelocity) > 15f) DamageVehicle(damageCoefficientt * 0.5f * curVelocity);
         else if (Mathf.Abs(curVelocity) > 5f) DamageVehicle(damageCoefficientt * 0.3f * curVelocity);
+        else return;
+
+        nextHitTimes[otherRoot] = Time.time + hitInterval;
+    }
+
+    // 清理过期/已销毁目标的节流记录，避免字典无限增长
+    void PruneHitTimers()
+    {
+        if (nextHitTimes.Count == 0) return;
+        foreach (Transform key in new List<Transform>(nextHitTimes.Keys))
+        {
+            if (key == null || Time.time >= nextHitTimes[key]) nextHitTimes.Remove(key);
+        }
     }
 
     /// <summary>

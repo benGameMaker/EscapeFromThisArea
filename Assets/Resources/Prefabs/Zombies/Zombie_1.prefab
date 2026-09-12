@@ -876,7 +876,7 @@ GameObject:
   - component: {fileID: 2286349837069945566}
   - component: {fileID: 8562312109060930681}
   - component: {fileID: 5625648795319904163}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: MeleeRange_Atk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2406,11 +2406,11 @@ MonoBehaviour:
   isDead: 0
   atkDistance: 2
   bashAtkDistance: 1.5
-  attackInterval: 1.5
   kinematicRestoreDelay: 0.8
   hurtSound: {fileID: 8300000, guid: 7def9142a4c3bda44b95ef13f46449d0, type: 3}
   deathSound: {fileID: 8300000, guid: 3d460c5668cee7e4fbc9a6bc09920e95, type: 3}
   soundHearRange: 30
+  vehicleTouchGrace: 1.2
 --- !u!114 &-3562282489199298318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3749,10 +3749,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3810549065525101793}
-  - component: {fileID: 2178327510760212679}
+  - component: {fileID: 9196225850411133149}
   m_Layer: 6
   m_Name: Hips_jnt
-  m_TagString: Untagged
+  m_TagString: Zombie_Body
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3775,8 +3775,8 @@ Transform:
   - {fileID: 8633009676222469532}
   m_Father: {fileID: 2563196848294813411}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &2178327510760212679
-BoxCollider:
+--- !u!136 &9196225850411133149
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3793,9 +3793,11 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.0120955, y: 0.8300779, z: 0.5617676}
-  m_Center: {x: -0.011081338, y: -0.0036997497, z: 0.009887695}
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2.02
+  m_Direction: 0
+  m_Center: {x: -0.1, y: 0, z: 0}
 --- !u!1 &5862072688141279482
 GameObject:
   m_ObjectHideFlags: 0
@@ -5742,7 +5744,7 @@ GameObject:
   - component: {fileID: 5784681086034514776}
   - component: {fileID: 6909169898238337397}
   - component: {fileID: 8068902571943319127}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: MeleeRange_BashAtk
   m_TagString: Untagged
   m_Icon: {fileID: 0}

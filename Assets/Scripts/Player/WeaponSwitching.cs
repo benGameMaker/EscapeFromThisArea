@@ -257,15 +257,14 @@ public class WeaponSwitching : MonoBehaviour
     }
 
     //手雷已投出(由动画事件ThrowingObjects生成完投掷物后调用)：
-    //扣除背包一颗手雷并返回是否扣减成功(失败=背包已空)。成功后才允许本轮"投掷动画"发生，
-    //模型显隐统一交给ThrowingOver收尾(有雷装回下一颗/无雷切刀)，避免中途状态与动画错位
-    public bool OnGrenadeThrown()
+    //扣除背包一颗手雷并隐藏手中模型。模型显隐统一交给ThrowingOver收尾
+    //(有雷装回下一颗/无雷切刀)，避免中途状态与动画错位
+    public void OnGrenadeThrown()
     {
         BagPanel bag = UIManager.Instance.GetPanel<BagPanel>();
-        bool deducted = bag != null && bag.ConsumeItem("Grenade", 1);
+        if (bag != null) bag.ConsumeItem("Grenade", 1);
         //先隐藏手中手雷(无论是否还有，等ThrowingOver决定装填还是切刀)
         if (Grenade != null) Grenade.SetActive(false);
-        return deducted;
     }
 
     //投掷动画末尾(由动画事件ThrowingOver调用)：

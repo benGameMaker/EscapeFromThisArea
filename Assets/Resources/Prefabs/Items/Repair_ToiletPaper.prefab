@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 4229168526544706911}
   - component: {fileID: 6416604753037369181}
   - component: {fileID: 1437686345007356724}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Repair_ToiletPaper
   m_TagString: Untagged
   m_Icon: {fileID: 0}

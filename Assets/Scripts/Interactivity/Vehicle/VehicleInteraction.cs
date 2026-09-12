@@ -44,12 +44,14 @@ public class VehicleInteraction : BaseInteractivity
         driver.transform.localPosition = Vector3.zero;
         driver.transform.localRotation = Quaternion.identity;
 
-        driver.isAim = false;
-        driver.rigAim.weight = 0f;
-        driver.rigGen.weight = 1f;
+        // 复位徒步的瞄准/举枪状态(含isHipGunRaised等标记)：
+        // 只改rigAim/rigGen权重不够，残留标记会导致下车后开火跳过"举枪"协程、枪不再跟随瞄准方向
+        driver.ResetAimAndGunState();
         driver.vd = GetComponent<VehicleDamage>();
         // 上车会隐藏玩家并切换到车载武器：打断仍在进行中的徒步换弹，避免换弹状态残留
         driver.CancelReload();
+        // 玩家上车：把玩家当前手持枪械的弹匣剩余子弹同步到车上同编号武器
+        if (vehicle != null) vehicle.SyncPlayerHeldGunAmmo(driver);
 
         // 检测器随车挂载：下面玩家整体会被SetActive(false)，
         // 先把DetectionZombies从玩家改挂到驾驶位并保持激活，保证车载武器开火时也能吸引僵尸。
@@ -98,6 +100,9 @@ public class VehicleInteraction : BaseInteractivity
         if (vehicle != null) vehicle.HideVehicleUI();
 
         driver.gameObject.SetActive(true);
+        // 下车同样复位瞄准/举枪状态，保证回到徒步后第一次开火的"举枪"流程正常执行，
+        // 使枪重新跟随相机射线命中点(WeaponHolder由瞄准约束驱动)
+        driver.ResetAimAndGunState();
         rb.excludeLayers = originalExcludeLayer;
 
         //解除父子关系回到场景根节点，位置在世界坐标下与DropOffPos相同

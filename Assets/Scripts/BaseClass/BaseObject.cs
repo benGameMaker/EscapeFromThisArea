@@ -69,6 +69,7 @@ public class BaseObject : MonoBehaviour
     // 只传入伤害数值的受伤方法，直接扣除 harm 点 HP
     public virtual void Injured(float harm)
     {
+        if(isDead) return;
         HP -= harm;
         if (HP <= 0)
         {

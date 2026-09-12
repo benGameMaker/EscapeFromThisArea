@@ -75,25 +75,33 @@ public class BulletControl : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        GameObject go;
-        if (owner == null) Debug.Log("owner为空");
-        if (collision.gameObject.CompareTag("Zombie"))
-        {
+        // 已回收则忽略：同一物理步内子弹可能同时与僵尸多个子碰撞体产生回调
+        if (isInPool) return;
 
-            Quaternion rotation = Quaternion.LookRotation(collision.contacts[0].normal) * Quaternion.Euler(0, -90, 0);
-            go = Instantiate(BloodPrefab, transform.position, rotation);
-            string part = collision.collider.gameObject.tag;
-            Debug.Log("子弹击中了" + collision.gameObject.name + "的" + part);
-            collision.gameObject.GetComponentInParent<BaseObject>().Injured(owner, (part == "Zombie_Body" ? weaponControl.harmMultiplier : weaponControl.harmMultiplier * 1.5f));
+        // 先取好碰撞信息（子弹随后会被回收/停用）。
+        // 目标若在受击时死亡会立刻禁用其碰撞体，届时contacts可能为空，故这里做安全取值
+        Vector3 hitPos = transform.position;
+        Vector3 hitNormal = collision.contactCount > 0 ? collision.GetContact(0).normal : transform.forward;
+        bool isZombie = collision.gameObject.CompareTag("Zombie");
+        BaseObject target = isZombie ? collision.gameObject.GetComponentInParent<BaseObject>() : null;
+        string partTag = collision.collider != null ? collision.collider.gameObject.tag : "";
+
+        // 先回收子弹：僵尸被打死时会立即禁用碰撞体，
+        // 子弹若仍留在其体内会被物理求解器弹飞(表现为"打死僵尸的子弹不消失反而被弹飞")
+        ReleaseToPool();
+
+        if (isZombie)
+        {
+            Quaternion rotation = Quaternion.LookRotation(hitNormal) * Quaternion.Euler(0, -90, 0);
+            Destroy(Instantiate(BloodPrefab, hitPos, rotation), 1f);
+            Debug.Log("子弹击中了" + collision.gameObject.name + "的" + partTag);
+            if (target != null && weaponControl != null)
+                target.Injured(owner, (partTag == "Zombie_Body" ? weaponControl.harmMultiplier : weaponControl.harmMultiplier * 1.5f));
         }
         else
         {
-            go = Instantiate(effectPrefab, transform.position, Quaternion.LookRotation(collision.contacts[0].normal));
-            Debug.Log("子弹击中的" + collision.gameObject.name+"不是对象基类，他的类型是"+collision.gameObject.tag);
-
+            Destroy(Instantiate(effectPrefab, hitPos, Quaternion.LookRotation(hitNormal)), 1f);
+            Debug.Log("子弹击中的" + collision.gameObject.name + "不是对象基类，他的类型是" + collision.gameObject.tag);
         }
-        Destroy(go, 1f);
-        // 碰撞后回收子弹到对象池
-        ReleaseToPool();
     }
 }

@@ -29,7 +29,7 @@ public class WeaponControl : MonoBehaviour
     public Sprite BulletIcon;
 
     LayerMask originalExcludeLayer;
-    [HideInInspector]
+
     public int curCapacity;
     [HideInInspector]
     public BaseObject owner;
@@ -52,7 +52,7 @@ public class WeaponControl : MonoBehaviour
     // 初始化弹匣。物体初始 inactive 时 Awake 不会执行，需由外部（如WeaponSwitching）主动调用
     public void InitCapacity()
     {
-        curCapacity = capacity;
+        //curCapacity = capacity;
         bp = UIManager.Instance.GetPanel<BagPanel>();
     }
     void Start()

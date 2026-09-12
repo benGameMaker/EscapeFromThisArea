@@ -132,6 +132,13 @@ public class ZombieConrtol : BaseObject
         if (mrAtk != null) mrAtk.CancelMelee();
         if (mrBashAtk != null) mrBashAtk.CancelMelee();
 
+        // 死亡后把全身所有碰撞器都失活（根节点身体Trigger、Head/Hips实体盒、
+        // MeleeRange攻击碰撞器等），避免尸体继续触发车辆碰撞/接触回调；
+        // 刚体改为Kinematic，尸体不再受物理推动。
+        Collider[] allColliders = GetComponentsInChildren<Collider>(true);
+        foreach (Collider col in allColliders) col.enabled = false;
+        if (rb != null) rb.isKinematic = true;
+
         base.Death();
     }
 

@@ -10,7 +10,7 @@ public class RepairItem : BaseItemObjData
         {
             if (SceneMgr.Instance.player.vd.curIntegrity >= 100)
             {
-                UIManager.Instance.GetPanel<PromptPanel>().ShowPromptText("The vehicle has been repaired");
+                UIManager.Instance.GetPanel<PromptPanel>().ShowPromptText("车辆完整度已满！");
                 return;
             }
             SceneMgr.Instance.player.vd.RepairVehicle(1);

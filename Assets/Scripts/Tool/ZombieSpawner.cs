@@ -25,6 +25,12 @@ public class ZombieSpawner : MonoBehaviour
     public float groundCheckHeight = 20f;    // 地面检测的起始高度
     public float spawnHeightOffset = 0.1f;   // 生成时沿法线向上偏移
 
+    [Header("=== 远距离清理 ===")]
+    [Tooltip("由本脚本生成的僵尸距离玩家超过该值时直接销毁")]
+    public float despawnRange = 40f;
+    [Tooltip("远距离清理的检查间隔(秒)，避免每帧遍历僵尸")]
+    public float despawnCheckInterval = 2f;
+
     [Header("=== 调试与可视化 ===")]
     public bool showDebugGizmos = true;      // 是否在Scene视图中显示调试信息
     public Color gizmoColor = Color.red;     // Gizmos颜色
@@ -33,6 +39,7 @@ public class ZombieSpawner : MonoBehaviour
     private List<GameObject> spawnedZombies = new List<GameObject>(); // 本脚本刷新的僵尸列表
     private Coroutine spawnCoroutine;
     private Transform playerTransform;
+    private float despawnCheckTimer;   // 远距离清理的间隔计时
 
     // ---- 数据缓存 ----
     private List<ZombieInfo> zombieInfoList;
@@ -72,6 +79,14 @@ public class ZombieSpawner : MonoBehaviour
 
         // 清理已被销毁的僵尸引用（防止列表堆积）
         CleanupDestroyedZombies();
+
+        // 远距离清理：按固定间隔执行一次，避免每帧遍历所有僵尸
+        despawnCheckTimer -= Time.deltaTime;
+        if (despawnCheckTimer <= 0f)
+        {
+            despawnCheckTimer = despawnCheckInterval;
+            DespawnFarZombies();
+        }
     }
 
     #region === 公开控制方法 ===
@@ -298,6 +313,22 @@ public class ZombieSpawner : MonoBehaviour
     {
         // 移除所有已被销毁的僵尸引用
         spawnedZombies.RemoveAll(z => z == null);
+    }
+
+    // 由本脚本生成的僵尸离玩家太远时直接销毁，避免玩家甩开后僵尸无限堆积/浪费性能
+    void DespawnFarZombies()
+    {
+        if (playerTransform == null) return;
+        for (int i = spawnedZombies.Count - 1; i >= 0; i--)
+        {
+            GameObject zombie = spawnedZombies[i];
+            if (zombie == null) continue;
+            if (Vector3.Distance(zombie.transform.position, playerTransform.position) > despawnRange)
+            {
+                Destroy(zombie);
+                spawnedZombies.RemoveAt(i);
+            }
+        }
     }
 
     #endregion

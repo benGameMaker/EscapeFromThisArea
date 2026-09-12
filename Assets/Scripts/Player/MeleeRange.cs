@@ -66,6 +66,7 @@ public class MeleeRange : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        //Debug.Log(this.transform.parent.name + "MeleeRange OnTriggerEnter: " + other.transform.parent.name);
         // 本次攻击已结算过：忽略同一窗口内的后续触发（打车辆时车身多Collider会重复触发）
         if (strikeSettled) return;
 
@@ -80,8 +81,13 @@ public class MeleeRange : MonoBehaviour
         }
 
         BaseObject obj = other.GetComponentInParent<BaseObject>();
-        // 打到自己/同阵营/无BaseObject的目标时忽略（不消耗本次攻击）
-        if (obj == null || obj == executor || other.CompareTag(gameObject.tag)) return;
+        // 打到自己/无BaseObject的目标时忽略（不消耗本次攻击）
+        if (obj == null || obj == executor) return;
+        // 同阵营(Tag相同)不误伤：不消耗本次攻击，同窗口仍可结算合法目标
+        if (other.CompareTag(gameObject.tag)) return;
+        // 僵尸不打自己人：攻击者与目标都是僵尸时忽略（僵尸各部位Tag不统一，
+        // 单靠上面的CompareTag判不出，需按执行者类型过滤）
+        if (executor is ZombieConrtol && obj is ZombieConrtol) return;
 
         if (BloodEffect != null)
         {

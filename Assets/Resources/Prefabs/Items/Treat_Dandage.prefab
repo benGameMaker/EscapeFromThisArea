@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5946957329566876112}
   - component: {fileID: -6889721798685215152}
   - component: {fileID: -4277716787019788390}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Treat_Dandage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -120,7 +120,7 @@ MonoBehaviour:
   maxStackNum: 5
   itemPrefabsName: Treat_Dandage
   treatTime: 4
-  treatValue: 20
+  treatValue: 25
   poseTransitionTime: 0.3
 --- !u!114 &5946957329566876112
 MonoBehaviour:
@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   guidingText: "\u6309E\u62FE\u53D6"
-  itemName: "\u81EA\u7597\u7EF7\u5E26"
+  itemName: "\u6CBB\u7597\u7EF7\u5E26"
   panelOffset: {x: 0, y: 1}
   audio: {fileID: 8300000, guid: a552a8814a9804b43933ecb1ae4faff6, type: 3}
 --- !u!65 &-6889721798685215152

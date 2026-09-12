@@ -25,6 +25,13 @@ public class PlayerController : BaseObject
     public AudioClip hurtSound;
     [Tooltip("玩家死亡时播放的音频(不循环)")]
     public AudioClip deathSound;
+    [Tooltip("行走时循环播放的脚步声音频(Inspector赋值)")]
+    public AudioClip footstepClip;
+    [Tooltip("快速跑时循环播放的脚步声音频(Inspector赋值)")]
+    public AudioClip footstepRunClip;
+
+    // 脚步循环播放专用AudioSource(行走/跑步共用，只同时播一个)
+    AudioSource footSource;
 
     [HideInInspector]
     public bool isHoldingWeapon = false;
@@ -53,6 +60,13 @@ public class PlayerController : BaseObject
     void Start()
     {
         mainCameraPos = Camera.main.transform;
+
+        // 初始化脚步专用AudioSource(复用，不重复添加)
+        footSource = GetComponent<AudioSource>();
+        if (footSource == null) footSource = gameObject.AddComponent<AudioSource>();
+        footSource.loop = true;
+        footSource.playOnAwake = false;
+
         mr = GetComponentInChildren<MeleeRange>();
         cp = GetComponentInChildren<ColliderProcessor>();
         curWeapon = GetComponentInChildren<WeaponControl>();
@@ -117,6 +131,63 @@ public class PlayerController : BaseObject
 
         Turn(camForwardFlat, objForwardFlat);
         if (isMoving) Movement(camForwardFlat);
+
+        // 脚步声：移动时直接循环播行走/跑步音频，停下即停止
+        UpdateFootstep();
+    }
+
+    /// <summary>
+    /// 移动循环脚步：行走播footstepClip，快速跑播footstepRunClip；
+    /// 停掉上一个直接播下一个，同一时刻只播放一个。停下/离地/死亡时停止。
+    /// </summary>
+    void UpdateFootstep()
+    {
+        if (footSource == null) return;
+
+        // 音量/开关与其他音效保持一致(每次同步，切设置即时生效)
+        if (GameDataMgr.Instance != null && GameDataMgr.Instance.musicData != null)
+        {
+            footSource.volume = GameDataMgr.Instance.musicData.soundValue;
+            footSource.mute = GameDataMgr.Instance.musicData.soundMuted;
+        }
+
+        bool grounded = animator != null && animator.GetBool("Grounded");
+        bool moving = !isDead && grounded && isMoving;
+
+        if (!moving)
+        {
+            StopFootstep();
+            return;
+        }
+
+        // 按当前移动方式选择音频：跑步(Speed_f=1)优先用跑步脚步
+        AudioClip clip = footstepClip;
+        if (footstepRunClip != null && animator.GetFloat("Speed_f") > 0.9f)
+            clip = footstepRunClip;
+
+        if (clip == null)
+        {
+            StopFootstep();
+            return;
+        }
+
+        // 已经在播同一个音频则无需操作；否则停掉旧的直接播新的
+        if (footSource.isPlaying && footSource.clip == clip) return;
+
+        footSource.Stop();
+        footSource.clip = clip;
+        footSource.Play();
+    }
+
+    void StopFootstep()
+    {
+        if (footSource != null && footSource.isPlaying) footSource.Stop();
+    }
+
+    // 玩家失活(上车/被飞行冻结/切场景等)时立刻停掉脚步，避免残留循环
+    void OnDisable()
+    {
+        StopFootstep();
     }
 
     public void Move(InputAction.CallbackContext context)
@@ -327,19 +398,11 @@ public class PlayerController : BaseObject
         WeaponSwitching ws = GetComponent<WeaponSwitching>();
         if (ws == null) return;
 
-        // 库存闸(实时查询)：背包已无手雷时绝不生成/投掷，只做收尾，杜绝"无中生有"的手雷
-        BagPanel bag = UIManager.Instance.GetPanel<BagPanel>();
-        if (bag == null || bag.itemsNum.GetValueOrDefault("Grenade") <= 0)
-        {
-            if (ws.Grenade != null && ws.Grenade.activeSelf) ws.OnGrenadeThrown();
-            return;
-        }
-
         GameObject prefab = Resources.Load<GameObject>("Prefabs/Items/10_Grenade");
         if (prefab == null)
         {
             Debug.LogWarning("未找到手雷预制体 Prefabs/Items/10_Grenade，无法投掷");
-            //仍做一次收尾(扣雷/切刀)，防止预制体缺失时按住左键陷入无限空投循环
+            //仍做一次收尾(扣雷/隐藏模型)，防止预制体缺失时按住左键陷入无限空投循环
             ws.OnGrenadeThrown();
             return;
         }
@@ -349,6 +412,10 @@ public class PlayerController : BaseObject
         grenade.layer = LayerMask.NameToLayer("Player");
         Rigidbody rb = grenade.GetComponent<Rigidbody>();
         if (rb == null) rb = grenade.AddComponent<Rigidbody>();
+        //只排除"玩家/车辆"层(扔雷时不被自己或车身挡下、可隔车窗抛出)；
+        //绝不能排除Zombie层，否则爆炸Trigger球对Zombie层的实体碰撞体不产生事件，
+        //手雷只炸得到碰巧把碰撞体放在Default层的僵尸(如Zombie_6的Head)。
+        rb.excludeLayers = LayerMask.GetMask("Player", "Vehicle");
         //投掷出去的实体必须是动态刚体，取消kinematic
         rb.isKinematic = false;
         //方向与摄像机正方向平行
@@ -366,11 +433,8 @@ public class PlayerController : BaseObject
         if (gc != null) gc.TriggerFuse();
         else Debug.LogWarning("手雷预制体上没有GrenadeControl，无法触发爆炸");
 
-        //扣除背包手雷并隐藏手中模型；若扣减失败(极端竞争：库存在这一帧被耗尽)则回收刚生成的雷
-        if (!ws.OnGrenadeThrown())
-        {
-            Destroy(grenade);
-        }
+        //扣除背包一颗手雷并隐藏手中模型（背包itemsNum统计已可靠，消耗后余量/装填判定准确）
+        ws.OnGrenadeThrown();
     }
     //投掷动画末尾事件(在投掷动画最后插入事件帧调用)：
     //背包中还有手雷则把手雷模型放回手中(可连续投掷)，没有则切换为持刀状态
@@ -396,6 +460,28 @@ public class PlayerController : BaseObject
         StartCoroutine(GunRaisingGesture(rigAim.weight, (isAim ? 1 : 0), gunRaisingTime));
         // 瞄准视角
         StartCoroutine(ViewpointSwitching(cco.m_Offset, (isAim ? aimOffset : genOffset), gunRaisingTime));
+    }
+
+    /// <summary>
+    /// 上车/下车等切换操作主体时，复位徒步的瞄准与举枪状态。
+    /// 否则上车时被强制放下瞄准(rigAim.weight=0)后 isHipGunRaised 若残留为true，
+    /// 下车后开火会跳过"举枪"协程，rigAim一直为0，枪不再跟随瞄准方向(WeaponHolder指向错乱)。
+    /// </summary>
+    public void ResetAimAndGunState()
+    {
+        isAim = false;
+        isHipGunRaised = false;
+        isFire = false;
+
+        if (delayedHolsterCoroutine != null)
+        {
+            StopCoroutine(delayedHolsterCoroutine);
+            delayedHolsterCoroutine = null;
+        }
+
+        if (rigAim != null) rigAim.weight = 0f;
+        if (rigGen != null) rigGen.weight = 1f;
+        if (animator != null) animator.SetBool("Shoot_b", false);
     }
     //隐藏玩家模型，在视觉上实现隐身
     public void Setvisiblity(bool isVisible)

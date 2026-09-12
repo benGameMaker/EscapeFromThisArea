@@ -20,7 +20,9 @@ public class VehicleCollisionInjury : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // 刚接触：按"撞击"倍率立即结算一次，并重置该目标的节流计时
+        //if (!other.CompareTag("Zombie")) return; 
+        // 刚接触：按"撞击"倍率立即结算一次（是否真的结算由TryInjure里的节流决定）
+        //Debug.Log("车辆碰撞到" + other.name);
         TryInjure(other, true);
     }
 
@@ -30,11 +32,22 @@ public class VehicleCollisionInjury : MonoBehaviour
         TryInjure(other, false);
     }
 
-    private void OnTriggerExit(Collider other)
+    private void Update()
     {
-        // 目标离开后清除其计时，重新接触时能立刻再次结算
-        BaseObject obj = other.gameObject.GetComponentInParent<BaseObject>();
-        if (obj != null) nextHitTimes.Remove(obj);
+        PruneTimers();
+    }
+
+    // 简单粗暴的处理：不依赖OnTriggerExit清计时。
+    // 碰撞体抖动会让Enter/Exit在同一物理帧反复交替，若一Exit就Remove计时，
+    // 每次重新Enter都能立刻结算伤害，节流形同虚设。
+    // 这里只定期清掉过期/已销毁目标的记录，让持续接触严格按hitInterval结算一次。
+    void PruneTimers()
+    {
+        if (nextHitTimes.Count == 0) return;
+        foreach (BaseObject key in new List<BaseObject>(nextHitTimes.Keys))
+        {
+            if (key == null || Time.time >= nextHitTimes[key]) nextHitTimes.Remove(key);
+        }
     }
 
     void TryInjure(Collider other, bool entering)
@@ -57,8 +70,8 @@ public class VehicleCollisionInjury : MonoBehaviour
         else if (speed > 15f) harm = entering ? 2f * speed : 1f * speed;
         else if (speed > 5f) harm = entering ? 1.2f * speed : 0.6f * speed;
         else return;
-
-        obj.Injured(harm);
+        Debug.Log("车辆对" + obj.name + "造成了伤害，速度为：" + speed);
+        obj.Injured(Mathf.Abs(harm));
         nextHitTimes[obj] = Time.time + hitInterval;
     }
 }

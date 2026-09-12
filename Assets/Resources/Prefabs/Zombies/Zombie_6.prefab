@@ -951,7 +951,7 @@ GameObject:
   - component: {fileID: 4035948096091251336}
   - component: {fileID: 208497101991322802}
   - component: {fileID: 6359490145325654453}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: MeleeRange_Atk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1933,11 +1933,11 @@ MonoBehaviour:
   isDead: 0
   atkDistance: 2
   bashAtkDistance: 1.5
-  attackInterval: 1.5
   kinematicRestoreDelay: 0.8
   hurtSound: {fileID: 8300000, guid: 7def9142a4c3bda44b95ef13f46449d0, type: 3}
   deathSound: {fileID: 8300000, guid: 3d460c5668cee7e4fbc9a6bc09920e95, type: 3}
   soundHearRange: 30
+  vehicleTouchGrace: 1.2
 --- !u!114 &7102493281363062535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3854,7 +3854,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4049829863039038370}
-  - component: {fileID: 9087711504849918942}
+  - component: {fileID: 7805380454852264602}
   m_Layer: 6
   m_Name: Hips_jnt
   m_TagString: Zombie_Body
@@ -3880,8 +3880,8 @@ Transform:
   - {fileID: 931778210165527508}
   m_Father: {fileID: 8923885451884169949}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &9087711504849918942
-BoxCollider:
+--- !u!136 &7805380454852264602
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3898,9 +3898,11 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.0120955, y: 0.8300779, z: 0.5617676}
-  m_Center: {x: -0.011081338, y: -0.0036997497, z: 0.009887695}
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2.02
+  m_Direction: 0
+  m_Center: {x: -0.1, y: 0, z: 0}
 --- !u!1 &5810137678887601282
 GameObject:
   m_ObjectHideFlags: 0
@@ -6479,7 +6481,7 @@ GameObject:
   - component: {fileID: 8769157061729709416}
   - component: {fileID: 159683817629862822}
   - component: {fileID: 7026260142985019818}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: MeleeRange_BashAtk
   m_TagString: Untagged
   m_Icon: {fileID: 0}

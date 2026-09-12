@@ -7,10 +7,14 @@ public class SceneMgr : MonoBehaviour
     static SceneMgr instance;
     public static SceneMgr Instance => instance;
     public GameObject testObject;
-    public BaseObject atker;
+    public BaseItemObjData Itme1;
+    public BaseItemObjData Itme2;
+    public BaseItemObjData Itme3;
+    public BaseItemObjData Itme4;
     public PlayerController player;
     public BagLogicProcess pblp;
     public BagLogicProcess vblp;
+    
     private void Awake()
     {
         instance = this;
@@ -33,8 +37,8 @@ public class SceneMgr : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.K))
         {
-            //player.Injured(player, 1f);
-            testObject.GetComponent<VehicleDamage>().DamageVehicle(20f);
+            player.Injured(player, 1f);
+            //testObject.GetComponent<VehicleDamage>().DamageVehicle(20f);
         }
         if (Input.GetKeyDown(KeyCode.J))
         {
@@ -44,6 +48,22 @@ public class SceneMgr : MonoBehaviour
         {
             if (UIManager.Instance.GetPanel<GameSettingPanel>() != null) UIManager.Instance.HidePanel<GameSettingPanel>();
             else UIManager.Instance.ShowPanel<GameSettingPanel>();
+        }
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            UIManager.Instance.GetPanel<BagPanel>().AddItem(Itme1);
+        }
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            UIManager.Instance.GetPanel<BagPanel>().AddItem(Itme2);
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            UIManager.Instance.GetPanel<BagPanel>().AddItem(Itme3);
+        }
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            UIManager.Instance.GetPanel<BagPanel>().AddItem(Itme4);
         }
     }
 }

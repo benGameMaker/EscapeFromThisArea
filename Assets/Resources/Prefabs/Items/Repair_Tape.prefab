@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 3997140513532006514}
   - component: {fileID: 9136789296691940511}
   - component: {fileID: 8112260460189768019}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Repair_Tape
   m_TagString: Untagged
   m_Icon: {fileID: 0}

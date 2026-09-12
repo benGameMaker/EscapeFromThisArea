@@ -19,7 +19,7 @@ public class GameSettingPanel : BasePanel
     {
         MusicData data = GameDataMgr.Instance.musicData;
         togMusic.isOn = data.musicOpen; 
-        togSound.isOn = data.soundOpen;
+        togSound.isOn = !data.soundMuted;
 
         sliderMusic.value = data.musicValue; sliderSound.value = data.soundValue;
 
@@ -35,7 +35,8 @@ public class GameSettingPanel : BasePanel
         });
         togSound.onValueChanged.AddListener((v) =>
         {
-            GameDataMgr.Instance.musicData.soundOpen = !v;
+            // 勾选(v=true)=开启音效，对应soundMuted=false；取反后存储
+            GameDataMgr.Instance.musicData.soundMuted = !v;
         });
         sliderMusic.onValueChanged.AddListener((v) =>
         {
@@ -48,12 +49,14 @@ public class GameSettingPanel : BasePanel
         });
         btnRestart.onClick.AddListener(() =>
         {
+            GameDataMgr.Instance.SaveMusicData();   // 重开前先保存设置
             string currentScene = SceneManager.GetActiveScene().name;
             UIManager.Instance.GetPanel<PlayerPanel>().gameObject.SetActive(true);
             LoadingMgr.Instance.LoadSceneAsync(currentScene, "重新开始布置场景中...", false, true);
         });
         btnReturn.onClick.AddListener(() =>
         {
+            GameDataMgr.Instance.SaveMusicData();   // 返回主菜单前先保存设置
             LoadingMgr.Instance.LoadSceneAsync("BeginScene", "正在返回主菜单...", false, true);
         });
     }
@@ -74,6 +77,8 @@ public class GameSettingPanel : BasePanel
     }
     public override void HideMe(UnityAction callback)
     {
+        // 无论用关闭按钮还是按T键/切场景隐藏，都先保存音频设置，避免改动丢失
+        GameDataMgr.Instance.SaveMusicData();
         base.HideMe(callback);
         if (SceneMgr.Instance.pblp != null) SceneMgr.Instance.pblp.EnableGameplayInput(true);
         else SceneMgr.Instance.vblp.EnableGameplayInput(true);
