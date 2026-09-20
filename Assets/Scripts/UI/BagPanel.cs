@@ -408,15 +408,11 @@ public class BagPanel : BasePanel
         itemUnit.iip = iip;
         return itemUnit;
     }
-    //在格子内的物品单元上挂载"使用行为"：
-    //场景拾取物(参数item所在的GameObject)在拾取后会被销毁，若直接把 item.UseBahaivor
-    //存进格子的委托，点击"使用"时组件已销毁，会抛 MissingReferenceException。
-    //因此这里给随格子存活的物品单元动态添加同类型的 BaseItemObjData 组件并拷贝数据，
-    //让委托指向它，使用行为不再依赖已销毁的场景实例。
+    //订阅物品使用行为到物品单元的UseBehavior委托
     void AttachItemBehavior(ItemUnit itemUnit, BaseItemObjData item)
     {
         if (itemUnit == null || item == null) return;
-        //已挂载过(例如同一格子曾绑定过)则不再重复挂载
+        //已挂载过,则不再重复挂载
         if (itemUnit.GetComponent<BaseItemObjData>() != null) return;
 
         BaseItemObjData behavior = itemUnit.gameObject.AddComponent(item.GetType()) as BaseItemObjData;

@@ -39,7 +39,7 @@ public class WeaponControl : MonoBehaviour
 
     public event UnityAction<int> OnCapacityChanged;
     public event UnityAction<float> OnReloadStart;
-    [Tooltip("开火事件：每实际打出一发子弹触发一次（参数为该武器），供枪声吸引僵尸等系统监听")]
+    [Tooltip("开火事件：每实际打出一发子弹触发一次，供枪声吸引僵尸等系统监听")]
     public event UnityAction<WeaponControl> OnFired;
     BagPanel bp;
     // 子弹对象池
@@ -72,7 +72,7 @@ public class WeaponControl : MonoBehaviour
 
     }
 
-    //通过函数设置武器归属者（上车时由VehicleController调用传入玩家，用于子弹伤害归属）
+    //设置武器归属者
     public void SetOwner(BaseObject newOwner)
     {
         //if(newOwner!=null)Debug.Log(name + "获取到了" + newOwner + "的信息");
@@ -99,7 +99,7 @@ public class WeaponControl : MonoBehaviour
             bulletPool.Get();
             // 生成火焰特效
             Destroy(Instantiate(FirePre, FirePoint.transform.position, FirePoint.transform.rotation), 0.1f);
-            // 广播该次开火（携带武器引用），供DetectionZombies根据attractiveDistance把附近僵尸吸引到开枪位置
+            // 广播该次开火，把附近僵尸吸引到开枪位置
             OnFired?.Invoke(this);
         }
 

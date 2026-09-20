@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class BaseObject : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class BaseObject : MonoBehaviour
     public Vector3 floatingDamageOffSet;
     [Tooltip("受伤时会浮现出该物体受到的伤害数值")]
     public bool floatingDamage = false;
+    [Tooltip("受伤飘字对象池的默认容量")]
+    public int floatingDamagePoolDefaultCapacity = 4;
+    [Tooltip("受伤飘字对象池的最大容量")]
+    public int floatingDamagePoolMaxSize = 20;
 
     [HideInInspector]
     public Vector2 moveVector;
@@ -26,6 +31,8 @@ public class BaseObject : MonoBehaviour
     Canvas canvas;
     RectTransform canvasRt;
     GameObject floatingDamagePre;
+    // 受伤飘字对象池，结构与 WeaponControl 的子弹对象池一致
+    ObjectPool<GameObject> floatingDamagePool;
 
     protected virtual void Awake()
     {
@@ -35,24 +42,38 @@ public class BaseObject : MonoBehaviour
         rb=GetComponent<Rigidbody>();
         if (rb == null) Debug.LogWarning(gameObject.name + "未挂载Rigidbody");
 
-        // 场景中不再常驻 Canvas：改为运行时通过 UIManager 单例获取
-        //（首次访问 UIManager 时若场景没有 Canvas 会自动创建并 DontDestroyOnLoad）
+        // 从 UIManager 单例获取画布组件
         Transform uiCanvasTrans = UIManager.Instance.canvasTrans;
         canvasRt = uiCanvasTrans.GetComponent<RectTransform>();
         canvas = uiCanvasTrans.GetComponent<Canvas>();
         floatingDamagePre = Resources.Load<GameObject>("Prefabs/UI/FloatingDamage");
         if (floatingDamagePre == null)
+        {
             Debug.LogWarning("FloatingDamage 预制体未找到：Resources/Prefabs/UI/FloatingDamage 路径是否正确？");
+        }
+        else if (floatingDamagePre.GetComponent<FloatingDamage>() == null)
+        {
+            // 预制体缺少飘字脚本时不允许建池，避免取出后空引用
+            Debug.LogWarning("FloatingDamage 预制体未挂载 FloatingDamage 脚本，飘字对象池不会创建。");
+            floatingDamagePre = null;
+        }
+        else
+        {
+            floatingDamagePool = new ObjectPool<GameObject>(
+                CreateFloatingDamage,
+                OnFloatingDamageGet,
+                OnFloatingDamageRelease,
+                OnFloatingDamageDestroy,
+                collectionCheck: true,
+                floatingDamagePoolDefaultCapacity,
+                floatingDamagePoolMaxSize
+            );
+        }
     }
 
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
     protected virtual void Update()
     {
-
+        
     }
 
     public virtual void Injured(BaseObject attacker, float extraHarm)
@@ -76,18 +97,13 @@ public class BaseObject : MonoBehaviour
             HP = 0;
             Death();
         }
-        if (floatingDamage)
+        if (floatingDamage && floatingDamagePool != null)
         {
-            GameObject obj = Instantiate(floatingDamagePre, canvasRt, false);
+            GameObject obj = floatingDamagePool.Get();
             FloatingDamage fd = obj.GetComponent<FloatingDamage>();
-            if (fd == null)
-            {
-                Debug.LogWarning("FloatingDamage 预制体未挂载 FloatingDamage 脚本，跳过飘字生成。");
-                Destroy(obj);
-                return;
-            }
-            fd.InjectDependencies(canvas, canvasRt, Camera.main);
-            fd.CreateFloatingDamageText(harm, transform.position + floatingDamageOffSet, Vector2.up, 100f, 0.5f);
+            // 生成失败（如初始化失败）立即归还，避免对象一直激活无法回收；飘字会持续跟随本物体的屏幕位置
+            if (!fd.CreateFloatingDamageText(harm, transform, transform.position + floatingDamageOffSet, Vector2.up, 100f, 0.5f))
+                floatingDamagePool.Release(obj);
         }
     }
 
@@ -100,6 +116,62 @@ public class BaseObject : MonoBehaviour
     {
         if (isDead || !animator.enabled) return;
     }
+
+    #region 受伤飘字对象池回调（与子弹对象池相同的结构）
+
+    GameObject CreateFloatingDamage()
+    {
+        GameObject obj = Instantiate(floatingDamagePre, canvasRt, false);
+        FloatingDamage fd = obj.GetComponent<FloatingDamage>();
+        // 注入画布/相机依赖与回收回调，整个生命周期只需一次
+        fd.InjectDependencies(canvas, canvasRt, Camera.main);
+        fd.releaseCallback = ReleaseFloatingDamage;
+        obj.SetActive(false);
+        return obj;
+    }
+
+    void OnFloatingDamageGet(GameObject obj)
+    {
+        obj.SetActive(true);
+    }
+
+    void OnFloatingDamageRelease(GameObject obj)
+    {
+        // 停止可能仍在运行的飘移协程，以防将动画带进对象池
+        FloatingDamage fd = obj.GetComponent<FloatingDamage>();
+        if (fd != null) fd.StopAllCoroutines();
+        obj.SetActive(false);
+    }
+
+    void OnFloatingDamageDestroy(GameObject obj)
+    {
+        Destroy(obj);
+    }
+
+    /// <summary>
+    /// 供 FloatingDamage 在飘字结束后回收自身到对象池。
+    /// 若持有者已销毁，直接销毁该飘字。
+    /// </summary>
+    public void ReleaseFloatingDamage(GameObject obj)
+    {
+        if (floatingDamagePool != null)
+            floatingDamagePool.Release(obj);
+        else if (obj != null)
+            Destroy(obj);
+    }
+
+    #endregion
+
+    protected virtual void OnDestroy()
+    {
+        // 销毁池中空闲的飘字实例；仍在播放的飘字在结束时走 ReleaseFloatingDamage 的兜底销毁
+        if (floatingDamagePool != null)
+        {
+            floatingDamagePool.Clear();
+            floatingDamagePool = null;
+        }
+    }
+
     protected virtual void Death()
     {
         if (isDead) return;   // 防止重复触发死亡逻辑

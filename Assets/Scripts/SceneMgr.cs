@@ -11,6 +11,7 @@ public class SceneMgr : MonoBehaviour
     public BaseItemObjData Itme2;
     public BaseItemObjData Itme3;
     public BaseItemObjData Itme4;
+    public BaseItemObjData Itme5;
     public PlayerController player;
     public BagLogicProcess pblp;
     public BagLogicProcess vblp;
@@ -49,11 +50,11 @@ public class SceneMgr : MonoBehaviour
             if (UIManager.Instance.GetPanel<GameSettingPanel>() != null) UIManager.Instance.HidePanel<GameSettingPanel>();
             else UIManager.Instance.ShowPanel<GameSettingPanel>();
         }
-        if (Input.GetKeyDown(KeyCode.X))
+        if (Input.GetKeyDown(KeyCode.Z))
         {
             UIManager.Instance.GetPanel<BagPanel>().AddItem(Itme1);
         }
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.X))
         {
             UIManager.Instance.GetPanel<BagPanel>().AddItem(Itme2);
         }
@@ -64,6 +65,10 @@ public class SceneMgr : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.V))
         {
             UIManager.Instance.GetPanel<BagPanel>().AddItem(Itme4);
+        }
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            UIManager.Instance.GetPanel<BagPanel>().AddItem(Itme5);
         }
     }
 }

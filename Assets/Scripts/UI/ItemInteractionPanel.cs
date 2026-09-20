@@ -61,11 +61,7 @@ public class ItemInteractionPanel : BasePanel
         ProcessingItem = itemUnit;
         BagPanel bag = GetBag();
         curCellIndex = bag != null ? bag.GetItemCellIndex(itemUnit) : -1;
-
-        //面板锚点与定位点都设为左上角，使摆放以左上角为基准
-        loaclRt.anchorMin = new Vector2(0f, 1f);
-        loaclRt.anchorMax = new Vector2(0f, 1f);
-        loaclRt.pivot = new Vector2(0f, 1f);
+ 
         //格子右上角的世界坐标，作为面板左上角的放置位置
         Vector3 topRightWorld = cellRt.TransformPoint(new Vector3(cellRt.rect.xMax, cellRt.rect.yMax, 0f));
         loaclRt.position = topRightWorld;
@@ -90,7 +86,6 @@ public class ItemInteractionPanel : BasePanel
         }
         if (ProcessingItem.UseBehavior != null)
         {
-            //行为内部(如RepairItem)会调用 BagPanel.ConsumeItem(name, num, curCellIndex) 精确消耗该格
             ProcessingItem.UseBehavior.Invoke(curCellIndex);
         }
         else
@@ -98,7 +93,7 @@ public class ItemInteractionPanel : BasePanel
             Debug.LogWarning("该物品没有可用的使用行为：" + ProcessingItem.itemName.text);
         }
     }
-    //点击"丢弃"：读取输入框中的数量，从该格扣除并把物品从当前操作物体的DiscardPoint正前方丢出
+    //点击丢弃,读取输入框中的数量，从该格扣除并把物品从当前操作物体的DiscardPoint正前方丢出
     void OnDiscard()
     {
         BagPanel bag = GetBag();

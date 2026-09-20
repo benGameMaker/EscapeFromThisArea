@@ -73,7 +73,7 @@ public class TreatItem : BaseItemObjData
 
         PlayerPanel pp = UIManager.Instance.GetPanel<PlayerPanel>();
 
-        // 3. 播放治疗动画，并用换弹转圈进度显示同样的治疗时长
+        // 3. 播放治疗动画，用换弹转圈进度显示同样的治疗时长
         pc.animator.SetBool("Treat_bandage_b", true);
         if (pp != null) pp.StartReloadProgress(treatTime);
 
@@ -104,7 +104,7 @@ public class TreatItem : BaseItemObjData
         pc.Treated(treatValue);
         if (pp != null) pp.UpdataHP(pc.HP, pc.maxHP);
 
-        // 6. 消耗一个治疗道具（精确到打开面板时右键的那个格子）
+        // 6. 消耗一个治疗道具
         BagPanel bag = UIManager.Instance.GetPanel<BagPanel>();
         if (bag != null) bag.ConsumeItem(itemName, 1, useCellIndex);
 

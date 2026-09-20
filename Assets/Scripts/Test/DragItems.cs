@@ -38,7 +38,6 @@ public class DragItems : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // 懒获取，防止Start执行时层级还不完整
         if (fatherObj == null) fatherObj = GetCellsObj();
         if (transform.parent == null) return;
 
@@ -49,10 +48,7 @@ public class DragItems : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
     public void OnDrag(PointerEventData eventData)
     {
-        // 防御：找不到Cells时放弃本次拖拽跟随，避免空引用报错
-        if (fatherObj == null) return;
-
-        // 让物品跟随鼠标移动（Overlay模式下世界坐标即屏幕像素坐标）
+        // 让物品跟随鼠标移动
         transform.position = eventData.position;
         // 拖拽期间把物品临时放到Cells下，脱离格子的布局限制
         if (transform.parent != fatherObj.transform)
